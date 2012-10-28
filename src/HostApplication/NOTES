@@ -1,0 +1,10 @@
+1. Running the server
+	python manage.py runserver 8080
+
+	That configures the port to 8080 (it's 8000 by default)
+
+2. Follow steps on tutorial (below) to make the database (the environment) and then start building up the model
+
+https://docs.djangoproject.com/en/dev/intro/tutorial01/
+
+3. Define the model for the application (we don't care about the backend - it will just feed data back to the user in plaintext for verification, the second step is the most important.
