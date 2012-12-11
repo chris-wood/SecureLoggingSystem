@@ -1,0 +1,10 @@
+\begin{thebibliography}{1}
+
+\bibitem{Bethencourt2007-CPABE}
+J.~Bethencourt, A.~Sahai, and B.~Waters.
+\newblock Ciphertext-policy attribute-based encryption.
+\newblock In {\em Proceedings of the 2007 IEEE Symposium on Security and
+  Privacy}, SP '07, pages 321--334, Washington, DC, USA, 2007. IEEE Computer
+  Society.
+
+\end{thebibliography}
