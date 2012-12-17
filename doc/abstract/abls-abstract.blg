@@ -3,44 +3,44 @@ Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
 The top-level auxiliary file: abls-abstract.aux
 The style file: abbrv.bst
 Database file #1: ../abls.bib
-You've used 1 entry,
+You've used 4 entries,
             2118 wiz_defined-function locations,
-            507 strings with 3979 characters,
-and the built_in function-call counts, 519 in all, are:
-= -- 56
-> -- 18
-< -- 1
-+ -- 7
-- -- 6
-* -- 34
-:= -- 81
-add.period$ -- 4
-call.type$ -- 1
-change.case$ -- 6
+            532 strings with 4626 characters,
+and the built_in function-call counts, 1752 in all, are:
+= -- 196
+> -- 51
+< -- 3
++ -- 20
+- -- 16
+* -- 110
+:= -- 262
+add.period$ -- 15
+call.type$ -- 4
+change.case$ -- 20
 chr.to.int$ -- 0
-cite$ -- 1
-duplicate$ -- 23
-empty$ -- 40
-format.name$ -- 6
-if$ -- 117
+cite$ -- 4
+duplicate$ -- 80
+empty$ -- 145
+format.name$ -- 16
+if$ -- 400
 int.to.chr$ -- 0
-int.to.str$ -- 1
-missing$ -- 1
-newline$ -- 8
-num.names$ -- 2
-pop$ -- 6
+int.to.str$ -- 4
+missing$ -- 4
+newline$ -- 23
+num.names$ -- 8
+pop$ -- 18
 preamble$ -- 1
-purify$ -- 5
+purify$ -- 16
 quote$ -- 0
-skip$ -- 19
+skip$ -- 66
 stack$ -- 0
-substring$ -- 37
-swap$ -- 10
-text.length$ -- 1
+substring$ -- 141
+swap$ -- 31
+text.length$ -- 3
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 4
+type$ -- 16
 warning$ -- 0
-while$ -- 5
-width$ -- 2
-write$ -- 16
+while$ -- 19
+width$ -- 5
+write$ -- 55

@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.4-1.40.13 (TeX Live 2012) (format=pdflatex 2012.6.30)  10 DEC 2012 21:02
+This is pdfTeX, Version 3.1415926-2.4-1.40.13 (TeX Live 2012) (format=pdflatex 2012.6.30)  12 DEC 2012 23:19
 entering extended mode
  \write18 enabled.
  file:line:error style messages enabled.
@@ -325,18 +325,23 @@ LaTeX Font Info:    Try loading font information for U+lasy on input line 25.
 (/usr/local/texlive/2012/texmf-dist/tex/latex/base/ulasy.fd
 File: ulasy.fd 1998/08/17 v2.2e LaTeX symbol font definitions
 )
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
-
-Overfull \hbox (1.57335pt too wide) in paragraph at lines 64--70
-\T1/aer/m/n/9 larger stor-age re-quire-ments and less com-pu-ta-tional ef-fi-ci
-ency. 
+Overfull \hbox (9.85805pt too wide) in paragraph at lines 47--55
+\T1/aer/m/n/9 lit-er-a-ture. How-ever, in cloud-based ap-pli-ca-tions, these sc
+hemes
  []
 
 
-Overfull \hbox (7.92651pt too wide) in paragraph at lines 77--84
-\T1/aer/m/n/9 attribute-based log-ging sys-tem that sup-ports ciphertext-policy
+Underfull \vbox (badness 10000) has occurred while \output is active []
 
+
+Overfull \hbox (5.36224pt too wide) in paragraph at lines 62--68
+\T1/aer/m/n/9 quire-ments and com-mu-ni-ca-tion over-head. Public-key schemes
+ []
+
+
+Overfull \hbox (1.57335pt too wide) in paragraph at lines 62--68
+\T1/aer/m/n/9 larger stor-age re-quire-ments and less com-pu-ta-tional ef-fi-ci
+ency. 
  []
 
 
@@ -346,32 +351,32 @@ Underfull \vbox (badness 10000) has occurred while \output is active []
 
 
 ]
-Overfull \hbox (1.95863pt too wide) in paragraph at lines 97--102
-[]\T1/aer/m/n/9 Database se-cu-rity mech-a-nisms, in-clud-ing client au-then-
+Overfull \hbox (9.25731pt too wide) in paragraph at lines 98--103
+\T1/aer/m/n/9 graphic keys. Also, since pref-er-ence is given to document-
  []
 
+(./abls-abstract.bbl)
 
-Overfull \hbox (2.88751pt too wide) in paragraph at lines 102--107
-\T1/aer/m/n/9 signed (and par-tially im-ple-mented) to sup-port strategy-
- []
+Package balance Warning: You have called \balance in second column
+(balance)                Columns might not be balanced.
 
-(./abls-abstract.bbl) [2] (./abls-abstract.aux) ) 
+[2] (./abls-abstract.aux) ) 
 Here is how much of TeX's memory you used:
- 3219 strings out of 493488
- 42611 string characters out of 3141326
- 105802 words of memory out of 3000000
- 6445 multiletter control sequences out of 15000+200000
+ 3222 strings out of 493488
+ 42662 string characters out of 3141326
+ 104811 words of memory out of 3000000
+ 6448 multiletter control sequences out of 15000+200000
  44091 words of font info for 58 fonts, out of 3000000 for 9000
  957 hyphenation exceptions out of 8191
  41i,11n,26p,454b,267s stack positions out of 5000i,500n,10000p,200000b,50000s
-{/usr/local/texlive/2012/texmf
--dist/fonts/enc/dvips/base/8r.enc}</usr/local/texlive/2012/texmf-dist/fonts/typ
-e1/public/amsfonts/cm/cmr9.pfb></usr/local/texlive/2012/texmf-dist/fonts/type1/
-public/amsfonts/cm/cmti9.pfb></usr/local/texlive/2012/texmf-dist/fonts/type1/ur
-w/helvetic/uhvb8a.pfb></usr/local/texlive/2012/texmf-dist/fonts/type1/urw/helve
-tic/uhvr8a.pfb></usr/local/texlive/2012/texmf-dist/fonts/type1/urw/times/utmb8a
-.pfb></usr/local/texlive/2012/texmf-dist/fonts/type1/urw/times/utmr8a.pfb>
-Output written on abls-abstract.pdf (2 pages, 73927 bytes).
+{/usr/local/texlive/2012/texmf-dist/fonts/enc/dvips/
+base/8r.enc}</usr/local/texlive/2012/texmf-dist/fonts/type1/public/amsfonts/cm/
+cmr9.pfb></usr/local/texlive/2012/texmf-dist/fonts/type1/public/amsfonts/cm/cmt
+i9.pfb></usr/local/texlive/2012/texmf-dist/fonts/type1/urw/helvetic/uhvb8a.pfb>
+</usr/local/texlive/2012/texmf-dist/fonts/type1/urw/helvetic/uhvr8a.pfb></usr/l
+ocal/texlive/2012/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/local/texli
+ve/2012/texmf-dist/fonts/type1/urw/times/utmr8a.pfb>
+Output written on abls-abstract.pdf (2 pages, 77431 bytes).
 PDF statistics:
  36 PDF objects out of 1000 (max. 8388607)
  25 compressed objects within 1 object stream
