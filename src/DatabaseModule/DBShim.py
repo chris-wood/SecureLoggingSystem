@@ -6,8 +6,7 @@ Author: Christopher Wood, caw4567@rit.edu
 import sqlite3 as lite
 
 class DBShim(object):
-	'''
-	The shim for the database that is used to store arbitrary user/log/crypto related information.
+	''' The shim for the database that is used to store arbitrary user/log/crypto related information.
 	Other modules use this object to encapsulate access to their respective database.
 
 	Ideally, there is low coupling between this class and the SQLite database, so that it's
@@ -18,8 +17,7 @@ class DBShim(object):
 	connectionMap = {}
 
 	def __init__(self, db):
-		'''
-		Initialize the shim with a database to connect to
+		''' Initialize the shim to connect to a database.
 		'''
 		if (db != None and len(db) > 0):
 			self.conn = lite.connect(db)
@@ -35,16 +33,14 @@ class DBShim(object):
 				DBShim.connectionMap[db] = 1
 
 	def closeConnection(self):
-		'''
-		Terminate the database connection.
+		''' Terminate the database connection.
 		'''
 		if (self.connAlive):
 			self.conn.close()
 			DBShim.connectionMap[self.dbString] = DBShim.connectionMap[self.dbString] - 1
 
 	def insertIntoTable(self, table, rowContents):
-		'''
-		Insert a row into the specified table. Data filtering happens on behalf of the caller.
+		''' Insert a row into the specified table. Data filtering happens on behalf of the caller.
 		'''
 		# Build the entry value for the query
 		emptyVal = "("
@@ -67,8 +63,7 @@ class DBShim(object):
 		self.conn.commit()
 
 	def executeMultiQuery(self, table, valueMap):
-		''' 
-		Query for a set of database elements that match all key/value pairs
+		''' Query for a set of database elements that match all key/value pairs
 		in the valueMap.
 		'''
 		queryString = "SELECT * from " + table + " WHERE "
@@ -80,19 +75,19 @@ class DBShim(object):
 		return self.cursor.fetchall()
 
 	def executeQuery(self, table, key, value):
-		'''
-		Perform a query on the arbitrary database
+		''' Perform a query on the specified table.
 		'''
 		self.cursor.execute("SELECT * FROM " + table + " WHERE " + key + " = '%s'" % value)
 		return self.cursor.fetchall()
 
 	def randomQuery(self, table):
+		''' Select a random row from the specified table (used by the crawlers).
+		'''
 		self.cursor.execute("SELECT * FROM " + table + " ORDER BY RANDOM () LIMIT 1")
 		return self.cursor.fetchall()
 
 def main():
-	'''
-	Unit test for this small module.
+	''' Unit test for this small module.
 	'''
 	print("Starting DB shim test...")
 	shim = DBShim("users.sqlite")

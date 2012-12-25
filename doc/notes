@@ -1,6 +1,11 @@
-Creating the certificate:
+- Creating the certificate:
 
 openssl genrsa 1024 > key
 openssl req -new -x509 -nodes -sha1 -days 365 -key key > cert
 
+- Database setup
+ -> draw the EHR diagram for the database
+ -> need to set up verifier key encryption 
+ -> set up symmetric key encryption for payloads
+ -> start moving some of the related work from the report to the final paper
 

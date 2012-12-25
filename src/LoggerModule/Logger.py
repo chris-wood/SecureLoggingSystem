@@ -65,6 +65,9 @@ class Logger(threading.Thread):
 		''' Initialize the authentication keys that are used when verifying the 
 		entries in the log database.
 		'''
+
+		# These keys should be encrypted using CPABE for the verifiers (only?)
+
 		epochKey = hmac.new("\EFx" * 20, str(time.time() * (1000000 * random.random())), hashlib.sha512).hexdigest()
 		entityKey = hmac.new("\EFx" * 20, str(time.time() * (1000000 * random.random())), hashlib.sha512).hexdigest()
 
@@ -73,6 +76,8 @@ class Logger(threading.Thread):
 
 		self.initialEpochKey[(userId, sessionId)] = epochKey
 		self.initialEntityKey[(userId, sessionId)] = entityKey
+
+		# TODO: settle on the relational database
 
 		'''
 		key = '0123456789abcdef'

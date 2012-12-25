@@ -18,6 +18,11 @@ sys.path.append("./Common")
 sys.path.append("./DatabaseModule")
 import TrafficProxy
 
+def bootstrap():
+	''' Bootstrap the database from the database evolution file.
+	'''
+	print "Bootstrapping..."
+
 def help():
 	'''
 	Display the available commands to the user.
@@ -36,7 +41,11 @@ def main():
 	The main entry point into the logging system that initializes everything
 	needed to be active at runtime.
 	'''
+	# Bootstrap the system
+	bootstrap()
+
 	# Just start the traffic proxy... That will spawn everything else as needed
+	'''
 	proxy = TrafficProxy.TrafficProxy().start()
 
 	# Handle user input now...
@@ -52,6 +61,7 @@ def main():
 
 	# Kill everything
 	proxy.kill()
+	'''
 	sys.exit(0);
 
 if (__name__ == '__main__'):
