@@ -4,6 +4,7 @@ Author: Christopher A. Wood, caw4567@rit.edu
 '''
 
 import threading
+import logging # Python logging module
 import ClientObject
 import ClientHandler
 import socket
@@ -35,10 +36,19 @@ class TrafficProxy(threading.Thread):
 		self.handler = None
 		self.serverSock = None
 
+		# Setup the Python logger
+		self.lgr = logging.getLogger('abls')
+		self.lgr.setLevel(logging.DEBUG)
+		fh = logging.FileHandler('myapp.log')
+		fh.setLevel(logging.WARNING)
+		frmt = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+		fh.setFormatter(frmt)
+		self.lgr.addHandler(fh)
+
 		# Set up the socket configuration parameters
 		self.context = SSL.Context(SSL.SSLv23_METHOD)
-		self.context.use_privatekey_file('./keys/key')
-		self.context.use_certificate_file('./keys/cert')
+		self.context.use_privatekey_file('./Keys/key') # our private key
+		self.context.use_certificate_file('./Keys/cert') # our self-signed certificate
 
 	def run(self):
 		address = (self.HOST, self.PORT)
@@ -50,23 +60,34 @@ class TrafficProxy(threading.Thread):
 
 		# Wait for incoming connections from clients
 		while self.running:
-			# Accept a new client connection
-			clientInfo = self.serverSock.accept()
-			print("Client connected from {}.".format(clientInfo[1]))
+			# Accept a new client connection 
+			newsocket, fromaddr = self.serverSock.accept()
+			
+			# Wrap the socket up in a SSL connection for authentication and encryption
+			'''connstream = ssl.wrap_socket(newsocket,
+                                 server_side=True,
+                                 certfile="./Keys/cert",
+                                 keyfile="./Keys/key",
+                                 ssl_version=ssl.PROTOCOL_TLSv1, # TODO: this should be a configurable parameter for ABLS
+                                 cert_reqs=ssl.CERT_REQUIRED) # we require a certificate from the client for authentication
+			'''
+			#print("Client connected from {}.".format(fromaddr))
+			self.lgr.debug("Client connected from {}.".format(fromaddr))
 
 			# Start the handler thread
 			handler = ClientHandler.ClientHandler(self)
 			handler.start()
-			handler.clientList.append(ClientObject.ClientObject(clientInfo))
+			handler.clientList.append(ClientObject.ClientObject(newsocket, fromaddr, None)) # None should be connstream
 			self.activeSessions.append(handler)
 
 		self.serverSock.close()
-		print("- end -")
+		self.lgr.debug("- end -")
+		#print("- end -")
 
 	def get(self):
 		#Retrieve the next element from the LogEntry queue
 		return self.queue.get()
 
 	def kill(self):
-		print("Killing the event queue thread.")
+		self.lgr.deubg("Killing the traffic proxy.")
 		self.serverSock.close()

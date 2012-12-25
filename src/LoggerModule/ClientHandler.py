@@ -50,6 +50,7 @@ class ClientHandler(threading.Thread):
 		while self.running:
 			for client in self.clientList:
 				message = client.sock.recv(self.server.BUFFSIZE)
+				#message = client.connstream.read() # this was for SSL-wrapped information
 				if message != None and message != "":
 					self.lgr.debug("client message: ", message)
 					#print("client message: ", message) # debug 

@@ -12,11 +12,12 @@ class ClientObject(object):
 	''' Simple wrapper for the socket and address information of a client.
 	This is just a glorified struct...
 	'''
-	def __init__(self, clientInfo):
+	def __init__(self, socket, addr, connstream):
 		''' Initialize the fields.
 		'''
-		self.sock = clientInfo[0]
-		self.address = clientInfo[1]
+		self.sock = socket
+		self.address = addr
+		self.connstream = connstream
 
 	def update(self, message):
 		''' Exposed method that can be used to send data back to the client, if needed.

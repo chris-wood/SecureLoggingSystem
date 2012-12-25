@@ -107,6 +107,7 @@ def main():
 			s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 			# Create the SSL context and then connect
+			# This key/certificate should be signed by a trusted CA
 			ssl_sock = ssl.wrap_socket(s, keyfile="../keys/key", certfile="../keys/cert", ca_certs="../keys/cert", cert_reqs=ssl.CERT_REQUIRED)
 			ssl_sock.connect((host, port))
 

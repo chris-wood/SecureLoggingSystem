@@ -23,6 +23,9 @@ import DBShim
 # For hashing log entries
 import Keccak 
 
+# For symmetric encryption
+from Crypto.Cipher import AES
+
 # For HMAC
 import hashlib, hmac
 
@@ -59,8 +62,7 @@ class Logger(threading.Thread):
 		self.queue = Queue.Queue()
 
 	def createSession(self, userId, sessionId):
-		'''
-		Initialize the authentication keys that are used when verifying the 
+		''' Initialize the authentication keys that are used when verifying the 
 		entries in the log database.
 		'''
 		epochKey = hmac.new("\EFx" * 20, str(time.time() * (1000000 * random.random())), hashlib.sha512).hexdigest()
@@ -71,6 +73,15 @@ class Logger(threading.Thread):
 
 		self.initialEpochKey[(userId, sessionId)] = epochKey
 		self.initialEntityKey[(userId, sessionId)] = entityKey
+
+		'''
+		key = '0123456789abcdef'
+		mode = AES.MODE_CBC
+		encryptor = AES.new(key, mode)
+
+		text = 'j' * 64 + 'i' * 128
+		ciphertext = encryptor.encrypt(text)
+		'''
 
 	def getQueue(self):
 		'''
