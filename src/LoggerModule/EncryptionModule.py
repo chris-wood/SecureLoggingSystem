@@ -19,8 +19,7 @@ sk_t = { 'D':G2, 'Dj':G2, 'Djp':G1, 'S':unicode }
 ct_t = { 'C_tilde':GT, 'C':G1, 'Cy':G1, 'Cyp':G2, 'policy':unicode, 'attributes':unicode }
 
 class EncryptionModule:
-	'''
-	The encryption class that handles encryption/decryption for data.
+	''' The encryption class that handles encryption/decryption for data.
 
 	It must reach out to the attribute authority to retrieve the master and public
 	key used for encryption and decryption.
@@ -32,8 +31,7 @@ class EncryptionModule:
 		(self.public, self.master) = self.cpabe.setup()
 
 	def set(self, master, public):
-		'''
-		Set the master and public key for this module. 
+		''' Set the master and public key for this module. 
 
 		THIS IS NOT SAFE. EXPERIMENTAL USE ONLY.
 		'''
@@ -41,20 +39,17 @@ class EncryptionModule:
 		self.public = public
 
 	def getValues(self):
-		'''
-		Retrieve the master and public key pairs.
+		''' Retrieve the master and public key pairs.
 		'''
 		return (self.master, self.public)
 
 	def generateUserKey(self, attributes):
-		'''
-		Generate a secret key for a user given their access structure.
+		''' Generate a secret key for a user given their access structure.
 		'''
 		return self.cpabe.keygen(self.public, self.master, attributes)
 
 	def encrypt(self, plaintext, policy):
-		'''
-		Encrypt a block of plaintext using the provided polcy structure. 
+		''' Encrypt a block of plaintext using the provided polcy structure. 
 		The ciphertext is stored as a dictionary, for now.
 		'''
 		key = self.groupObj.random(GT)
@@ -66,8 +61,7 @@ class EncryptionModule:
 		return { 'c1':c1, 'c2':c2 }
 
 	def decrypt(self, sKey, ciphertext):
-		'''
-		Decrypt the provided ciphertext sing the secret key. Decryption is only successful if
+		''' Decrypt the provided ciphertext sing the secret key. Decryption is only successful if
 		the policy embedded in the secret key matches the ciphertext access policy.
 		'''
 		c1, c2 = ciphertext['c1'], ciphertext['c2']

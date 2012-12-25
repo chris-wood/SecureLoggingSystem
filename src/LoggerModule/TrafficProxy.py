@@ -14,8 +14,7 @@ from time import clock, time # for time-based extraction
 from pykka.actor import ThreadingActor
 
 class TrafficProxy(threading.Thread):
-	'''
-	This is an active queue that accepts new data over its TCP socket 
+	''' This is an active object that accepts new data over its TCP socket 
 	(meaning that it is kept separate from the main application that uses it)
 	'''
 
