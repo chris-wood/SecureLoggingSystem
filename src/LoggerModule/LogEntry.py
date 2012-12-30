@@ -22,7 +22,7 @@ class LogEntry(object):
 			if not (('user' in data) and ('sessionId' in data) and ('payload' in data)):
 				raise Exception("Corrupt JSON string retrieved from client.")
 
-			# Persist the data...
+			# Persist the data
 			self.user = data['user']
 			self.sessionId = data['sessionId']
 			self.payload = data['payload']

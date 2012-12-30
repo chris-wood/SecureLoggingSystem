@@ -3,9 +3,14 @@
 openssl genrsa 1024 > key
 openssl req -new -x509 -nodes -sha1 -days 365 -key key > cert
 
-- Database setup
+TODO:
+1. add eventID to the payload of incoming messages so that the appropriate policy can be built
+
+- Database setup (TODO list)
  -> draw the EHR diagram for the database
- -> need to set up verifier key encryption 
+ -> need to set up verifier key encryption (the epoch and entity keys, encrypted by salted master key with the session), key is hash(master + user + session)
  -> set up symmetric key encryption for payloads
  -> start moving some of the related work from the report to the final paper
+ -> encrypt user and session IDs using keys that are stored in local SQLite database and protected by the OS (encryption key for these are hash (master + user + session)
+ -> 
 

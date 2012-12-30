@@ -39,7 +39,7 @@ class TrafficProxy(threading.Thread):
 		# Setup the Python logger
 		self.lgr = logging.getLogger('abls')
 		self.lgr.setLevel(logging.DEBUG)
-		fh = logging.FileHandler('myapp.log')
+		fh = logging.FileHandler('abls.log')
 		fh.setLevel(logging.WARNING)
 		frmt = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 		fh.setFormatter(frmt)

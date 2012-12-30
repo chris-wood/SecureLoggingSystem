@@ -30,16 +30,14 @@ from Crypto.Cipher import AES
 import hashlib, hmac
 
 class Logger(threading.Thread):
-	'''
-	The logging thread that interacts with other actors to perform perform entry encryption
+	''' The logging thread that interacts with other actors to perform perform entry encryption
 	'''
 
 	# This can (and should) be changed as needed.
 	EPOCH_WINDOW_SIZE = 5
 
 	def __init__(self):
-		'''
-		Default constructor.
+		''' Default constructor.
 		'''	
 		threading.Thread.__init__(self)
 		self.running = False
@@ -66,37 +64,42 @@ class Logger(threading.Thread):
 		entries in the log database.
 		'''
 
-		# These keys should be encrypted using CPABE for the verifiers (only?)
+		# Generate symmetric keys for this session - OLD APPROACH
+		#epochKey = hmac.new("\EFx" * 20, str(time.time() * (1000000 * random.random())), hashlib.sha512).hexdigest()
+		#entityKey = hmac.new("\EFx" * 20, str(time.time() * (1000000 * random.random())), hashlib.sha512).hexdigest()
 
-		epochKey = hmac.new("\EFx" * 20, str(time.time() * (1000000 * random.random())), hashlib.sha512).hexdigest()
-		entityKey = hmac.new("\EFx" * 20, str(time.time() * (1000000 * random.random())), hashlib.sha512).hexdigest()
+		# Generate the epoch and entity keys (both are random 32-bytes strings) - used for verification (integrity) only
+		epochKey = Random.new().read(32)
+		entityKey = Random.new().read(32)
 
-		self.logShim.replaceInTable("InitialEpochKey", (userId, sessionId, epochKey))
-		self.logShim.replaceInTable("InitialEntityKey", (userId, sessionId, entityKey))
+		# These keys should be encrypted using CPABE for the (verifier role and user role)
+		msg = '{"user":' + str(userId) + ',"sessionId":' + str(sessionId) + '"}' 
+		policy = self.manager.ask({'command' : 'verifyPolicy', 'payload' : msg})
+		encryptedEpochKey = self.encryptionModule.encrypt(epochKey, policy)
+		encryptedEntityKey = self.encryptionModule.encrypt(entityKey, policy)
+
+		# Persist the encrypted keys
+		self.logShim.replaceInTable("InitialEpochKey", (userId, sessionId, encryptedEpochKey))
+		self.logShim.replaceInTable("InitialEntityKey", (userId, sessionId, encryptedEntityKey))
+
+		# TODO: how to mask the userId and sessionId columns?
+		# What key to use to encrypt the user and session IDs?
+
+		#self.logShim.replaceInTable("InitialEpochKey", (userId, sessionId, epochKey))
+		#self.logShim.replaceInTable("InitialEntityKey", (userId, sessionId, entityKey))
 
 		self.initialEpochKey[(userId, sessionId)] = epochKey
 		self.initialEntityKey[(userId, sessionId)] = entityKey
 
-		# TODO: settle on the relational database
-
-		'''
-		key = '0123456789abcdef'
-		mode = AES.MODE_CBC
-		encryptor = AES.new(key, mode)
-
-		text = 'j' * 64 + 'i' * 128
-		ciphertext = encryptor.encrypt(text)
-		'''
+		# TODO: settle on the relational database schema...
 
 	def getQueue(self):
-		'''
-		Fetch this logger's internal queue.
+		''' Fetch this logger's internal queue.
 		'''
 		return self.queue
 
 	def run(self):
-		''' 
-		Empty the queue into the log as fast as possible. We are the bottleneck.
+		''' Empty the queue into the log as fast as possible. We are the bottleneck.
 		'''
 		# Create the log shim.
 		self.logShim = DBShim.DBShim("/Users/caw/Projects/PrivateProjects/LoggingSystem/src/DatabaseModule/log.sqlite")
@@ -107,8 +110,7 @@ class Logger(threading.Thread):
 			self.processLogEntry(msg)
 
 	def addNewEvent(self, userId, sessionId, message):
-		'''
-		Construct a new event to add to the log. It is assumed the epoch key is 
+		''' Construct a new event to add to the log. It is assumed the epoch key is 
 		already initialized before this happens.
 		'''
 		# Some definitions
@@ -205,8 +207,7 @@ class Logger(threading.Thread):
 		print("Inserted the log: " + str((userId, sessionId, epochLength, str(message), xi, yi)))
 
 	def processLogEntry(self, msg):
-		'''
-		This method is responsible for processing a single msg retrieved from the traffic proxy.
+		''' This method is responsible for processing a single msg retrieved from the traffic proxy.
 		'''
 		policy = self.manager.ask({'command' : 'policy', 'payload' : msg})
 		ciphertext = self.encryptionModule.encrypt(msg, policy)
@@ -214,7 +215,7 @@ class Logger(threading.Thread):
 		# Parse the host application data
 		entry = LogEntry.LogEntry(jsonString = msg)
 
-		# See if this is a new session that we need to manage
+		# See if this is a new session that we need to manage, or if it's part of an existing session
 		valueMap = {"userId" : entry.user, "sessionId" : entry.sessionId}
 		results = self.logShim.executeMultiQuery("InitialEpochKey", valueMap)
 		if (len(results) == 0):
@@ -224,7 +225,6 @@ class Logger(threading.Thread):
 		self.addNewEvent(entry.user, entry.sessionId, ciphertext)
 
 	def kill(self):
-		'''
-		Terminate this thread.
+		''' Terminate this thread.
 		'''
 		print("Killing the logger thread.")

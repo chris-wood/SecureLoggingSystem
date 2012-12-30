@@ -40,13 +40,23 @@ class PolicyManager(ThreadingActor):
 	def on_receive(self, message):
 		if message.get('command') == 'policy':
 			return self.generatePolicy(message['payload'])
+		elif message.get('command') == 'verifyPolicy':
+			return self.generateVerifyPolicy(message['payload'])
 		elif message.get('command') == 'attributes':
 			return self.generateAttributes(message['payload'])
+
+	def generateVerifyPolicy(self, payload):
+		''' Generate the policy for verification data (containing the verify policy and
+			the source user ID)
+		'''
+		print "hello world"
 
 	def generatePolicy(self, payload):
 		'''
 		Generate the policy for a specific user by reaching out the user attribute database
 		for this user's attributes.
+
+		TODO: this is incorrect - it should generate the policy based on the user ID, a colleague flag, and anything else that is event-specific)
 		'''
 		entry = LogEntry.LogEntry(jsonString = payload)
 		conj = ''
