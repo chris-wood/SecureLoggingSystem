@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.4-1.40.13 (TeX Live 2012) (format=pdflatex 2012.6.30)  4 JAN 2013 22:30
+This is pdfTeX, Version 3.1415926-2.4-1.40.13 (TeX Live 2012) (format=pdflatex 2012.6.30)  5 JAN 2013 11:23
 entering extended mode
  \write18 enabled.
  file:line:error style messages enabled.
@@ -622,18 +622,18 @@ Overfull \hbox (9.94527pt too wide) in paragraph at lines 114--119
  []
 
 LaTeX Font Info:    Font shape `T1/ppl/bx/n' in size <9> not available
-(Font)              Font shape `T1/ppl/b/n' tried instead on input line 137.
+(Font)              Font shape `T1/ppl/b/n' tried instead on input line 134.
 
 LaTeX Warning: Citation `Bellare1997-ForwardIntegrity' on page \thepage  undefi
-ned on input line 137.
+ned on input line 134.
 
 
-Overfull \hbox (2.59258pt too wide) in paragraph at lines 143--150
+Overfull \hbox (2.59258pt too wide) in paragraph at lines 140--147
 []\T1/ppl/m/n/9 Log in-tegrity is achieved through hash chains and message-
  []
 
 
-Overfull \hbox (4.45491pt too wide) in paragraph at lines 143--150
+Overfull \hbox (4.45491pt too wide) in paragraph at lines 140--147
 \T1/ppl/m/n/9 that con-tains the gen-er-at-ing source in-for-ma-tion, the en-cr
 ypted
  []
@@ -642,10 +642,10 @@ ypted
 File: images/hashchain.pdf Graphic file (type pdf)
 
 <use images/hashchain.pdf>
-Package pdftex.def Info: images/hashchain.pdf used on input line 158.
+Package pdftex.def Info: images/hashchain.pdf used on input line 155.
 (pdftex.def)             Requested size: 275.22862pt x 282.45563pt.
 
-Overfull \hbox (1.30983pt too wide) in paragraph at lines 169--175
+Overfull \hbox (1.30983pt too wide) in paragraph at lines 166--172
 []\T1/ppl/m/n/9 In this con-text, an epoch $\OML/cmm/m/it/9 Ep[]$ \T1/ppl/m/n/9
  sim-ply cor-re-sponds to a fixed-
  []
@@ -653,45 +653,60 @@ Overfull \hbox (1.30983pt too wide) in paragraph at lines 169--175
 [2]
 
 LaTeX Warning: Reference `sec:security' on page \thepage  undefined on input li
-ne 203.
+ne 200.
 
 <images/tagchain.pdf, id=23, 362.10281pt x 181.42781pt>
 File: images/tagchain.pdf Graphic file (type pdf)
 
 <use images/tagchain.pdf>
-Package pdftex.def Info: images/tagchain.pdf used on input line 227.
+Package pdftex.def Info: images/tagchain.pdf used on input line 224.
 (pdftex.def)             Requested size: 289.68263pt x 145.14244pt.
 
-Overfull \hbox (5.23846pt too wide) in paragraph at lines 238--240
+Overfull \hbox (5.23846pt too wide) in paragraph at lines 235--237
 \T1/ppl/m/n/9 con-trol the fre-quency of data sent to the log server, which
  []
 
 
-Overfull \hbox (18.32448pt too wide) in paragraph at lines 242--243
+Overfull \hbox (18.32448pt too wide) in paragraph at lines 239--240
 \T1/ppl/m/n/9 num-bers, which leads to very fine-grained database queries. 
  []
 
 [3 <./images/hashchain.pdf>]
 
 LaTeX Warning: Reference `sec:analysis' on page \thepage  undefined on input li
-ne 265.
+ne 262.
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 293--295
+Underfull \hbox (badness 10000) in paragraph at lines 290--292
 [] []$\OML/cmm/m/it/9 UID$\T1/ppl/m/n/9 , $\OML/cmm/m/it/9 SID$\T1/ppl/m/n/9 , 
 $\OMS/cmsy/m/n/9 L \OT1/cmr/m/n/9 =
  []
 
 
 LaTeX Warning: Reference `sec:architecture' on page \thepage  undefined on inpu
-t line 351.
+t line 348.
 
 [4 <./images/tagchain.pdf>]
 
 LaTeX Warning: Reference `fig:schema' on page \thepage  undefined on input line
- 362.
+ 359.
 
-(./abls.bbl) [5] (./abls.aux)
+
+Overfull \hbox (11.63751pt too wide) in paragraph at lines 368--369
+[]\T1/ppl/m/n/9 User and ses-sion at-tribute columns masked and en-crypted 
+ []
+
+
+Overfull \hbox (1.2245pt too wide) in paragraph at lines 369--370
+[]\T1/ppl/m/n/9 Deployment scheme set up, in-clud-ing database sys-tems 
+ []
+
+(./abls.bbl)
+
+Package balance Warning: You have called \balance in second column
+(balance)                Columns might not be balanced.
+
+[5] (./abls.aux)
 
 LaTeX Warning: There were undefined references.
 
@@ -720,7 +735,7 @@ alatino/uplr8a.pfb></usr/local/texlive/2012/texmf-dist/fonts/type1/urw/palatino
 /uplri8a.pfb></usr/local/texlive/2012/texmf-dist/fonts/type1/urw/times/utmb8a.p
 fb></usr/local/texlive/2012/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/l
 ocal/texlive/2012/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on abls.pdf (5 pages, 378807 bytes).
+Output written on abls.pdf (5 pages, 379271 bytes).
 PDF statistics:
  164 PDF objects out of 1000 (max. 8388607)
  135 compressed objects within 2 object streams
