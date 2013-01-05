@@ -1,4 +1,4 @@
-% SHIFT - project abstract
+% ABLS - term-long paper
 
 \documentclass{sig-alternate}
 
@@ -8,6 +8,19 @@
 \usepackage{balance}
 \usepackage{verbatim}
 \usepackage{enumitem}
+\usepackage[table]{xcolor}
+\usepackage{multicol,multirow}
+\usepackage{subfig}
+\usepackage{dcolumn}
+\usepackage{palatino}
+\usepackage{bbm}
+\usepackage{url}
+\usepackage{verbatim}
+\usepackage{algorithm}
+\usepackage[noend]{algorithmic}
+\usepackage{fancybox, fancyvrb}
+\usepackage{listings}
+
 \permission{}
 \CopyrightYear{2012}
 %\crdata{0-00000-00-0/00/00}
@@ -24,13 +37,16 @@ caw4567@rit.edu
 \date{\today}
 \maketitle
 \begin{abstract}
+User-based non-repudiation is an increasingly important property of cloud-based applica-tions. It provides irrefutable evidence that ties system behavior to specific users, thus enabling strict enforcement of organizational security policies. System logs are typically used as the basis for this property. Thus, the effectiveness of system audits based on log files reduces to the problem of maintaining the integrity and confidentiality of log files. In this project, we study the problem of building secure log files. We investigate the benefits of ciphertext-policy attribute-based encryption (CP-ABE) to solve a variety of log design issues. In addition, we also present the architecture and a preliminary analysis for a proof-of-concept system that fulfills the confidentiality and integrity requirements for a secure log.
+\end{abstract}
 
+\section{Introduction}
 User-based non-repudiation is a system security property that provides indisputable evidence that links
 specific actions to individual users (or entities) that trigger such actions. Cryptographically speaking, non-repudiation requires that the integrity and 
 origin of all data should be provable. In essence, this enables system audits to be conducted that can
 identify data misuse (and thus, potential security policy violations) by comparing the sources of system events
 with all entities authorized to invoke these events. Therefore, treating non-repudiation as a required system 
-quality attribute in the SaaS architecture is likely to become a common trend in the commercial, 
+quality attribute in the architecture is likely to become a common trend in the commercial, 
 government, and even more specifically, the health-care domain.
 
 System audits typically use log files to determine the cause and effect of events that took 
@@ -112,7 +128,253 @@ Altogether, the security features of database authentication, encryption, and au
 in the existing ABLS architecture. With these changes, we will then re-evaluate the ABLS at an architectural, security, 
 and performance perspective to determine its usefulness in cloud-based settings. 
 
-\end{abstract}
+\section{Log Design}
+In this section we present our log generation and verification schemes.
+They are influenced by past work done by Schneier et al \cite{Schneier1999-Secure},
+Bellare et al. \cite{Bellare1997-ForwardIntegrity}, Ma et al. \cite{Ma2008-FssAgg},
+and Yavuz et al. \cite{Yavuz2009-BAF}. 
+
+\subsection{Log Construction}
+\label{sec:LogConstruction}
+
+Log integrity is achieved through hash chains and message-authentication codes. 
+Each log entry is a five-tuple element that contains the generating source
+information, the encrypted payload of the entry, a hash digest that provides
+a link between the current and previous hash chain entries, and an authentication tag for this digest. In the proof-of-concept
+system implementation, Keccak is used as the standalone hash function $H$
+and the $HMAC$ function is built using $SHA$-$512$. 
+Formally, each log entry $L_i$ is built using the following protocol (as depicted in Figure \ref{fig:hashChain}):
+\begin{align*}
+X_i = & H(X_{i - 1}, E_{SK}(D_i)) \\ % rationale: need to link this entry to previous for chaining
+Y_i = & HMAC_{EpK_{j}}(X_i, Ep_{j}) \\ % rationale: for epoch-key based: can keep in logger memory and then commit on epoch cycle (helps against wiretapping attacks and load balancing)
+L_i = & (U_{ID}, S_{ID}, E_{SK}(D_i), X_i, Y_i) % rationale for u/s: searhability
+\end{align*}
+
+\begin{figure*}[ht!]
+  \centering
+  \includegraphics[scale=0.8]{images/hashchain.pdf} \\
+\caption{A visual depiction of the hash chain construction scheme. In this case, the epoch window is $5$ log entries, as shown by the epoch
+cycle after $5$ consecutive log entries.}
+\label{fig:hashChain}
+\end{figure*}
+
+In this scheme the $X_i$ elements are used to link together consecutive entries in 
+the hash chain. Similarly, the $Y_i$ elements are used to provide authentication 
+for the $X_i$ element using an authentication tag that is computed from $X_i$ and the 
+previous epoch digest $Ep_{j - 1}$. 
+
+In this context, an epoch $Ep_j$ simply corresponds to a fixed-size set of log entries that
+are being processed (i.e. an epoch window). For example, if the epoch size is $n$ entries, then the 
+log generation scheme will cycle after $n$ log entries have been constructed and begin working on a new set of log entries. After a cycle is completed, a context block
+for the most recent epoch is created and inserted into an epoch chain (similar to the log chain). These log generation cycles create frames (or windows) in the entire log chain in which the 
+scheme generates log entries using a single epoch block and key $Ep_{j}$ and $EpK_j$, respectively. 
+More specifically, $Y_i$ is the authentication tag that is built using only the entries within the current epoch window.
+
+%TODO: forward-secrecy guarantees... compare to aggregate signatures (we store each hash chain and the entire thing altogether)
+
+%In order to provide computationally efficient means of generating the 
+%authentication tag for the log chain, log generation is divided into epochs of
+%client-defined sizes. The selection criteria for this epoch size is 
+%discussed in more detail later, but should generally be based
+%on the frequency of traffic that is generated by the host application. 
+
+Context blocks for epoch windows are stored in the same way as log chains.
+Each epoch chain entry $Ep_j$ is built as follows:
+\begin{align*}
+Ep_j = & HMAC_{EpK_{j}}(Ep_{j - 1}, L_{l}) \\
+Ep_0 = & HMAC_{EpK_{0}}(0)
+\end{align*}
+In this context, $L_{l}$ is the last log chain entry for the previous epoch $Ep_{j - 1}$.
+Thus, each epoch chain entry maintains the integrity of the log chain at each epoch cycle
+by linking the most recent log chain entry to the previous epoch context block.
+The key $EpK_{j}$ that is used to compute the $Y_i$ authentication tag is
+based on the current epoch $Ep_j$, and only evolves when the epoch window cycles. 
+This update is done with a pseudorandom function $H$ (which,
+in our case, is simply the Keccak hash function), and is defined as follows:
+\begin{align*}
+EpK_{j + 1} = H(EpK_{j}) \\
+\end{align*}
+The initial epoch key $EpK_0$ is a secret that is initialized when a session
+is started. Corruption of this key can enable a determined attacker to reconstruct
+the log chain and epoch chain without detection. Without this information, however,
+such modifications are always detectable. We refer to Section \ref{sec:security} for
+a more detailed description of this issue.
+
+Finally, as a third layer of integrity, a single digest for the entire log $T_i$
+chain is stored as the log chain is iteratively constructed. Formally, $T_i$ is
+built as follows:
+\begin{align*}
+T_i = & HMAC_{T_{K_{i}}}(L_{i}, T_{i - 1}) \\
+T_0 = & HMAC_{T_{K_{0}}}(L_{i}, 1) %caw: this needs to change in the code. current code does not do it this way.
+\end{align*}
+The secret key $T_{K_{0}}$ for the entire log chain is another secret that is
+initialized when the session is started. Similar to the epoch key, it is evolved
+with a pseudorandom function $H$ as follows:
+\begin{align*}
+T_{K_{i + 1}} = H(T_{K_{i}})
+\end{align*}
+
+A visual representation of this protocol is shown in Figure \ref{fig:tagChain}. It is
+important to note that a chain of $T_i$ elements is not maintained. Instead, only the
+most recent element is persisted to the database. This is critical to prevent
+truncation attacks.
+
+\begin{figure*}[ht!]
+  \centering
+  \includegraphics[scale=0.8]{images/tagchain.pdf} \\
+\caption{A visual depiction of the protocol used to build the log chain authentication tag.}
+\label{fig:tagChain}
+\end{figure*}
+
+\subsection{Log Generation Rationale}
+The construction of each log entry satisfies the following properties:
+\begin{enumerate}
+	\item Each log entry payload is encrypted and only viewable by those with the appropriate attributes.
+	\item The integrity of the log chain is ensured through the links generated by $X_i$ elements, which are verifiable by the $Y_i$ authentication tags.
+	\item The integrity of the entire log chain is guaranteed with the $T_i$ element. This protects the log chain against truncation attacks.
+	\item The epoch-based log generation enables the logger to control the frequency of data
+	sent to the log server, which helps with load balancing and protects against wiretapping attacks.
+	\item The epoch window is assumed to be a fixed (constant) size, and thus it requires $\mathcal{O}(1)$ time to verify. The log chain can be verified in $\mathcal{O}(n)$ time, where $n$ is the length of the log chain. These results are discussed in Section \ref{log:ComputationalComplexity}.
+	\item There are three different modes of verification that can be performed (weak, normal, and strongest). These modes are described in Section \ref{log:VerificationModes}.
+	\item The log is searchable by the user identity and session numbers, which leads to very fine-grained database queries. 
+\end{enumerate}
+
+\subsubsection{Computational Complexity}
+\label{log:ComputationalComplexity}
+In the worst case scenario, a single log construction event must generate the newest log entry $L_i$ and 
+update the epoch context block chain to cycle into a new epoch window $Ep_j$. Based on the definition
+of the log entries, a combination of one hash computation, one $HMAC$ computation, and one entry payload
+encryption is required. Furthermore, based on the previous definitions, only a single
+$HMAC$ computation is required to generate each epoch context block. 
+
+Under the assumption that each log entry payload will be of a fixed size (in the number of bytes 
+used to represent the data), then we will have a constant time complexity for each encryption 
+operation. Furthermore, since each hash and $HMAC$ operation is parameterized by fixed-length
+inputs, these will also yield constant time complexities. Thus, we have the following time complexities
+for each of these operations:
+\begin{itemize}
+	\item Hash - $\mathcal{O}(1)$
+	\item $HMAC$ - $\mathcal{O}(1)$
+	\item Encryption - $\mathcal{O}(1)$
+\end{itemize}
+Therefore, it is easy to see that log generation has a constant time complexity, which is necessary for system scalability
+and performance under heavy traffic loads. However, the constant can vary significantly depending on
+the underlying cryptographic parameters. We will revisit this issue in the evaluation results, presented in Section \ref{sec:analysis}.
+
+%TODO: generate better facts on time complexity of hmac and encryption (ask Staszek...)
+
+\subsubsection{Verification Modes}
+\label{log:VerificationModes}
+
+Our log construction scheme enables three different modes of verification to be implemented,
+each of which has different integrity and performance guarantees. Table \ref{tab:verifModes} 
+provides an overview of the differences between these modes of verification. Algorithms \ref{alg:strongVerify}
+and \ref{alg:weakVerify} provide a description of two of these verification modes.
+
+\begin{table*}[ht!]
+	\caption{The integrity and performance differences for the three log verification modes supported by the log generation scheme.}
+	\label{tab:verifModes}
+	\begin{tabular}{|l|l|l|l|}
+		\hline
+		\textbf{Verification Mode} & \textbf{Visibility} & \textbf{Integrity Guarantees} & \textbf{Worst-case Performance} \\ \hline
+		Weak & Public & Weak & 1 Keccak computation \\ 
+		Normal & Private & Medium & 2 Keccak and 2 $HMAC$ computations \\ 
+		Strong & Private & Strong & 2 Keccak and 4 $HMAC$ computations \\
+		\hline
+	\end{tabular}
+\end{table*}
+
+\begin{algorithm}[ht!] %[htb]
+\caption{Strongest verification procedure} \label{alg:strongVerify}
+\begin{algorithmic}[1]
+\REQUIRE{$UID$, $SID$, $\mathcal{L} = \{L_0, L_1,...,L_n\}, ChainDigest, Ep_k, L_k, EpochSize$}
+% \ENSURE{The number of all minimum $(s,t)$-cuts of $G$}
+
+% I decided not to list the input/output in this case, so that's why the above two lines are commented out
+\STATE{$payload \leftarrow UID | SID | 0 | L_0[3] | 0$}
+\STATE{$epoch \leftarrow HMAC(Ep_k, 0)$}
+\STATE{$x_1 \leftarrow Keccak(payload)$}
+\STATE{Return $FAIL$ if $x_1 \not= L_0[4]$}
+\STATE{$y_1 \leftarrow HMAC(Ep_k, epoch | x_1)$}
+\STATE{Return $FAIL$ if $y_1 \not= L_0[5]$}
+\STATE{$ed \leftarrow HMAC(L_k, x_1)$}
+\STATE{$L_k \leftarrow HMAC(L_k, \text{''constant value''})$}
+\FOR{$i = 1 \to n$}
+	\STATE{$payload \leftarrow UID | SID | i | L_i[3] | L_{i - 1}[4]$}
+	\STATE{$x_i \leftarrow Keccak(payload)$}
+	\STATE{Return $FAIL$ if $x_i \not= L_i[4]$}
+	\IF{$i | EpochSize$}
+		\STATE{$newKey \leftarrow Keccak(Ep_k$)}
+		\STATE{$Ep_k \leftarrow newKey$}
+		\STATE{$payload \leftarrow epoch | L_{i - 1}[4]$}
+		\STATE{$ed = HMAC(newKey, payload)$}
+	\ENDIF
+	\STATE{$y_i \leftarrow HMAC(Ep_k, epoch | x_i)$}
+	\STATE{Return $FAIL$ if $y_i \not= L_i[5]$}
+	\STATE{$ed \leftarrow HMAC(L_k, x_1)$}
+	\STATE{$L_k \leftarrow HMAC(L_k, \text{''constant value''})$}
+\ENDFOR
+\STATE{Return $FAIL$ if $ed \not= ChainDigest$}
+\STATE{Return $PASS$}
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[ht!] %[htb]
+\caption{Weak verification procedure} \label{alg:weakVerify}
+\begin{algorithmic}[1]
+\REQUIRE{$UID$, $SID$, $\mathcal{L} = \{L_0, L_1,...,L_n\}$}
+% \ENSURE{The number of all minimum $(s,t)$-cuts of $G$}
+
+% I decided not to list the input/output in this case, so that's why the above two lines are commented out
+\STATE{$payload \leftarrow UID | SID | 0 | L_0[3] | 0$}
+\STATE{$x_1 \leftarrow Keccak(payload)$}
+\STATE{Return $FAIL$ if $x_1 \not= L_0[4]$}
+\FOR{$i = 1 \to n$}
+	\STATE{$payload \leftarrow UID | SID | i | L_i[3] | L_{i - 1}[4]$}
+	\STATE{$x_i \leftarrow Keccak(payload)$}
+	\STATE{Return $FAIL$ if $x_i \not= L_i[4]$}
+\ENDFOR
+\STATE{Return $PASS$}
+\end{algorithmic}
+\end{algorithm}
+
+Although the weak verification mode does not provide the strongest integrity guarantees, it
+is useful for offline analysis of log files by users. In such situations, although the users 
+cannot be entirely positive that the log file has not been tampered with, they can at least 
+view some of their own data. For automated verifiers that run concurrently with the logging system, 
+the strong verification mode enables them to walk the database to perform integrity 
+checks on log chains for user sessions. This provides the users and system administrators 
+with confidence that the log database is correct. We discuss the role of automated
+verifiers in Section \ref{sec:architecture}.
+
+\subsection{Searchability}
+Based on the definitions provided in Section \ref{sec:LogConstruction}, it is easy to 
+see that log searchability is done by querying the database with known user identities and optional session 
+identifiers. This was a tradeoff that we made to support reasonable auditing performance. 
+It has been shown that in some application domains the presence of any relevant information
+pertaining to users is a violation of security policies. However, since the entire entry payload
+is kept confidential to unauthorized users through encryption, we do not anticipate the presence 
+of this information causing many problems. 
+
+The database schema for our logging system is shown in Figure \ref{fig:schema}. We emphasize that, 
+if the log server were compromised, the only information that a determined attacker could retrieve from
+the log database is a collection of user identities, which do not directly correspond to ``real'' user
+identities (i.e. database user identities are GUIDs that are generated whenever a user account is created
+by the host application). 
+
+\section{Completed Work}
+\begin{enumerate}
+	\item Symmetric key management
+	\item User and session attribute columns masked and encrypted
+	\item Deployment scheme set up, including database systems
+	\item Initial audit design implemented
+\end{enumerate}
+
+\section{Deployment Strategy}
+TODO
+
+\section{Future Work}
+TODO
 
 \begin{comment}
 \begin{table}

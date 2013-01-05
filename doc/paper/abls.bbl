@@ -1,0 +1,31 @@
+\begin{thebibliography}{1}
+
+\bibitem{Bethencourt2007-CPABE}
+J.~Bethencourt, A.~Sahai, and B.~Waters.
+\newblock Ciphertext-policy attribute-based encryption.
+\newblock In {\em Proceedings of the 2007 IEEE Symposium on Security and
+  Privacy}, SP '07, pages 321--334, Washington, DC, USA, 2007. IEEE Computer
+  Society.
+
+\bibitem{Ma2008-FssAgg}
+D.~Ma.
+\newblock Practical forward secure sequential aggregate signatures.
+\newblock In {\em Proceedings of the 2008 ACM symposium on Information,
+  computer and communications security}, ASIACCS '08, pages 341--352, New York,
+  NY, USA, 2008. ACM.
+
+\bibitem{Schneier1999-Secure}
+B.~Schneier and J.~Kelsey.
+\newblock Secure audit logs to support computer forensics.
+\newblock {\em ACM Transactions on Information and System Security (TISSEC)},
+  2(2):159--176, 1999.
+
+\bibitem{Yavuz2009-BAF}
+A.~A. Yavuz and P.~Ning.
+\newblock Baf: An efficient publicly verifiable secure audit logging scheme for
+  distributed systems.
+\newblock In {\em Proceedings of the 2009 Annual Computer Security Applications
+  Conference}, ACSAC '09, pages 219--228, Washington, DC, USA, 2009. IEEE
+  Computer Society.
+
+\end{thebibliography}
