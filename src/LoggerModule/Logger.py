@@ -59,6 +59,15 @@ class Logger(threading.Thread):
 		# Create the log queue
 		self.queue = Queue.Queue()
 
+		# Setup the Python logger
+		self.lgr = logging.getLogger('abls')
+		self.lgr.setLevel(logging.DEBUG)
+		fh = logging.FileHandler('abls.log')
+		fh.setLevel(logging.WARNING)
+		frmt = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+		fh.setFormatter(frmt)
+		self.lgr.addHandler(fh)
+
 	def createSession(self, userId, sessionId):
 		''' Initialize the authentication keys that are used when verifying the 
 		entries in the log database.

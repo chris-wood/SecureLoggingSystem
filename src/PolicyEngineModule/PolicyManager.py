@@ -44,7 +44,7 @@ class PolicyManager(ThreadingActor):
 		# Create the DB shim to connect to the user attribute database
 		self.shim = DBShim.DBShim("/Users/caw/Projects/PrivateProjects/LoggingSystem/src/DatabaseModule/users.db") 
 
-		print("PolicyManager actor started.")
+		self.lgr.debug("PolicyManager: actor started.")
 
 	def on_receive(self, message):
 		''' Handle an incoming message.
@@ -60,10 +60,10 @@ class PolicyManager(ThreadingActor):
 		''' Generate the policy for verification data (containing the verify policy and
 			the source user ID).
 		'''
-		self.lgr.debug("DEBUG: generating verification policy in PolicyManager.")
+		self.lgr.debug("PolicyManager: generating verification policy in PolicyManager.")
 		entry = LogEntry.LogEntry(jsonString = payload)
 		conj = '(verifier ' + entry.user + ')'
-		self.lgr.debug("DEBUG: the resulting policy is: " + conj)
+		self.lgr.debug("PolicyManager: the resulting policy is: " + conj)
 		return conj
 
 	def generatePolicy(self, payload):
@@ -71,7 +71,7 @@ class PolicyManager(ThreadingActor):
 		Generate the policy for a specific user by reaching out the user attribute database
 		for this user's attributes.
 
-		TODO: this is incorrect - it should generate the policy based on the user ID, a colleague flag, and anything else that is event-specific)
+		TODO: caw:  this is incorrect - it should generate the policy based on the user ID, a colleague flag, and anything else that is event-specific)
 		'''
 		entry = LogEntry.LogEntry(jsonString = payload)
 		conj = ''

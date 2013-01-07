@@ -23,8 +23,9 @@ class TrafficProxy(threading.Thread):
 	activeSessions = []
 
 	def __init__(self):	
-		# Initialize the traffic proxy that intercepts traffic from the incoming source,
-		# makes sure it's authenticated, and then sets up a handler to parse all traffic
+		''' Initialize the traffic proxy that intercepts traffic from the incoming source,
+			makes sure it's authenticated, and then sets up a handler to parse all traffic.
+		'''
 		threading.Thread.__init__(self)
 		self.running = False
 
@@ -51,6 +52,8 @@ class TrafficProxy(threading.Thread):
 		self.context.use_certificate_file('./Keys/cert') # our self-signed certificate
 
 	def run(self):
+		''' Run the traffic proxy and listen for incoming connections.
+		'''
 		address = (self.HOST, self.PORT)
 		self.running = True
 		self.serverSock = socket.socket()
@@ -85,9 +88,12 @@ class TrafficProxy(threading.Thread):
 		#print("- end -")
 
 	def get(self):
-		#Retrieve the next element from the LogEntry queue
+		''' Retrieve teh next element from the LogEntry queue.
+		'''
 		return self.queue.get()
 
 	def kill(self):
+		''' Terminate the thread.
+		'''
 		self.lgr.deubg("Killing the traffic proxy.")
 		self.serverSock.close()
