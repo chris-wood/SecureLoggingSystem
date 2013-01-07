@@ -102,7 +102,8 @@ class Logger(threading.Thread):
 		''' Empty the queue into the log as fast as possible. We are the bottleneck.
 		'''
 		# Create the log shim.
-		self.logShim = DBShim.DBShim("/Users/caw/Projects/PrivateProjects/LoggingSystem/src/DatabaseModule/log.sqlite")
+		self.logShim = DBShim.DBShim("/Users/caw/Projects/SecureLoggingSystem/src/DatabaseModule/log.db")
+		self.keyShim = DBShim.DBShim("/Users/caw/Projects/SecureLoggingSystem/src/src/DatabaseModule/key.db")
 
 		self.running = True
 		while self.running:

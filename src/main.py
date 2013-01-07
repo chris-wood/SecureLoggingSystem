@@ -28,7 +28,7 @@ def bootstrap(debug = True):
 
 		# Check to see if we need to clear the table
 		# This is specific to SQLite - it needs to be less coupled to SQLite
-		shim = DBShim.DBShim("/Users/caw/Projects/PrivateProjects/LoggingSystem/src/DatabaseModule/log.sqlite")
+		shim = DBShim.DBShim("/Users/caw/Projects/SecureLoggingSystem/src/DatabaseModule/log.sqlite")
 		tableResults = shim.executeRawQuery("SELECT name FROM sqlite_master WHERE type='table' AND name='Log'")
 		if (len(tableResults) != 0):
 			shim.executeRawQuery("DELETE * FROM Log")
