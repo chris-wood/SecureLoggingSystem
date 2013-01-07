@@ -73,13 +73,13 @@ class Logger(threading.Thread):
 		entityKey = Random.new().read(32)
 
 		# These keys should be encrypted using CPABE for the (verifier role and user role)
+		# so they can easily be recovered for verification
 		msg = '{"user":' + str(userId) + ',"sessionId":' + str(sessionId) + '"}' 
 		policy = self.manager.ask({'command' : 'verifyPolicy', 'payload' : msg})
 		encryptedEpochKey = self.encryptionModule.encrypt(epochKey, policy)
 		encryptedEntityKey = self.encryptionModule.encrypt(entityKey, policy)
 
 		# Persist the encrypted keys
-		# TODO: these were self.logShim
 		self.keyShim.replaceInTable("InitialEpochKey", (userId, sessionId, encryptedEpochKey))
 		self.keyShim.replaceInTable("InitialEntityKey", (userId, sessionId, encryptedEntityKey))
 

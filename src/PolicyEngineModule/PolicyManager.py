@@ -33,7 +33,7 @@ class PolicyManager(ThreadingActor):
 		self.eventMap['eventB'] = self.engine.handleEventB
 
 		# Create the DB shim to connect to the user attribute database
-		self.shim = DBShim.DBShim("/Users/caw/Projects/PrivateProjects/LoggingSystem/src/DatabaseModule/users.sqlite") 
+		self.shim = DBShim.DBShim("/Users/caw/Projects/PrivateProjects/LoggingSystem/src/DatabaseModule/users.db") 
 
 		print("PolicyManager actor started.")
 
@@ -49,7 +49,9 @@ class PolicyManager(ThreadingActor):
 		''' Generate the policy for verification data (containing the verify policy and
 			the source user ID)
 		'''
-		print "hello world"
+		print("DEBUG: generating verification policy in PolicyManager")
+		entry = LogEntry.LogEntry(jsonString = payload)
+		attrs = self.userAttributes(str(entry.user))
 
 	def generatePolicy(self, payload):
 		'''
