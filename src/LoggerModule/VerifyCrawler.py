@@ -26,8 +26,7 @@ class VerifyCrawler(threading.Thread):
 	'''
 
 	def __init__(self, server):
-		'''
-		Constructor that stores the log server information.
+		''' Constructor that stores the log server information.
 		'''
 		threading.Thread.__init__(self)
 		self.server = server
@@ -38,8 +37,7 @@ class VerifyCrawler(threading.Thread):
 		self.MAX_TRIES = 10 # This can (and should) be configured by expermientation.
 
 	def run(self):
-		'''
-		The main thread loop for this verifier.
+		''' The main thread loop for this verifier.
 		'''
 		# Create the shim
 		self.shim = DBShim.DBShim(self.server)
@@ -71,8 +69,7 @@ class VerifyCrawler(threading.Thread):
 			time.sleep(5)
 
 	def selectRow(self):
-		'''
-		Select a row from the database to perform a strong verification on
+		''' Select a row from the database to perform a strong verification on
 		'''
 		userId = sessionId = 0
 		
@@ -108,8 +105,7 @@ class VerifyCrawler(threading.Thread):
 		return (userId, sessionId)
 
 	def strongestVerify(self, userId, sessionId, log, epochKey, entityKey, lastDigest, EPOCH_WINDOW_SIZE = Logger.Logger.EPOCH_WINDOW_SIZE):
-		'''
-		Walks the log chain and epoch chain for verification, and computes the 
+		''' Walks the log chain and epoch chain for verification, and computes the 
 		entity digests at every epoch cycle for comparison to check with
 		the end result. Not publicly verifiable, and requires the initial epoch and entity keys.
 		'''
@@ -189,8 +185,7 @@ class VerifyCrawler(threading.Thread):
 			return ctChain
 
 	def weakVerify(self, userId, sessionId, log, epochKey, entityKey, EPOCH_WINDOW_SIZE):
-		'''
-		Only walks the log chain for verification
+		''' Only walks the log chain for verification.
 		'''
 		ctChain = []
 
@@ -229,10 +224,9 @@ class VerifyCrawler(threading.Thread):
 			return ctChain
 		
 def main():
+	''' The crawler thread test (watch it go at runtime).
 	'''
-	The crawler thread test (watch it go at runtime).
-	'''
-	crawler = VerifyCrawler("/Users/caw/Projects/PrivateProjects/LoggingSystem/src/DatabaseModule/log.sqlite")
+	crawler = VerifyCrawler("/Users/caw/Projects/PrivateProjects/LoggingSystem/src/DatabaseModule/log.db")
 	crawler.run()
 
 if (__name__ == '__main__'):

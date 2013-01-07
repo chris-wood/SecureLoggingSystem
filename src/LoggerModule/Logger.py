@@ -101,8 +101,6 @@ class Logger(threading.Thread):
 		self.initialEpochKey[(userId, sessionId)] = epochKey
 		self.initialEntityKey[(userId, sessionId)] = entityKey
 
-		# TODO: settle on the relational database schema...
-
 	def getQueue(self):
 		''' Fetch this logger's internal queue.
 		'''
