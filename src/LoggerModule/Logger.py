@@ -79,8 +79,9 @@ class Logger(threading.Thread):
 		encryptedEntityKey = self.encryptionModule.encrypt(entityKey, policy)
 
 		# Persist the encrypted keys
-		self.logShim.replaceInTable("InitialEpochKey", (userId, sessionId, encryptedEpochKey))
-		self.logShim.replaceInTable("InitialEntityKey", (userId, sessionId, encryptedEntityKey))
+		# TODO: these were self.logShim
+		self.keyShim.replaceInTable("InitialEpochKey", (userId, sessionId, encryptedEpochKey))
+		self.keyShim.replaceInTable("InitialEntityKey", (userId, sessionId, encryptedEntityKey))
 
 		# TODO: how to mask the userId and sessionId columns?
 		# What key to use to encrypt the user and session IDs?
@@ -131,12 +132,14 @@ class Logger(threading.Thread):
 			# Create the initial epoch block
 			currKey = self.initialEpochKey[(userId, sessionId)]
 			self.epochKey[(userId, sessionId)] = currKey
-			self.logShim.insertIntoTable("EpochKey", (userId, sessionId, currKey))
+			#self.logShim.insertIntoTable("EpochKey", (userId, sessionId, currKey))
+			self.keyShim.insertIntoTable("EpochKey", (userId, sessionId, currKey))
 			lastEpochDigest = hmac.new(currKey, "0", hashlib.sha512).hexdigest()
 
 			# Set the entity key
 			self.entityKey[(userId, sessionId)] = self.initialEntityKey[(userId, sessionId)]
-			self.logShim.insertIntoTable("EntityKey", (userId, sessionId, self.entityKey[(userId, sessionId)]))
+			#self.logShim.insertIntoTable("EntityKey", (userId, sessionId, self.entityKey[(userId, sessionId)]))
+			self.keyShim.insertIntoTable("EntityKey", (userId, sessionId, self.entityKey[(userId, sessionId)]))
 
 			# Save the epoch digest
 			self.logShim.insertIntoTable("Epoch", (userId, sessionId, lastEpochDigest))
@@ -147,8 +150,10 @@ class Logger(threading.Thread):
 			# Update the epoch/entity key values from the database
 			length = len(logResults)
 			valueMap = {"userId" : userId, "sessionId" : sessionId}
-			epochKeyResults = self.logShim.executeMultiQuery("EpochKey", valueMap)
-			entityKeyResults = self.logShim.executeMultiQuery("EntityKey", valueMap)
+			#epochKeyResults = self.logShim.executeMultiQuery("EpochKey", valueMap)
+			#entityKeyResults = self.logShim.executeMultiQuery("EntityKey", valueMap)
+			epochKeyResults = self.keyShim.executeMultiQuery("EpochKey", valueMap)
+			entityKeyResults = self.keyShim.executeMultiQuery("EntityKey", valueMap)
 			self.epochKey[(userId, sessionId)] = epochKeyResults[len(epochKeyResults) - 1]["key"]
 			self.entityKey[(userId, sessionId)] = entityKeyResults[len(entityKeyResults) - 1]["key"]
 
@@ -158,7 +163,8 @@ class Logger(threading.Thread):
 				currKey = str(self.epochKey[(userId, sessionId)])
 				newKey = self.sha3.Keccak((len(bytes(currKey)), currKey.encode("hex")))
 				self.epochKey[(userId, sessionId)] = newKey
-				self.logShim.insertIntoTable("EpochKey", (userId, sessionId, newKey))
+				#self.logShim.insertIntoTable("EpochKey", (userId, sessionId, newKey))
+				self.keyShim.insertIntoTable("EpochKey", (userId, sessionId, newKey))
 
 				# Pull the last epoch block
 				length = len(epochResults)
@@ -199,7 +205,8 @@ class Logger(threading.Thread):
 		lastEntityDigest = hmac.new(currEntityKey, xi, hashlib.sha512).hexdigest()
 		self.logShim.replaceInTable("Entity", (userId, sessionId, lastEntityDigest))
 		self.entityKey[(userId, sessionId)] = hmac.new(currEntityKey, "some constant value", hashlib.sha512).hexdigest() # update the keys
-		self.logShim.insertIntoTable("EntityKey", (userId, sessionId, self.entityKey[(userId, sessionId)]))
+		#self.logShim.insertIntoTable("EntityKey", (userId, sessionId, self.entityKey[(userId, sessionId)]))
+		self.keyShim.insertIntoTable("EntityKey", (userId, sessionId, self.entityKey[(userId, sessionId)]))
 
 		# Store the elements now
 		self.logShim.insertIntoTable("Log", (userId, sessionId, epochLength, str(message), xi, yi))
@@ -218,7 +225,8 @@ class Logger(threading.Thread):
 
 		# See if this is a new session that we need to manage, or if it's part of an existing session
 		valueMap = {"userId" : entry.user, "sessionId" : entry.sessionId}
-		results = self.logShim.executeMultiQuery("InitialEpochKey", valueMap)
+		#results = self.logShim.executeMultiQuery("InitialEpochKey", valueMap)
+		results = self.keyShim.executeMultiQuery("InitialEpochKey", valueMap)
 		if (len(results) == 0):
 			self.createSession(entry.user, entry.sessionId)
 
