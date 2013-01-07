@@ -74,6 +74,14 @@ class DBShim(object):
 		self.cursor.execute(queryString)
 		return self.cursor.fetchall()
 
+	def executeRawQuery(self, query):
+		''' Execute a user-defined query on the specified table. 
+
+		WARNING: THIS IS NOT SAFE. FOR DEVELOPMENT PURPOSES ONLY.
+		'''
+		self.cursor.execute(query)
+		return self.cursor.fetchall()
+
 	def executeQuery(self, table, key, value):
 		''' Perform a query on the specified table.
 		'''
