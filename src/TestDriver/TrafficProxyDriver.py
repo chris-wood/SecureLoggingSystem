@@ -24,16 +24,14 @@ EventCount = 20
 ssl_sock = None
 
 def close():
-	'''
-	Close the open socket.
+	''' Close the open socket.
 	'''
 	global ssl_sock
 	ssl_sock.close()
 	sys.exit(0)
 
 def test(user, session, payload, count, sleep = 0):
-	'''
-	Send some test data to the user.
+	''' Send some test data to the user.
 	'''
 	global ssl_sock
 	for i in range(0, count):
@@ -42,8 +40,7 @@ def test(user, session, payload, count, sleep = 0):
 		time.sleep(sleep)
 
 def stressTest_1():
-	'''
-	Run a stress test on the system. 
+	''' Run a stress test on the system. 
 	'''
 	global EventCount
 	global ssl_sock
@@ -57,8 +54,7 @@ def stressTest_1():
 		ssl_sock.write('{"user":' + str(user) + ',"sessionId":' + str(session) + ',"payload":"' + str(payload) + '"}')
 
 def help():
-	'''
-	Display the supported commands.
+	''' Display the supported commands.
 	'''
 	print("Supported commands:")
 	print("   help or ? - display available commands.")
@@ -66,8 +62,7 @@ def help():
 	print("   test - write a sample message to the socket 10 times (JSON wrapping is automatic)")
 
 def handleInput(userInput):
-	'''
-	Determine the action to take based on user input.
+	''' Determine the action to take based on user input.
 	'''
 	if (userInput == 'help' or userInput == '?'):
 		help()
@@ -80,6 +75,8 @@ def handleInput(userInput):
 		stressTest_1()
 
 def prompt():
+	''' Prompt the user to enter a command (if they want).
+	'''
 	print("-----------------------------------------")
 	print("Type 'help' or '?' for available commands")
 	print("-----------------------------------------")
@@ -94,8 +91,7 @@ def prompt():
 		handleInput(userInput)
 
 def main():
-	'''
-	The main driver for this test module. Create the secure socket connection
+	''' The main driver for this test module. Create the secure socket connection
 	and the jump into the user input loop.
 	'''
 	global ssl_sock

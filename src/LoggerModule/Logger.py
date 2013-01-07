@@ -9,6 +9,7 @@ import random
 import threading
 import Queue
 import json
+import logging # Python logging module
 
 # Add in the files from the other modules
 sys.path.append("../PolicyEngineModule/")
@@ -25,6 +26,7 @@ import Keccak
 
 # For symmetric encryption
 from Crypto.Cipher import AES
+from Crypto import Random
 
 # For HMAC
 import hashlib, hmac
@@ -111,7 +113,7 @@ class Logger(threading.Thread):
 		'''
 		# Create the log shim.
 		self.logShim = DBShim.DBShim("/Users/caw/Projects/SecureLoggingSystem/src/DatabaseModule/log.db")
-		self.keyShim = DBShim.DBShim("/Users/caw/Projects/SecureLoggingSystem/src/src/DatabaseModule/key.db")
+		self.keyShim = DBShim.DBShim("/Users/caw/Projects/SecureLoggingSystem/src/DatabaseModule/key.db")
 
 		self.running = True
 		while self.running:

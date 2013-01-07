@@ -88,7 +88,6 @@ def main():
 	bootstrap(debug = debugMode)
 
 	# Just start the traffic proxy... that will spawn everything else as needed
-	'''
 	proxy = TrafficProxy.TrafficProxy().start()
 
 	# Handle user input now...
@@ -104,7 +103,6 @@ def main():
 
 	# Kill everything
 	proxy.kill()
-	'''
 	sys.exit(0);
 
 if (__name__ == '__main__'):

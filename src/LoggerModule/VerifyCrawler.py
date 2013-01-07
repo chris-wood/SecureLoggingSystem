@@ -8,7 +8,9 @@ import time
 import threading
 import struct
 import string
-import Logger
+import logging # Python logging module
+
+# Our own stuff
 import DBShim
 import Logger
 

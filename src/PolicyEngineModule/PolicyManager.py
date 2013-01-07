@@ -3,13 +3,15 @@ File: PolicyManager.py
 Author: Christopher Wood, caw4567@rit.edu
 '''
 
-import PolicyEngine
+import logging # Python logging module
 
 import sys
 sys.path.append("../LoggerModule")
 sys.path.append("../Common")
 sys.path.append("../DatabaseModule")
 
+# Our own stuff
+import PolicyEngine
 import LogEntry
 import EventInformation
 import DBShim
