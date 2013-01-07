@@ -32,12 +32,23 @@ class PolicyManager(ThreadingActor):
 		self.eventMap['eventA'] = self.engine.handleEventA
 		self.eventMap['eventB'] = self.engine.handleEventB
 
+		# Setup the Python logger
+		self.lgr = logging.getLogger('abls')
+		self.lgr.setLevel(logging.DEBUG)
+		fh = logging.FileHandler('abls.log')
+		fh.setLevel(logging.WARNING)
+		frmt = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+		fh.setFormatter(frmt)
+		self.lgr.addHandler(fh)
+
 		# Create the DB shim to connect to the user attribute database
 		self.shim = DBShim.DBShim("/Users/caw/Projects/PrivateProjects/LoggingSystem/src/DatabaseModule/users.db") 
 
 		print("PolicyManager actor started.")
 
 	def on_receive(self, message):
+		''' Handle an incoming message.
+		'''
 		if message.get('command') == 'policy':
 			return self.generatePolicy(message['payload'])
 		elif message.get('command') == 'verifyPolicy':
@@ -47,11 +58,13 @@ class PolicyManager(ThreadingActor):
 
 	def generateVerifyPolicy(self, payload):
 		''' Generate the policy for verification data (containing the verify policy and
-			the source user ID)
+			the source user ID).
 		'''
-		print("DEBUG: generating verification policy in PolicyManager")
+		self.lgr.debug("DEBUG: generating verification policy in PolicyManager.")
 		entry = LogEntry.LogEntry(jsonString = payload)
-		attrs = self.userAttributes(str(entry.user))
+		conj = '(verifier ' + entry.user + ')'
+		self.lgr.debug("DEBUG: the resulting policy is: " + conj)
+		return conj
 
 	def generatePolicy(self, payload):
 		'''
