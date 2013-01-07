@@ -28,10 +28,30 @@ def bootstrap(debug = True):
 
 		# Check to see if we need to clear the table
 		# This is specific to SQLite - it needs to be less coupled to SQLite
-		shim = DBShim.DBShim("/Users/caw/Projects/SecureLoggingSystem/src/DatabaseModule/log.sqlite")
-		tableResults = shim.executeRawQuery("SELECT name FROM sqlite_master WHERE type='table' AND name='Log'")
+		shim = DBShim.DBShim("/Users/caw/Projects/SecureLoggingSystem/src/DatabaseModule/log.db")
+		tableResults = shim.executeRawQuery("SELECT name FROM sqlite_master WHERE type='table' AND name='log'")
 		if (len(tableResults) != 0):
-			shim.executeRawQuery("DELETE * FROM Log")
+			shim.executeRawQuery("DELETE FROM log")
+		tableResults = shim.executeRawQuery("SELECT name FROM sqlite_master WHERE type='table' AND name='entity'")
+		if (len(tableResults) != 0):
+			shim.executeRawQuery("DELETE FROM entity")
+		tableResults = shim.executeRawQuery("SELECT name FROM sqlite_master WHERE type='table' AND name='epoch'")
+		if (len(tableResults) != 0):
+			shim.executeRawQuery("DELETE FROM epoch")
+
+
+		# Check to see if we need to clear the table
+		# This is specific to SQLite - it needs to be less coupled to SQLite
+		shim = DBShim.DBShim("/Users/caw/Projects/SecureLoggingSystem/src/DatabaseModule/users.db")
+		tableResults = shim.executeRawQuery("SELECT name FROM sqlite_master WHERE type='table' AND name='users'")
+		if (len(tableResults) != 0):
+			# Delete the contents in the table
+			shim.executeRawQuery("DELETE FROM users")
+			
+			# Re-populate it with dummy users (alice, bob, chris)
+			shim.insertIntoTable("users", (0, "alice", "alice@test.com", "one"))
+			shim.insertIntoTable("users", (1, "bob", "bob@test.com", "two"))
+			shim.insertIntoTable("users", (2, "chris", "chris@test.com", "three"))
 
 def help():
 	'''
@@ -58,6 +78,7 @@ def main():
 	needed to be active at runtime.
 	'''	
 
+	# Check for debug mode (which clears the database and initalizes with some content)
 	debugMode = False
 	if (len(sys.argv) == 2):
 		if ("-c" in sys.argv[1]):

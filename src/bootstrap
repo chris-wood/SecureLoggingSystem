@@ -1,5 +1,0 @@
-echo "Bootstrapping the system databases."
-sqlite3 DatabaseModule/log.db < DatabaseModule/bootstrap_log.sql
-sqlite3 DatabaseModule/key.db < DatabaseModule/bootstrap_key.sql
-sqlite3 DatabaseModule/policy.db < DatabaseModule/bootstrap_policy.sql
-sqlite3 DatabaseModule/user.db < DatabaseModule/bootstrap_user.sql
