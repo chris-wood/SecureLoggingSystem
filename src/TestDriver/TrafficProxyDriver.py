@@ -46,8 +46,8 @@ def stressTest_1():
 	global ssl_sock
 
 	payload = "THIS IS A NORMAL SIZED PAYLOAD THAT MOST APPLICATIONS WILL PROBABLY GENERATE"
-	user = 1 # change this to reflect what's in the user database
-	session = 1
+	user = "alice" # change this to reflect what's in the user database
+	session = 0
 
 	for i in range(0, EventCount):
 		print("Sending message: " + str(i))

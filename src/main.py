@@ -49,9 +49,10 @@ def bootstrap(debug = True):
 			shim.executeRawQuery("DELETE FROM users")
 			
 			# Re-populate it with dummy users (alice, bob, chris)
-			shim.insertIntoTable("users", (0, "alice", "alice@test.com", "one"))
-			shim.insertIntoTable("users", (1, "bob", "bob@test.com", "two"))
-			shim.insertIntoTable("users", (2, "chris", "chris@test.com", "three"))
+			print("Initializing dummy data into the users table")
+			shim.insertIntoTable("users", "(?, ?, ?, ?)", (0, "alice", "alice@test.com", "one"))
+			shim.insertIntoTable("users", "(?, ?, ?, ?)", (1, "bob", "bob@test.com", "two"))
+			shim.insertIntoTable("users", "(?, ?, ?, ?)", (2, "chris", "chris@test.com", "three"))
 
 def help():
 	'''
@@ -69,7 +70,7 @@ def handleInput(userInput):
 def printUsage():
 	''' Print the usage message.
 	'''
-	print("Usage: python main.py [-c]")
+	print("Usage: python main.py [-c] [-s]")
 	print("   -c -> clear the Log database")
 
 def main():
@@ -80,30 +81,34 @@ def main():
 
 	# Check for debug mode (which clears the database and initalizes with some content)
 	debugMode = False
-	if (len(sys.argv) == 2):
-		if ("-c" in sys.argv[1]):
-			debugMode = True
+	startMode = False
+	if (len(sys.argv) >= 2):
+		for i in range(1, len(sys.argv)):
+			if ("-c" in sys.argv[i]):
+				debugMode = True
+			if ("-s" in sys.argv[i]):
+				startMode = True
 
 	# Bootstrap the system
 	bootstrap(debug = debugMode)
 
 	# Just start the traffic proxy... that will spawn everything else as needed
-	proxy = TrafficProxy.TrafficProxy().start()
-
-	# Handle user input now...
-	print("---------------------------")
-	print("Type 'help' or '?' for help")
-	print("---------------------------")
-	userInput = raw_input(">> ")
-	handleInput(userInput)
-
-	while (userInput != 'quit'):
+	if (startMode):
+		proxy = TrafficProxy.TrafficProxy().start()
+		print("---------------------------")
+		print("Type 'help' or '?' for help")
+		print("---------------------------")
 		userInput = raw_input(">> ")
 		handleInput(userInput)
 
-	# Kill everything
-	proxy.kill()
-	sys.exit(0);
+		# The user input loop
+		while (userInput != 'quit'):
+			userInput = raw_input(">> ")
+			handleInput(userInput)
+
+		# Kill everything
+		proxy.kill()
+		sys.exit(0);
 
 if (__name__ == '__main__'):
 	main()

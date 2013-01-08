@@ -39,17 +39,19 @@ class DBShim(object):
 			self.conn.close()
 			DBShim.connectionMap[self.dbString] = DBShim.connectionMap[self.dbString] - 1
 
-	def insertIntoTable(self, table, rowContents):
+	def insertIntoTable(self, table, rowAttributes, rowContents):
 		''' Insert a row into the specified table. Data filtering happens on behalf of the caller.
 		'''
 		# Build the entry value for the query
-		emptyVal = "("
-		for i in range(0, len(rowContents) - 1):
-			emptyVal = emptyVal + "?,"
-		emptyVal = emptyVal + "?)"
+		#emptyVal = "("
+		#for i in range(0, len(rowContents) - 1):
+		#	emptyVal = emptyVal + "?,"
+		#emptyVal = emptyVal + "?)"
 
 		# Execute the query...
-		self.cursor.execute('INSERT INTO ' + table + ' values ' + emptyVal, rowContents)
+		print('INSERT INTO ' + table + ' values ' + rowAttributes + " " + str(rowContents))
+		self.cursor.execute('INSERT INTO ' + table + ' VALUES ' + rowAttributes, rowContents)
+		#self.cursor.execute('INSERT INTO ' + table + ' values ' + rowAttributes + " " + str(rowContents))
 		self.conn.commit()
 
 	def replaceInTable(self, table, rowContents):
@@ -98,9 +100,9 @@ def main():
 	''' Unit test for this small module.
 	'''
 	print("Starting DB shim test...")
-	shim = DBShim("users.sqlite")
-	rows = shim.executeQuery("users", "id", "1")
-	print(rows[0]["id"])
+	shim = DBShim("users.db")
+	rows = shim.executeQuery("users", "userId", "1")
+	print(rows[0]["userId"])
 	print(rows[0]["name"])
 	print(rows[0]["email"])
 	print(rows[0]["attributes"])
@@ -109,22 +111,22 @@ def main():
 	print(shim.randomQuery("users"))
 
 	print("Starting log shim test...")
-	shim = DBShim("log.sqlite")
-	shim.insertIntoTable("Log", (1, 2, 0, "HELLO WORLD", 1337, 1337))
-	shim.insertIntoTable("Log", (1, 2, 0, "HELLO WORLD", 123, 4444))
-	shim.insertIntoTable("Log", (1, 2, 0, "HELLO WORLD", 123, 1312337))
-	shim.insertIntoTable("Log", (1, 5, 0, "THIS WILL NOT WORK", 123, 1312337))
-	print(shim.executeQuery("Log", "userId", 1))
+	shim = DBShim("log.db")
+	shim.insertIntoTable("log", "(?, ?, ?, ?, ?, ?)", (1, 2, 0, "HELLO WORLD", 1337, 1337))
+	shim.insertIntoTable("log", (1, 2, 0, "HELLO WORLD", 123, 4444))
+	shim.insertIntoTable("log", (1, 2, 0, "HELLO WORLD", 123, 1312337))
+	shim.insertIntoTable("log", (1, 5, 0, "THIS WILL NOT WORK", 123, 1312337))
+	print(shim.executeQuery("log", "userId", 1))
 
 	valueMap = {"userId" : 1, "sessionId" : 2}
-	print(shim.executeMultiQuery("Log", valueMap))
+	print(shim.executeMultiQuery("log", valueMap))
 	valueMap = {"userId" : 1, "sessionId" : 10000}
-	print(len(shim.executeMultiQuery("Log", valueMap)))
-	shim.replaceInTable("Log", (1, 5, 0, "CHANGED!", 123, 28928282828))
-	print(shim.executeQuery("Log", "userId", 1))	
+	print(len(shim.executeMultiQuery("log", valueMap)))
+	shim.replaceInTable("log", (1, 5, 0, "CHANGED!", 123, 28928282828))
+	print(shim.executeQuery("log", "userId", 1))	
 
 	print("The last test.")
-	print(shim.executeQuery("Log", "userId", 1))
+	print(shim.executeQuery("log", "userId", 1))
 
 # Let it rip...
 if (__name__ == '__main__'):

@@ -86,6 +86,7 @@ class Logger(threading.Thread):
 		# These keys should be encrypted using CPABE for the (verifier role and user role)
 		# so they can easily be recovered for verification
 		msg = '{"user":' + str(userId) + ',"sessionId":' + str(sessionId) + '"}' 
+		print "verify msg: " + str(msg)
 		policy = self.manager.ask({'command' : 'verifyPolicy', 'payload' : msg})
 		encryptedEpochKey = self.encryptionModule.encrypt(epochKey, policy)
 		encryptedEntityKey = self.encryptionModule.encrypt(entityKey, policy)
@@ -118,6 +119,7 @@ class Logger(threading.Thread):
 		self.running = True
 		while self.running:
 			msg = self.queue.get()
+			print "processing: " + str(msg)
 			self.processLogEntry(msg)
 
 	def addNewEvent(self, userId, sessionId, message):
