@@ -32,7 +32,7 @@
 \alignauthor{
 Christopher A. Wood \\
 Department of Computer Science \\
-caw4567@rit.edu
+{\tt caw4567@rit.edu}
 }}
 \date{\today}
 \maketitle
@@ -239,114 +239,7 @@ The construction of each log entry satisfies the following properties:
 	\item The log is searchable by the user identity and session numbers, which leads to very fine-grained database queries. 
 \end{enumerate}
 
-\subsubsection{Computational Complexity}
-\label{log:ComputationalComplexity}
-In the worst case scenario, a single log construction event must generate the newest log entry $L_i$ and 
-update the epoch context block chain to cycle into a new epoch window $Ep_j$. Based on the definition
-of the log entries, a combination of one hash computation, one $HMAC$ computation, and one entry payload
-encryption is required. Furthermore, based on the previous definitions, only a single
-$HMAC$ computation is required to generate each epoch context block. 
-
-Under the assumption that each log entry payload will be of a fixed size (in the number of bytes 
-used to represent the data), then we will have a constant time complexity for each encryption 
-operation. Furthermore, since each hash and $HMAC$ operation is parameterized by fixed-length
-inputs, these will also yield constant time complexities. Thus, we have the following time complexities
-for each of these operations:
-\begin{itemize}
-	\item Hash - $\mathcal{O}(1)$
-	\item $HMAC$ - $\mathcal{O}(1)$
-	\item Encryption - $\mathcal{O}(1)$
-\end{itemize}
-Therefore, it is easy to see that log generation has a constant time complexity, which is necessary for system scalability
-and performance under heavy traffic loads. However, the constant can vary significantly depending on
-the underlying cryptographic parameters. We will revisit this issue in the evaluation results, presented in Section \ref{sec:analysis}.
-
-%TODO: generate better facts on time complexity of hmac and encryption (ask Staszek...)
-
-\subsubsection{Verification Modes}
-\label{log:VerificationModes}
-
-Our log construction scheme enables three different modes of verification to be implemented,
-each of which has different integrity and performance guarantees. Table \ref{tab:verifModes} 
-provides an overview of the differences between these modes of verification. Algorithms \ref{alg:strongVerify}
-and \ref{alg:weakVerify} provide a description of two of these verification modes.
-
-\begin{table*}[ht!]
-	\caption{The integrity and performance differences for the three log verification modes supported by the log generation scheme.}
-	\label{tab:verifModes}
-	\begin{tabular}{|l|l|l|l|}
-		\hline
-		\textbf{Verification Mode} & \textbf{Visibility} & \textbf{Integrity Guarantees} & \textbf{Worst-case Performance} \\ \hline
-		Weak & Public & Weak & 1 Keccak computation \\ 
-		Normal & Private & Medium & 2 Keccak and 2 $HMAC$ computations \\ 
-		Strong & Private & Strong & 2 Keccak and 4 $HMAC$ computations \\
-		\hline
-	\end{tabular}
-\end{table*}
-
-\begin{algorithm}[ht!] %[htb]
-\caption{Strongest verification procedure} \label{alg:strongVerify}
-\begin{algorithmic}[1]
-\REQUIRE{$UID$, $SID$, $\mathcal{L} = \{L_0, L_1,...,L_n\}, ChainDigest, Ep_k, L_k, EpochSize$}
-% \ENSURE{The number of all minimum $(s,t)$-cuts of $G$}
-
-% I decided not to list the input/output in this case, so that's why the above two lines are commented out
-\STATE{$payload \leftarrow UID | SID | 0 | L_0[3] | 0$}
-\STATE{$epoch \leftarrow HMAC(Ep_k, 0)$}
-\STATE{$x_1 \leftarrow Keccak(payload)$}
-\STATE{Return $FAIL$ if $x_1 \not= L_0[4]$}
-\STATE{$y_1 \leftarrow HMAC(Ep_k, epoch | x_1)$}
-\STATE{Return $FAIL$ if $y_1 \not= L_0[5]$}
-\STATE{$ed \leftarrow HMAC(L_k, x_1)$}
-\STATE{$L_k \leftarrow HMAC(L_k, \text{''constant value''})$}
-\FOR{$i = 1 \to n$}
-	\STATE{$payload \leftarrow UID | SID | i | L_i[3] | L_{i - 1}[4]$}
-	\STATE{$x_i \leftarrow Keccak(payload)$}
-	\STATE{Return $FAIL$ if $x_i \not= L_i[4]$}
-	\IF{$i | EpochSize$}
-		\STATE{$newKey \leftarrow Keccak(Ep_k$)}
-		\STATE{$Ep_k \leftarrow newKey$}
-		\STATE{$payload \leftarrow epoch | L_{i - 1}[4]$}
-		\STATE{$ed = HMAC(newKey, payload)$}
-	\ENDIF
-	\STATE{$y_i \leftarrow HMAC(Ep_k, epoch | x_i)$}
-	\STATE{Return $FAIL$ if $y_i \not= L_i[5]$}
-	\STATE{$ed \leftarrow HMAC(L_k, x_1)$}
-	\STATE{$L_k \leftarrow HMAC(L_k, \text{''constant value''})$}
-\ENDFOR
-\STATE{Return $FAIL$ if $ed \not= ChainDigest$}
-\STATE{Return $PASS$}
-\end{algorithmic}
-\end{algorithm}
-
-\begin{algorithm}[ht!] %[htb]
-\caption{Weak verification procedure} \label{alg:weakVerify}
-\begin{algorithmic}[1]
-\REQUIRE{$UID$, $SID$, $\mathcal{L} = \{L_0, L_1,...,L_n\}$}
-% \ENSURE{The number of all minimum $(s,t)$-cuts of $G$}
-
-% I decided not to list the input/output in this case, so that's why the above two lines are commented out
-\STATE{$payload \leftarrow UID | SID | 0 | L_0[3] | 0$}
-\STATE{$x_1 \leftarrow Keccak(payload)$}
-\STATE{Return $FAIL$ if $x_1 \not= L_0[4]$}
-\FOR{$i = 1 \to n$}
-	\STATE{$payload \leftarrow UID | SID | i | L_i[3] | L_{i - 1}[4]$}
-	\STATE{$x_i \leftarrow Keccak(payload)$}
-	\STATE{Return $FAIL$ if $x_i \not= L_i[4]$}
-\ENDFOR
-\STATE{Return $PASS$}
-\end{algorithmic}
-\end{algorithm}
-
-Although the weak verification mode does not provide the strongest integrity guarantees, it
-is useful for offline analysis of log files by users. In such situations, although the users 
-cannot be entirely positive that the log file has not been tampered with, they can at least 
-view some of their own data. For automated verifiers that run concurrently with the logging system, 
-the strong verification mode enables them to walk the database to perform integrity 
-checks on log chains for user sessions. This provides the users and system administrators 
-with confidence that the log database is correct. We discuss the role of automated
-verifiers in Section \ref{sec:architecture}.
-
+\begin{comment}
 \subsection{Searchability}
 Based on the definitions provided in Section \ref{sec:LogConstruction}, it is easy to 
 see that log searchability is done by querying the database with known user identities and optional session 
@@ -361,23 +254,103 @@ if the log server were compromised, the only information that a determined attac
 the log database is a collection of user identities, which do not directly correspond to ``real'' user
 identities (i.e. database user identities are GUIDs that are generated whenever a user account is created
 by the host application). 
+\end{comment}
 
-\section{Completed Work}
+\section{Implementation}
+In order to test both the correctness and performance of ABLS, a proof-of-concept system has been
+developed. In this section we provide the design and rationale for the prototype architecture.
+
+\subsection{Deployment}
+\label{sec:deployment}
+ABLS is designed to be a centralized logging system backed by a set of distributed databases. A context
+diagram for the ABLS deployment scheme is shown in Figure \ref{fig:deployment}, and a more detailed
+depiction of the flow of data between application and database servers is shown in Figure \ref{fig:design}.
+
+\begin{figure*}[htb!]
+\label{fig:design}
+\begin{center}
+\includegraphics[width=7in]{images/design.pdf}
+\caption{The deployment diagram for ABLS.}
+\end{center}
+\end{figure*}
+
+Based on the purpose of each piece of database used in the log, it is best to physically separate databases
+that store data of different security classes rather than rely on MAC with polyinstantiation. Of course, access control
+and authentication mechanisms for all database servers is enforced at the operating system level, thus
+prohibiting immediate access to all unauthorized users other than the {\tt LoggingModule} and {\tt PolicyEngine} 
+processes. 
+
+In the current ABLS prototype, all database servers are separated as individual SQLite database files. Once
+the deployment platform is selected and properly configured, these will be replaced with instances of MySQL 
+databases running on separate servers.
+
+\subsection{Key Management}
+In order to increase the performance of log entry encryption during a given user session, symmetric-key encryption
+using AES-256 is chosen to encrypt all log entry messages. The symmetric key is then encrypted using the CP-ABE
+scheme. This design enhancement enables increased improvement without sacrificing the level of confidentiality 
+granularity that is needed for each log entry. 
+
+The basic algorithm for encrypting a log entry is shown in Algorithm \ref{alg:encrypt}.
+
+\begin{algorithm}[ht!] %[htb]
+\caption{Log entry encryption} \label{alg:encrypt}
+\begin{algorithmic}[1]
+\REQUIRE{An unencrypted log entry $L_i$ for session $S_j$ of user $U_k$}
+% \ENSURE{The number of all minimum $(s,t)$-cuts of $G$}
+
+% I decided not to list the input/output in this case, so that's why the above two lines are commented out
+\STATE{Let $P$ be the access control policy for the message of $L_i$, as determined by the {\tt PolicyManager}}
+\IF{The symmetric key $K$ for $(U_k, S_j)$ has not been generated for $P$}
+	\STATE{Generate $K$ and encrypt it (with the CP-ABE encryption module) using $P$}
+	\STATE{Persist $K$ to the key database}
+\ENDIF
+\STATE{Encrypt $L_i$ with AES-256 using $K$, yielding $E(L_i, K)$}
+\STATE{Persist $(L_i, K)$ to the log database}
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Database Design}
+As shown in section \ref{sec:deployment}, there are four main databases that must be maintained by ABLS:
+the log, key, user, and policy database. The log database maintains the all information in the log chain for every 
+single user and session pair. The key database stores the cryptographic keys that were used to construct
+such log chains. The user and policy databases store user information and policy rules for ABLS, respectively. 
+In the current prototype of ABLS, the policy database is not used externally. All event rules are hard-coded into
+the {\tt PolicyEngine}. 
+
+In order to link the entries in the log tables to their corresponding verification and encryption keys in the key database,
+common user and session IDs are used (though not as the primary key for the tables since they do not satisfy
+the uniqueness property). However, because such the storage of such user and session information in plaintext
+may lead to violation of user privacy, they are deterministically masked before being stored in the database. 
+
+% TODO: how is the masking done?
+This masking procedure uses information sensitive to the 
+
+% User and session attribute columns masked and encrypted
+
+%\section{Auditing}
+%TODO: Initial audit design implemented
+
+\section{Completed and Future Work}
+Over the course of this project I have completed the following tasks.
+
+% TODO: expand on all of these - it should fill 3/4 of a page
+
 \begin{enumerate}
-	\item Symmetric key management
-	\item User and session attribute columns masked and encrypted
-	\item Deployment scheme set up, including database systems
-	\item Initial audit design implemented
-	\item Generated test data for practical applications
-	\item Extended the test driver program to provide a more robust interface to the client
-	\item Researched methods of client authentication
+	\item Symmetric-key encryption for the log entries was implemented and integrated into the relational database model.
+	\item The application and database bootstrap process was automated.
+	\item Redesigned the relational database model to account for the different security classes among data that is used by ABLS. This resulted in a physical separation of database servers.
+	\item Expanded the test driver program to include a more robust suite of tests to simulate varying traffic loads. The user interface of this program was also improved so as to aid the developers in interacting with the ABLS prototype.
+	\item The initial implementation of the database masking procedure was started.
 \end{enumerate}
 
-\section{Deployment Strategy}
-TODO: insert figure
-
 \section{Future Work}
-TODO
+
+% expand on this - it should fill 3/4 of a page
+
+- auditing design and implementation (define automated worker tasks that use pre-defined strategies for
+auditing (search by userID) or whatnot that can be triggered by any web application set in front of ABLS - 
+making it easy for auditors to start their own automated audits)
+- encrypting and masking user identity attributes in all of the databases
 
 \begin{comment}
 \begin{table}

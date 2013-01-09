@@ -235,6 +235,9 @@ class Logger(threading.Thread):
 		''' This method is responsible for processing a single msg retrieved from the traffic proxy.
 		'''
 		policy = self.manager.ask({'command' : 'policy', 'payload' : msg})
+
+		# TODO: use the symmetric key stored in memory here to encrypt, not the CP-ABE scheme
+
 		ciphertext = self.encryptionModule.encrypt(msg, policy)
 		print("ciphertext = " + str(ciphertext))
 

@@ -1,0 +1,488 @@
+<html>
+  <head>
+    <META http-equiv="Content-Type" content="text/html; charset=utf-16">
+    <title>Threat Model Analysis Results</title>
+    <style type="text/css">
+          /* HTML Elements Start*/
+          body, table, td, th
+          {
+          font-family: Segoe UI, tahoma, verdana, arial, helvetica, sans-serif;
+          background: white;
+          font-size: 9pt;
+          }
+
+          table
+          {
+          width: 100%;
+          border-collapse:collapse
+          }
+
+          th
+          {
+          vertical-align: top;
+          padding: 3px;
+          border-bottom: solid 1px #80a0c0;
+          font-weight: bold;
+          text-align: left;
+          }
+
+          td
+          {
+          vertical-align: top;
+          padding: 3px;
+          border-bottom: solid 1px #80a0c0;
+          }
+
+          DIV
+          {
+          -moz-box-sizing:border-box;
+          box-sizing:border-box;
+          }
+
+          blockquote
+          {
+          margin: 6px 15px 6px 15px;
+          }
+
+          a, a:visited, a:link
+          {
+          text-decoration: none;
+          color: #BB5503;
+          }
+
+          a:hover
+          {
+          text-decoration: underline;
+          color: #6593CF
+          }
+          /* HTML Elements End */
+
+          /* ID specific classes Start */
+          #reportTitle
+          {
+          font-size: 14pt;
+          width: 100%;
+          text-align: center;
+          padding: 5px 0px 5px 0px;
+          font-weight: bold;
+          border: solid 1px #15428B;
+          color: #15428B;
+          margin-bottom: 15px;
+          }
+
+          #tableOfContents
+          {
+          margin: 0px 30px 15px 30px;
+          width: 100%;
+          }
+
+          #TAMElements
+          {
+          margin-bottom: 15px;
+          }
+          /* ID specific classes End */
+
+          /* General classes start */
+          td.toc
+          {
+          padding: 3px 0px 3px 0px;
+          border-bottom-width: 0px;
+          text-align: center;
+          }
+
+          .sectionTitle
+          {
+          font-size: 12pt;
+          width: 100%;
+          padding: 5px 0px 5px 15px;
+          font-weight: bold;
+          background-color: #294C7A;
+          color: white;
+          margin-top: 15px;
+          }
+
+          .sectionSubTitle
+          {
+          font-size: 11pt;
+          width: 100%;
+          padding: 5px 0px 2px 0px;
+          font-weight: bold;
+          color: #15428B;
+          margin-bottom: 10px;
+          border-bottom: solid 1px #80a0c0;
+          }
+
+          .sectionSubTitle2
+          {
+          font-size: 11pt;
+          font-weight: bold;
+          color: #6593CF;
+          }
+
+          .sectionSubTitle3
+          {
+          font-size: 9pt;
+          font-weight: bold;
+          color: #15428B;
+          }
+          .sectionContent
+          {
+          padding: 10px;
+          border: solid 1px #15428B;
+          margin-bottom: 25px;
+          width: 100%;
+          }
+          /* General classes end */
+
+          /* Utility classes start */
+          .bottomPadding
+          {
+          padding-bottom: 15px;
+          }
+          /* Utility classes end */
+
+          /* Page Specific classes start */
+          td.TMILabel
+          {
+          padding: 10px 10px 10px 0px;
+          width: 20%;
+          font-weight: bold;
+          }
+
+          td.TMIData
+          {
+          padding: 10px 0px 10px 0px;
+          width: 80%;
+          }
+
+          td.TAMType
+          {
+          padding: 3px 10px 3px 0px;
+          width: 30%;
+          }
+
+          td.TAMDescription
+          {
+          padding: 3px 0px 3px 0px;
+          width: 70%;
+          }
+
+          th.TAMType
+          {
+          padding: 3px 10px 3px 0px;
+          width: 30%;
+          }
+
+          th.TAMDescription
+          {
+          padding: 3px 0px 3px 0px;
+          width: 70%;
+          }
+
+          .dvmCell
+          {
+          width: 50%;
+          }
+
+          .threatTextType
+          {
+          font-weight: bold;
+          }
+          /* Page Specific classes end */
+        </style>
+  </head>
+  <body>
+    <div id="reportTitle">
+            Threat Model Analysis Report: </div>
+    <div class="sectionTitle">Diagram Validation Messages</div>
+    <div class="sectionContent">There are no diagram validation messages.</div>
+    <div class="sectionTitle">Empty Threats</div>
+    <div class="sectionContent">
+      <div class="sectionSubTitle2 bottomPadding">The following threats have no threat description:</div>
+      <table>
+        <tr>
+          <th>Element Name</th>
+          <th>Threat Type</th>
+        </tr>
+        <tr>
+          <td>Attributes</td>
+          <td>Tampering</td>
+        </tr>
+        <tr>
+          <td>Attributes</td>
+          <td>InformationDisclosure</td>
+        </tr>
+        <tr>
+          <td>Attributes</td>
+          <td>DenialOfService</td>
+        </tr>
+        <tr>
+          <td>Encrypted log entry</td>
+          <td>Tampering</td>
+        </tr>
+        <tr>
+          <td>Encrypted log entry</td>
+          <td>InformationDisclosure</td>
+        </tr>
+        <tr>
+          <td>Encrypted log entry</td>
+          <td>DenialOfService</td>
+        </tr>
+        <tr>
+          <td>Log Entry</td>
+          <td>Tampering</td>
+        </tr>
+        <tr>
+          <td>Log Entry</td>
+          <td>InformationDisclosure</td>
+        </tr>
+        <tr>
+          <td>Log Entry</td>
+          <td>DenialOfService</td>
+        </tr>
+        <tr>
+          <td>Log Entry</td>
+          <td>Tampering</td>
+        </tr>
+        <tr>
+          <td>Log Entry</td>
+          <td>InformationDisclosure</td>
+        </tr>
+        <tr>
+          <td>Log Entry</td>
+          <td>DenialOfService</td>
+        </tr>
+        <tr>
+          <td>Policy query</td>
+          <td>Tampering</td>
+        </tr>
+        <tr>
+          <td>Policy query</td>
+          <td>InformationDisclosure</td>
+        </tr>
+        <tr>
+          <td>Policy query</td>
+          <td>DenialOfService</td>
+        </tr>
+        <tr>
+          <td>Policy</td>
+          <td>Tampering</td>
+        </tr>
+        <tr>
+          <td>Policy</td>
+          <td>InformationDisclosure</td>
+        </tr>
+        <tr>
+          <td>Policy</td>
+          <td>DenialOfService</td>
+        </tr>
+        <tr>
+          <td>Query attributes</td>
+          <td>Tampering</td>
+        </tr>
+        <tr>
+          <td>Query attributes</td>
+          <td>InformationDisclosure</td>
+        </tr>
+        <tr>
+          <td>Query attributes</td>
+          <td>DenialOfService</td>
+        </tr>
+        <tr>
+          <td>Query policy</td>
+          <td>Tampering</td>
+        </tr>
+        <tr>
+          <td>Query policy</td>
+          <td>InformationDisclosure</td>
+        </tr>
+        <tr>
+          <td>Query policy</td>
+          <td>DenialOfService</td>
+        </tr>
+        <tr>
+          <td>Responses</td>
+          <td>Tampering</td>
+        </tr>
+        <tr>
+          <td>Responses</td>
+          <td>InformationDisclosure</td>
+        </tr>
+        <tr>
+          <td>Responses</td>
+          <td>DenialOfService</td>
+        </tr>
+        <tr>
+          <td>Update policy</td>
+          <td>Tampering</td>
+        </tr>
+        <tr>
+          <td>Update policy</td>
+          <td>InformationDisclosure</td>
+        </tr>
+        <tr>
+          <td>Update policy</td>
+          <td>DenialOfService</td>
+        </tr>
+        <tr>
+          <td>Cloud Application</td>
+          <td>Spoofing</td>
+        </tr>
+        <tr>
+          <td>Cloud Application</td>
+          <td>Repudiation</td>
+        </tr>
+        <tr>
+          <td>Logger</td>
+          <td>Spoofing</td>
+        </tr>
+        <tr>
+          <td>Logger</td>
+          <td>Tampering</td>
+        </tr>
+        <tr>
+          <td>Logger</td>
+          <td>Repudiation</td>
+        </tr>
+        <tr>
+          <td>Logger</td>
+          <td>InformationDisclosure</td>
+        </tr>
+        <tr>
+          <td>Logger</td>
+          <td>DenialOfService</td>
+        </tr>
+        <tr>
+          <td>Logger</td>
+          <td>ElevationOfPrivilege</td>
+        </tr>
+        <tr>
+          <td>AttributeShim</td>
+          <td>Spoofing</td>
+        </tr>
+        <tr>
+          <td>AttributeShim</td>
+          <td>Tampering</td>
+        </tr>
+        <tr>
+          <td>AttributeShim</td>
+          <td>Repudiation</td>
+        </tr>
+        <tr>
+          <td>AttributeShim</td>
+          <td>InformationDisclosure</td>
+        </tr>
+        <tr>
+          <td>AttributeShim</td>
+          <td>DenialOfService</td>
+        </tr>
+        <tr>
+          <td>AttributeShim</td>
+          <td>ElevationOfPrivilege</td>
+        </tr>
+        <tr>
+          <td>LogServerShim</td>
+          <td>Spoofing</td>
+        </tr>
+        <tr>
+          <td>LogServerShim</td>
+          <td>Tampering</td>
+        </tr>
+        <tr>
+          <td>LogServerShim</td>
+          <td>Repudiation</td>
+        </tr>
+        <tr>
+          <td>LogServerShim</td>
+          <td>InformationDisclosure</td>
+        </tr>
+        <tr>
+          <td>LogServerShim</td>
+          <td>DenialOfService</td>
+        </tr>
+        <tr>
+          <td>LogServerShim</td>
+          <td>ElevationOfPrivilege</td>
+        </tr>
+        <tr>
+          <td>PolicyEngine</td>
+          <td>Spoofing</td>
+        </tr>
+        <tr>
+          <td>PolicyEngine</td>
+          <td>Tampering</td>
+        </tr>
+        <tr>
+          <td>PolicyEngine</td>
+          <td>Repudiation</td>
+        </tr>
+        <tr>
+          <td>PolicyEngine</td>
+          <td>InformationDisclosure</td>
+        </tr>
+        <tr>
+          <td>PolicyEngine</td>
+          <td>DenialOfService</td>
+        </tr>
+        <tr>
+          <td>PolicyEngine</td>
+          <td>ElevationOfPrivilege</td>
+        </tr>
+        <tr>
+          <td>PolicyShim</td>
+          <td>Spoofing</td>
+        </tr>
+        <tr>
+          <td>PolicyShim</td>
+          <td>Tampering</td>
+        </tr>
+        <tr>
+          <td>PolicyShim</td>
+          <td>Repudiation</td>
+        </tr>
+        <tr>
+          <td>PolicyShim</td>
+          <td>InformationDisclosure</td>
+        </tr>
+        <tr>
+          <td>PolicyShim</td>
+          <td>DenialOfService</td>
+        </tr>
+        <tr>
+          <td>PolicyShim</td>
+          <td>ElevationOfPrivilege</td>
+        </tr>
+        <tr>
+          <td>TrafficProxy</td>
+          <td>Spoofing</td>
+        </tr>
+        <tr>
+          <td>TrafficProxy</td>
+          <td>Tampering</td>
+        </tr>
+        <tr>
+          <td>TrafficProxy</td>
+          <td>Repudiation</td>
+        </tr>
+        <tr>
+          <td>TrafficProxy</td>
+          <td>InformationDisclosure</td>
+        </tr>
+        <tr>
+          <td>TrafficProxy</td>
+          <td>DenialOfService</td>
+        </tr>
+        <tr>
+          <td>TrafficProxy</td>
+          <td>ElevationOfPrivilege</td>
+        </tr>
+      </table>
+    </div>
+    <div class="sectionTitle">Unmitigated Threats</div>
+    <div class="sectionContent">All threats have mitigations.</div>
+    <div class="sectionTitle">Certifications</div>
+    <div class="sectionContent">No certifications have been made for this threat model.</div>
+    <div class="sectionTitle">Non-Autogenerated Elements</div>
+    <div class="sectionContent">No elements have threat generation disabled.</div>
+  </body>
+</html>
