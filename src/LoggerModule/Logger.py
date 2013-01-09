@@ -210,7 +210,8 @@ class Logger(threading.Thread):
 		# Now hash the hash chain entry... But first, build up the data that's needed
 		currKey = str(self.epochKey[(userId, sessionId)])
 		epochLength = len(epochResults)
-		lastEpoch = epochResults[epochLength - 1]["epochDigest"]
+		print("epoch results = " + str(epochResults))
+		lastEpoch = epochResults[epochLength - 1]["digest"]
 
 		# Here are the elements for the log entry tuple
 		xi = self.sha3.Keccak((len(bytes(payload)), payload.encode("hex"))) # not authentication
@@ -219,13 +220,13 @@ class Logger(threading.Thread):
 		# Store the latest entity digest
 		currEntityKey = str(self.entityKey[(userId, sessionId)])
 		lastEntityDigest = hmac.new(currEntityKey, xi, hashlib.sha512).hexdigest()
-		self.logShim.replaceInTable("entity", (userId, sessionId, lastEntityDigest))
+		self.logShim.replaceInTable("entity", "(userId, sessionId, digest)", (userId, sessionId, lastEntityDigest))
 		self.entityKey[(userId, sessionId)] = hmac.new(currEntityKey, "some constant value", hashlib.sha512).hexdigest() # update the keys
 		#self.logShim.insertIntoTable("EntityKey", (userId, sessionId, self.entityKey[(userId, sessionId)]))
-		self.keyShim.insertIntoTable("entityKey", (userId, sessionId, self.entityKey[(userId, sessionId)]))
+		self.keyShim.insertIntoTable("entityKey", "(userId, sessionId, key)", (userId, sessionId, self.entityKey[(userId, sessionId)]))
 
 		# Store the elements now
-		self.logShim.insertIntoTable("log", (userId, sessionId, epochLength, str(message), xi, yi))
+		self.logShim.insertIntoTable("log", "(userId, sessionId, epochId, message, xhash, yhash)", (userId, sessionId, epochLength, str(message), xi, yi))
 
 		# Debug
 		print("Inserted the log: " + str((userId, sessionId, epochLength, str(message), xi, yi)))
