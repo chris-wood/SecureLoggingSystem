@@ -54,6 +54,8 @@ class DBShim(object):
 		self.conn.commit()
 
 	def replaceInTable(self, table, rowAttributes, rowContents):
+		''' Insert or replace the row contents into the specified table. This is probably not safe.
+		'''
 		emptyVal = "("
 		for i in range(0, len(rowContents) - 1):
 			emptyVal = emptyVal + "?,"
@@ -78,7 +80,7 @@ class DBShim(object):
 	def executeRawQuery(self, query):
 		''' Execute a user-defined query on the specified table. 
 
-		WARNING: THIS IS NOT SAFE. FOR DEVELOPMENT PURPOSES ONLY.
+		**** WARNING: THIS IS NOT SAFE. FOR DEVELOPMENT PURPOSES ONLY. ****
 		'''
 		self.cursor.execute(query)
 		return self.cursor.fetchall()
@@ -97,7 +99,7 @@ class DBShim(object):
 		return self.cursor.fetchall()
 
 def main():
-	''' Unit test for this small module.
+	''' Unit test for this small module - verified by output inspection.
 	'''
 	print("Starting DB shim test...")
 	shim = DBShim("users.db")
