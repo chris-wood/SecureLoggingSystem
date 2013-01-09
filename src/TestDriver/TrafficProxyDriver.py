@@ -35,8 +35,8 @@ def test(user, session, payload, count, sleep = 0):
 	'''
 	global ssl_sock
 	for i in range(0, count):
-		ssl_sock.write('{"user":' + str(user) + ',"sessionId":' + str(session) + ',"payload":"' + str(payload) + '"}')
-		print('{"user":' + str(user) + ',"sessionId":' + str(session) + ',"payload":"' + str(payload) + '"}')
+		ssl_sock.write('{"userId":' + str(user) + ',"sessionId":' + str(session) + ',"payload":"' + str(payload) + '"}')
+		print('{"userId":' + str(user) + ',"sessionId":' + str(session) + ',"payload":"' + str(payload) + '"}')
 		time.sleep(sleep)
 
 def stressTest_1():
@@ -46,12 +46,12 @@ def stressTest_1():
 	global ssl_sock
 
 	payload = "THIS IS A NORMAL SIZED PAYLOAD THAT MOST APPLICATIONS WILL PROBABLY GENERATE"
-	user = "alice" # change this to reflect what's in the user database
+	user = 0
 	session = 0
 
 	for i in range(0, EventCount):
 		print("Sending message: " + str(i))
-		ssl_sock.write('{"user":' + str(user) + ',"sessionId":' + str(session) + ',"payload":"' + str(payload) + '"}')
+		ssl_sock.write('{"userId":' + str(user) + ',"sessionId":' + str(session) + ',"payload":"' + str(payload) + '"}')
 
 def help():
 	''' Display the supported commands.
@@ -70,7 +70,7 @@ def handleInput(userInput):
 		print("Terminating...")
 		close()
 	elif ('test' in userInput):
-		test(1, 0, "TEST PAYLOAD", 10, 1) 
+		test(0, 0, "TEST PAYLOAD", 10, 1) 
 	elif ('stress1' in userInput):
 		stressTest_1()
 

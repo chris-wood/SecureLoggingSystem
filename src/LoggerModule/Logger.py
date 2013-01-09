@@ -235,14 +235,14 @@ class Logger(threading.Thread):
 		entry = LogEntry.LogEntry(jsonString = msg)
 
 		# See if this is a new session that we need to manage, or if it's part of an existing session
-		valueMap = {"userId" : entry.user, "sessionId" : entry.sessionId}
+		valueMap = {"userId" : entry.userId, "sessionId" : entry.sessionId}
 		#results = self.logShim.executeMultiQuery("InitialEpochKey", valueMap)
 		results = self.keyShim.executeMultiQuery("InitialEpochKey", valueMap)
 		if (len(results) == 0):
-			self.createSession(entry.user, entry.sessionId)
+			self.createSession(entry.userId, entry.sessionId)
 
 		# Now store the event in the log 
-		self.addNewEvent(entry.user, entry.sessionId, ciphertext)
+		self.addNewEvent(entry.userId, entry.sessionId, ciphertext)
 
 	def kill(self):
 		''' Terminate this thread.

@@ -43,25 +43,24 @@ class DBShim(object):
 		''' Insert a row into the specified table. Data filtering happens on behalf of the caller.
 		'''
 		# Build the entry value for the query
-		#emptyVal = "("
-		#for i in range(0, len(rowContents) - 1):
-		#	emptyVal = emptyVal + "?,"
-		#emptyVal = emptyVal + "?)"
-
-		# Execute the query...
-		print('INSERT INTO ' + table + ' values ' + rowAttributes + " " + str(rowContents))
-		self.cursor.execute('INSERT INTO ' + table + ' VALUES ' + rowAttributes, rowContents)
-		#self.cursor.execute('INSERT INTO ' + table + ' values ' + rowAttributes + " " + str(rowContents))
-		self.conn.commit()
-
-	def replaceInTable(self, table, rowContents):
 		emptyVal = "("
 		for i in range(0, len(rowContents) - 1):
 			emptyVal = emptyVal + "?,"
 		emptyVal = emptyVal + "?)"
 
 		# Execute the query...
-		self.cursor.execute('INSERT OR REPLACE INTO ' + table + ' values ' + emptyVal, rowContents)
+		print('INSERT INTO ' + table + ' ' + rowAttributes + " VALUES " + str(rowContents))
+		self.cursor.execute("INSERT INTO " + table + rowAttributes + " VALUES " + emptyVal, rowContents)
+		self.conn.commit()
+
+	def replaceInTable(self, table, rowAttributes, rowContents):
+		emptyVal = "("
+		for i in range(0, len(rowContents) - 1):
+			emptyVal = emptyVal + "?,"
+		emptyVal = emptyVal + "?)"
+
+		# Execute the query...
+		self.cursor.execute('INSERT OR REPLACE INTO ' + table + rowAttributes + ' VALUES ' + emptyVal, rowContents)
 		self.conn.commit()
 
 	def executeMultiQuery(self, table, valueMap):
@@ -87,6 +86,7 @@ class DBShim(object):
 	def executeQuery(self, table, key, value):
 		''' Perform a query on the specified table.
 		'''
+		print("SELECT * FROM " + table + " WHERE " + key + " = '%s'" % value)
 		self.cursor.execute("SELECT * FROM " + table + " WHERE " + key + " = '%s'" % value)
 		return self.cursor.fetchall()
 
@@ -112,17 +112,17 @@ def main():
 
 	print("Starting log shim test...")
 	shim = DBShim("log.db")
-	shim.insertIntoTable("log", "(?, ?, ?, ?, ?, ?)", (1, 2, 0, "HELLO WORLD", 1337, 1337))
-	shim.insertIntoTable("log", (1, 2, 0, "HELLO WORLD", 123, 4444))
-	shim.insertIntoTable("log", (1, 2, 0, "HELLO WORLD", 123, 1312337))
-	shim.insertIntoTable("log", (1, 5, 0, "THIS WILL NOT WORK", 123, 1312337))
+	shim.insertIntoTable("log", "(userId, sessionId, epochId, message, xhash, yhash)", (1, 2, 0, "HELLO WORLD", 1337, 1337))
+	shim.insertIntoTable("log", "(userId, sessionId, epochId, message, xhash, yhash)", (1, 2, 0, "HELLO WORLD", 123, 4444))
+	shim.insertIntoTable("log", "(userId, sessionId, epochId, message, xhash, yhash)", (1, 2, 0, "HELLO WORLD", 123, 1312337))
+	shim.insertIntoTable("log", "(userId, sessionId, epochId, message, xhash, yhash)", (1, 5, 0, "THIS WILL NOT WORK", 123, 1312337))
 	print(shim.executeQuery("log", "userId", 1))
 
 	valueMap = {"userId" : 1, "sessionId" : 2}
 	print(shim.executeMultiQuery("log", valueMap))
 	valueMap = {"userId" : 1, "sessionId" : 10000}
 	print(len(shim.executeMultiQuery("log", valueMap)))
-	shim.replaceInTable("log", (1, 5, 0, "CHANGED!", 123, 28928282828))
+	shim.replaceInTable("log", "(userId, sessionId, epochId, message, xhash, yhash)", (1, 5, 0, "CHANGED!", 123, 28928282828))
 	print(shim.executeQuery("log", "userId", 1))	
 
 	print("The last test.")

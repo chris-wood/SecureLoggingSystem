@@ -19,13 +19,11 @@ import DBShim
 from pykka.actor import ThreadingActor
 
 class PolicyManager(ThreadingActor):
-	'''
-	The policy engine that will use event, source, and requestor to generate keys.
+	''' The policy engine that will use event, source, and requestor to generate keys.
 	'''
 
 	def on_start(self):
-		'''
-		Create the context information for this policy engine.
+		''' Create the context information for this policy engine.
 		'''
 		self.engine = PolicyEngine.PolicyEngine()
 
@@ -78,7 +76,7 @@ class PolicyManager(ThreadingActor):
 		entry = LogEntry.LogEntry(jsonString = payload)
 		conj = ''
 		try:
-			attrs = self.userAttributes(str(entry.user))
+			attrs = self.userAttributes(str(entry.userId))
 			print(attrs)
 			conj = '('
 			for i in range(len(attrs) - 1):
@@ -100,6 +98,7 @@ class PolicyManager(ThreadingActor):
 		'''
 		Reach out to the user database for their attributes
 		'''
-		result = self.shim.executeQuery("users", "id", str(userId))	
+		result = self.shim.executeQuery("users", "userId", userId)
+		print result
 		return (result[0]["attributes"].split(','))
 

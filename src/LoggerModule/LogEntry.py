@@ -19,11 +19,11 @@ class LogEntry(object):
 			data = json.loads(jsonString)
 			if (len(data) != 3):
 				raise Exception("Corrupt JSON string retrieved from client.")
-			if not (('user' in data) and ('sessionId' in data) and ('payload' in data)):
+			if not (('userId' in data) and ('sessionId' in data) and ('payload' in data)):
 				raise Exception("Corrupt JSON string retrieved from client.")
 
 			# Persist the data
-			self.user = data['user']
+			self.userId = data['userId']
 			self.sessionId = data['sessionId']
 			self.payload = data['payload']
 			self.json = jsonString
