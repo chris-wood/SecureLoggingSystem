@@ -11,6 +11,7 @@ import traceback
 import Queue
 import json
 import logging # Python logging module
+import pickle
 
 # Add in the files from the other modules
 sys.path.append("../PolicyEngineModule/")
@@ -93,9 +94,8 @@ class Logger(threading.Thread):
 		encryptedEntityKey = self.encryptionModule.encrypt(entityKey, policy)
 
 		# Persist the encrypted keys
-		print("type of the key = " + str(type(encryptedEpochKey)))
-		self.keyShim.replaceInTable("initialEpochKey", "(userId, sessionId, key)", (userId, sessionId, str(encryptedEpochKey))) #encryptedEpochKey
-		self.keyShim.replaceInTable("initialEntityKey", "(userId, sessionId, key)", (userId, sessionId, str(encryptedEntityKey))) #encryptedEntityKey
+		self.keyShim.replaceInTable("initialEpochKey", "(userId, sessionId, key)", (userId, sessionId, encryptedEpochKey)) #encryptedEpochKey
+		self.keyShim.replaceInTable("initialEntityKey", "(userId, sessionId, key)", (userId, sessionId, encryptedEntityKey)) #encryptedEntityKey
 
 		# TODO: how to mask the userId and sessionId columns?
 		# What key to use to encrypt the user and session IDs?
@@ -149,13 +149,13 @@ class Logger(threading.Thread):
 			currKey = self.initialEpochKey[(userId, sessionId)]
 			self.epochKey[(userId, sessionId)] = currKey
 			#self.logShim.insertIntoTable("EpochKey", (userId, sessionId, currKey))
-			self.keyShim.insertIntoTable("epochKey", "(userId, sessionId, key)", (userId, sessionId, str(currKey)))
+			self.keyShim.insertIntoTable("epochKey", "(userId, sessionId, key)", (userId, sessionId, currKey))
 			lastEpochDigest = hmac.new(currKey, "0", hashlib.sha512).hexdigest()
 
 			# Set the entity key
 			self.entityKey[(userId, sessionId)] = self.initialEntityKey[(userId, sessionId)]
 			#self.logShim.insertIntoTable("EntityKey", (userId, sessionId, self.entityKey[(userId, sessionId)]))
-			self.keyShim.insertIntoTable("entityKey", "(userId, sessionId, key)", (userId, sessionId, str(self.entityKey[(userId, sessionId)])))
+			self.keyShim.insertIntoTable("entityKey", "(userId, sessionId, key)", (userId, sessionId, self.entityKey[(userId, sessionId)]))
 
 			# Save the epoch digest
 			self.logShim.insertIntoTable("epoch", "(userId, sessionId, digest)", (userId, sessionId, lastEpochDigest))
@@ -180,7 +180,7 @@ class Logger(threading.Thread):
 				newKey = self.sha3.Keccak((len(bytes(currKey)), currKey.encode("hex")))
 				self.epochKey[(userId, sessionId)] = newKey
 				#self.logShim.insertIntoTable("EpochKey", (userId, sessionId, newKey))
-				self.keyShim.insertIntoTable("epochKey", "(userId, sessionId, key)", (userId, sessionId, str(newKey)))
+				self.keyShim.insertIntoTable("epochKey", "(userId, sessionId, key)", (userId, sessionId, newKey))
 
 				# Pull the last epoch block
 				length = len(epochResults)
@@ -223,13 +223,13 @@ class Logger(threading.Thread):
 		self.logShim.replaceInTable("entity", "(userId, sessionId, digest)", (userId, sessionId, lastEntityDigest))
 		self.entityKey[(userId, sessionId)] = hmac.new(currEntityKey, "some constant value", hashlib.sha512).hexdigest() # update the keys
 		#self.logShim.insertIntoTable("EntityKey", (userId, sessionId, self.entityKey[(userId, sessionId)]))
-		self.keyShim.insertIntoTable("entityKey", "(userId, sessionId, key)", (userId, sessionId, str(self.entityKey[(userId, sessionId)])))
+		self.keyShim.insertIntoTable("entityKey", "(userId, sessionId, key)", (userId, sessionId, self.entityKey[(userId, sessionId)]))
 
 		# Store the elements now
-		self.logShim.insertIntoTable("log", "(userId, sessionId, epochId, message, xhash, yhash)", (userId, sessionId, epochLength, str(message), xi, yi))
+		self.logShim.insertIntoTable("log", "(userId, sessionId, epochId, message, xhash, yhash)", (userId, sessionId, epochLength, message, xi, yi))
 
 		# Debug
-		print("Inserted the log: " + str((userId, sessionId, epochLength, str(message), xi, yi)))
+		print("Inserted the log: " + str((userId, sessionId, epochLength, message, xi, yi)))
 
 	def processLogEntry(self, msg):
 		''' This method is responsible for processing a single msg retrieved from the traffic proxy.

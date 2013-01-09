@@ -14,6 +14,11 @@ from charm.schemes.abenc.abenc_bsw07 import CPabe_BSW07 # Load the CP-ABE scheme
 from charm.toolbox.symcrypto import AuthenticatedCryptoAbstraction # for symmetric crypto
 from charm.core.math.pairing import hashPair as sha1 # to hash the element for symmetric key (is it worthwhile to switch to a different hash function?)
 
+from charm.core.engine.util import objectToBytes, bytesToObject
+
+import pickle
+import json
+
 # type annotations
 pk_t = { 'g':G1, 'g2':G2, 'h':G1, 'f':G1, 'e_gg_alpha':GT }
 mk_t = {'beta':ZR, 'g2_alpha':G2 }
@@ -185,6 +190,10 @@ def main():
 	#msg = groupObj.encode("hello world!")
 	msg = "Hello world!"
 	ct = aa.encrypt(msg, '((four or three) and (three or one))')
+	print("encrypted stuff = " + str(ct))
+	serialized = objectToBytes(ct, PairingGroup('SS512'))
+	print("serialized ciphertext: " + serialized)
+	print("unserialized: " + str(bytesToObject(serialized, PairingGroup('SS512'))))
 
 	#print(ct)
 	(success, recovered) = aa.decrypt(sk, ct)

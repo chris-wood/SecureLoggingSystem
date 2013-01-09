@@ -61,10 +61,10 @@ class PolicyManager(ThreadingActor):
 		''' Generate the policy for verification data (containing the verify policy and
 			the source user ID).
 		'''
-		self.lgr.debug("PolicyManager: generating verification policy in PolicyManager.")
+		print("PolicyManager: generating verification policy in PolicyManager.")
 		entry = LogEntry.LogEntry(jsonString = payload)
-		conj = '(verifier ' + str(entry.userId) + ')'
-		self.lgr.debug("PolicyManager: the resulting policy is: " + conj)
+		conj = '(verifier and ' + str(entry.userId) + ')'
+		print("PolicyManager: the resulting policy is: " + conj)
 		return conj
 
 	def generatePolicy(self, payload):

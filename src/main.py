@@ -28,7 +28,7 @@ def bootstrap(debug = True):
 		print("Debug: Clearing the log database")
 
 		# Check to see if we need to clear the table
-		# This is specific to SQLite - it needs to be less coupled to SQLite
+		# This is specific to SQLite - coupling needs to be removed
 		shim = DBShim.DBShim("/Users/caw/Projects/SecureLoggingSystem/src/DatabaseModule/log.db")
 		tableResults = shim.executeRawQuery("SELECT name FROM sqlite_master WHERE type='table' AND name='log'")
 		if (len(tableResults) != 0):
@@ -56,14 +56,12 @@ def bootstrap(debug = True):
 			shim.insertIntoTable("users", "(userId, name, email, attributes)", (2, "chris", "chris@test.com", "three"))
 
 def help():
-	'''
-	Display the available commands to the user.
+	''' Display the available commands to the user.
 	'''
 	print("NOT IMPLEMENTED YET")
 
 def handleInput(userInput):
-	'''
-	Helper function to handle user input.
+	''' Helper function to handle user input.
 	'''
 	if (userInput == 'help' or userInput == '?'):
 		help()
@@ -75,8 +73,7 @@ def printUsage():
 	print("   -c -> clear the Log database")
 
 def main():
-	'''
-	The main entry point into the logging system that initializes everything
+	''' The main entry point into the logging system that initializes everything
 	needed to be active at runtime.
 	'''	
 

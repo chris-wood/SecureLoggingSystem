@@ -11,6 +11,7 @@ from charm.toolbox.ABEnc import ABEnc, Input, Output
 from charm.schemes.abenc.abenc_bsw07 import CPabe_BSW07 # Load the CP-ABE scheme as defined by Bethencourt in 2007 paper
 from charm.toolbox.symcrypto import AuthenticatedCryptoAbstraction # for symmetric crypto
 from charm.core.math.pairing import hashPair as sha1 # to hash the element for symmetric key (is it worthwhile to switch to a different hash function?)
+from charm.core.engine.util import objectToBytes,bytesToObject
 
 # Type annotations
 pk_t = { 'g':G1, 'g2':G2, 'h':G1, 'f':G1, 'e_gg_alpha':GT }
@@ -33,7 +34,7 @@ class EncryptionModule:
 	def set(self, master, public):
 		''' Set the master and public key for this module. 
 
-		THIS IS NOT SAFE. EXPERIMENTAL USE ONLY.
+		**** THIS IS NOT SAFE. EXPERIMENTAL USE ONLY. ****
 		'''
 		self.master = master
 		self.public = public
@@ -58,15 +59,15 @@ class EncryptionModule:
         # Instantiate a symmetric enc scheme from this key
 		cipher = AuthenticatedCryptoAbstraction(sha1(key))
 		c2 = cipher.encrypt(plaintext)
-		return { 'c1':c1, 'c2':c2 }
+		return objectToBytes({ 'c1':c1, 'c2':c2 }, PairingGroup('SS512'))
 
-	def decrypt(self, sKey, ciphertext):
+	def decrypt(self, sKey, serializedCiphertext):
 		''' Decrypt the provided ciphertext sing the secret key. Decryption is only successful if
 		the policy embedded in the secret key matches the ciphertext access policy.
 		'''
+		ciphertext = bytesToObject(serializedCiphertext, PairingGroup('SS512'))
 		c1, c2 = ciphertext['c1'], ciphertext['c2']
 		success = True
-
 		try:
 			key = self.cpabe.decrypt(self.public, sKey, c1)
 			if (key == False):
@@ -74,7 +75,7 @@ class EncryptionModule:
 		except: 
 			success = False
 
-		# Try to perform the encryption if we were able to recover the key
+		# Try to perform the decryption if we were able to recover the key
 		plaintext = None
 		if (success == True):
 			cipher = AuthenticatedCryptoAbstraction(sha1(key))
