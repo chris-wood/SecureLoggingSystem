@@ -52,13 +52,13 @@ class Logger(threading.Thread):
 		# Create the encryption module and Keccak instance
 		self.encryptionModule = EncryptionModule.EncryptionModule()
 		self.sha3 = Keccak.Keccak()
-		
-		self.epochKey = {} # key is (user, session)
-		self.entityKey = {} # key is (user, session)
 
-		# The initial epoch and entity keys that are used for verification
+		# The in-memory keys that are maintained (and discarded as needed)
 		self.initialEpochKey = {}
 		self.initialEntityKey = {}
+		self.epochKey = {} # key is (user, session)
+		self.entityKey = {} # key is (user, session)
+		self.policyKeyMap = {} # key is (user, session, policy)
 
 		# Create the log queue
 		self.queue = Queue.Queue()
@@ -234,15 +234,27 @@ class Logger(threading.Thread):
 	def processLogEntry(self, msg):
 		''' This method is responsible for processing a single msg retrieved from the traffic proxy.
 		'''
-		policy = self.manager.ask({'command' : 'policy', 'payload' : msg})
+		# Parse the host application data
+		entry = LogEntry.LogEntry(jsonString = msg)
 
-		# TODO: use the symmetric key stored in memory here to encrypt, not the CP-ABE scheme
+		policy = self.manager.ask({'command' : 'policy', 'payload' : msg})
+		key = None
+		iv = None
+		if not ((entry.userId, entry.sessionId, policy) in self.policyKeyMap.keys()):
+			iv = Random.new().read(AES.block_size) # we need an IV of 16-bytes, this is also random...
+			key = Random.new().read(32)
+
+			# Encrypt the key using the policy and store it the database
+			encryptedKey = self.encryptionModule.encrypt(msg, key)
+			self.policyKeyMap[(entry.userId, entry.sessionId, policy)] = encryptedKey
+
+		encryptor = AES.new(rng, mode, iv)
+text = 'j' * 64 + 'i' * 128
+ciphertext = encryptor.encrypt(text)
+
 
 		ciphertext = self.encryptionModule.encrypt(msg, policy)
 		print("ciphertext = " + str(ciphertext))
-
-		# Parse the host application data
-		entry = LogEntry.LogEntry(jsonString = msg)
 
 		# See if this is a new session that we need to manage, or if it's part of an existing session
 		valueMap = {"userId" : entry.userId, "sessionId" : entry.sessionId}
