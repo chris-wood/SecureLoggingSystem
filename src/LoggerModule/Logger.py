@@ -52,6 +52,7 @@ class Logger(threading.Thread):
 		# Create the encryption module and Keccak instance
 		self.encryptionModule = EncryptionModule.EncryptionModule()
 		self.sha3 = Keccak.Keccak()
+		self.aesMode = AES.MODE_CBC
 
 		# The in-memory keys that are maintained (and discarded as needed)
 		self.initialEpochKey = {}
@@ -246,14 +247,13 @@ class Logger(threading.Thread):
 
 			# Encrypt the key using the policy and store it the database
 			encryptedKey = self.encryptionModule.encrypt(msg, key)
-			self.policyKeyMap[(entry.userId, entry.sessionId, policy)] = encryptedKey
+			self.policyKeyMap[(entry.userId, entry.sessionId, policy)] = key
 
-		encryptor = AES.new(rng, mode, iv)
-text = 'j' * 64 + 'i' * 128
-ciphertext = encryptor.encrypt(text)
+			# TODO: store the encrypted key and IV into the database
+		else:
 
-
-		ciphertext = self.encryptionModule.encrypt(msg, policy)
+		ciphertext = AES.new(key, self.aesMode, iv).encrypt(key)
+		#ciphertext = self.encryptionModule.encrypt(msg, policy)
 		print("ciphertext = " + str(ciphertext))
 
 		# See if this is a new session that we need to manage, or if it's part of an existing session
