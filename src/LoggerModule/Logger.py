@@ -184,7 +184,7 @@ class Logger(threading.Thread):
 
 				# Pull the last epoch block
 				length = len(epochResults)
-				lastEpoch = epochResults[length - 1]["epochDigest"]
+				lastEpoch = epochResults[length - 1]["digest"]
 
 				# Pull the last hash block
 				length = len(logResults)
@@ -223,7 +223,7 @@ class Logger(threading.Thread):
 		self.logShim.replaceInTable("entity", "(userId, sessionId, digest)", (userId, sessionId, lastEntityDigest))
 		self.entityKey[(userId, sessionId)] = hmac.new(currEntityKey, "some constant value", hashlib.sha512).hexdigest() # update the keys
 		#self.logShim.insertIntoTable("EntityKey", (userId, sessionId, self.entityKey[(userId, sessionId)]))
-		self.keyShim.insertIntoTable("entityKey", "(userId, sessionId, key)", (userId, sessionId, self.entityKey[(userId, sessionId)]))
+		self.keyShim.insertIntoTable("entityKey", "(userId, sessionId, key)", (userId, sessionId, str(self.entityKey[(userId, sessionId)])))
 
 		# Store the elements now
 		self.logShim.insertIntoTable("log", "(userId, sessionId, epochId, message, xhash, yhash)", (userId, sessionId, epochLength, str(message), xi, yi))
