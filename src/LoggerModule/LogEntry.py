@@ -10,12 +10,15 @@ class LogEntry(object):
 	This class is just a wrapper for log information retrieved from the application.
 	'''
 
-	def __init__(self, jsonString = None, user = None, sessionId = None, payLoad = None):
+	def __init__(self, jsonString = None, userId = None, sessionId = None, payLoad = None):
 		'''
 		Construct a log entry object from a JSON string retrieved from the client
 		'''
 		# Parse the string and check its validity (if JSON string was provided)
 		if (jsonString != None):
+
+			print jsonString
+
 			data = json.loads(jsonString)
 			if (len(data) != 3):
 				raise Exception("Corrupt JSON string retrieved from client.")
@@ -28,7 +31,7 @@ class LogEntry(object):
 			self.payload = data['payload']
 			self.json = jsonString
 		else:
-			self.user = user
+			self.userId = userId
 			self.sessionId = sessionId
 			self.payload = payload
 		

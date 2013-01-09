@@ -4,6 +4,7 @@ Author: Christopher Wood, caw4567@rit.edu
 '''
 
 import sqlite3 as lite
+import traceback
 
 class DBShim(object):
 	''' The shim for the database that is used to store arbitrary user/log/crypto related information.
@@ -22,6 +23,7 @@ class DBShim(object):
 		if (db != None and len(db) > 0):
 			self.conn = lite.connect(db)
 			self.conn.row_factory = lite.Row
+			self.conn.text_factory = str
 			self.cursor = self.conn.cursor()
 			self.connAlive = True
 			self.dbString = db
@@ -62,6 +64,7 @@ class DBShim(object):
 		emptyVal = emptyVal + "?)"
 
 		# Execute the query...
+		print('INSERT OR REPLACE INTO ' + table + rowAttributes + ' VALUES ' + emptyVal)
 		self.cursor.execute('INSERT OR REPLACE INTO ' + table + rowAttributes + ' VALUES ' + emptyVal, rowContents)
 		self.conn.commit()
 
@@ -74,6 +77,7 @@ class DBShim(object):
 		for i in range(0, len(keys) - 1):
 			queryString = queryString + keys[i] + " = '" + str(valueMap[keys[i]]) + "' and "
 		queryString = queryString + keys[len(keys) - 1] + " = '" + str(valueMap[keys[len(keys) - 1]]) + "'"
+		print("executing multiple query: " + str(queryString))
 		self.cursor.execute(queryString)
 		return self.cursor.fetchall()
 

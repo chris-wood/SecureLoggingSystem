@@ -4,6 +4,7 @@ Author: Christopher Wood, caw4567@rit.edu
 '''
 
 import logging # Python logging module
+import traceback
 
 import sys
 sys.path.append("../LoggerModule")
@@ -42,7 +43,7 @@ class PolicyManager(ThreadingActor):
 		self.lgr.addHandler(fh)
 
 		# Create the DB shim to connect to the user attribute database
-		self.shim = DBShim.DBShim("/Users/caw/Projects/PrivateProjects/LoggingSystem/src/DatabaseModule/users.db") 
+		self.shim = DBShim.DBShim("/Users/caw/Projects/SecureLoggingSystem/src/DatabaseModule/users.db") 
 
 		self.lgr.debug("PolicyManager: actor started.")
 
@@ -62,7 +63,7 @@ class PolicyManager(ThreadingActor):
 		'''
 		self.lgr.debug("PolicyManager: generating verification policy in PolicyManager.")
 		entry = LogEntry.LogEntry(jsonString = payload)
-		conj = '(verifier ' + entry.user + ')'
+		conj = '(verifier ' + str(entry.userId) + ')'
 		self.lgr.debug("PolicyManager: the resulting policy is: " + conj)
 		return conj
 
@@ -84,6 +85,7 @@ class PolicyManager(ThreadingActor):
 			conj = conj + str(attrs[len(attrs) - 1].lower() + ')')	
 		except:
 			print("Error: invalid result from users database")
+			traceback.print_exc(file=sys.stdout)
 		return conj
 
 	def generateAttributes(self, eventInfo):
@@ -99,6 +101,5 @@ class PolicyManager(ThreadingActor):
 		Reach out to the user database for their attributes
 		'''
 		result = self.shim.executeQuery("users", "userId", userId)
-		print result
 		return (result[0]["attributes"].split(','))
 

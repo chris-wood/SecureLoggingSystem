@@ -10,6 +10,7 @@ Usage:
 import sys
 import time
 import threading
+import traceback
 
 # Build the system path
 sys.path.append("./LoggerModule/")
@@ -24,7 +25,7 @@ def bootstrap(debug = True):
 	'''
 	# Wipe the data if we're in debug mode
 	if (debug == True):
-		print("Clearing the log database")
+		print("Debug: Clearing the log database")
 
 		# Check to see if we need to clear the table
 		# This is specific to SQLite - it needs to be less coupled to SQLite
@@ -50,9 +51,9 @@ def bootstrap(debug = True):
 			
 			# Re-populate it with dummy users (alice, bob, chris)
 			print("Initializing dummy data into the users table")
-			shim.insertIntoTable("users", "(?, ?, ?, ?)", (0, "alice", "alice@test.com", "one"))
-			shim.insertIntoTable("users", "(?, ?, ?, ?)", (1, "bob", "bob@test.com", "two"))
-			shim.insertIntoTable("users", "(?, ?, ?, ?)", (2, "chris", "chris@test.com", "three"))
+			shim.insertIntoTable("users", "(userId, name, email, attributes)", (0, "alice", "alice@test.com", "one"))
+			shim.insertIntoTable("users", "(userId, name, email, attributes)", (1, "bob", "bob@test.com", "two"))
+			shim.insertIntoTable("users", "(userId, name, email, attributes)", (2, "chris", "chris@test.com", "three"))
 
 def help():
 	'''
