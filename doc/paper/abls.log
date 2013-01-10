@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.4-1.40.13 (TeX Live 2012) (format=pdflatex 2012.6.30)  10 JAN 2013 00:15
+This is pdfTeX, Version 3.1415926-2.4-1.40.13 (TeX Live 2012) (format=pdflatex 2012.6.30)  10 JAN 2013 11:39
 entering extended mode
  \write18 enabled.
  file:line:error style messages enabled.
@@ -711,66 +711,77 @@ Overfull \hbox (10.05309pt too wide) in paragraph at lines 260--264
  []
 
 
-Overfull \hbox (5.1661pt too wide) in paragraph at lines 294--298
+Overfull \hbox (5.1661pt too wide) in paragraph at lines 294--299
 \T1/ppl/m/n/9 spond-ing ver-i-fi-ca-tion and en-cryp-tion keys in the key datab
 ase,
  []
 
-
-Overfull \hbox (15.35432pt too wide) in paragraph at lines 336--341
+[4]
+Overfull \hbox (15.35432pt too wide) in paragraph at lines 341--346
 \T1/ppl/m/n/9 seg-re-gated and are ex-pected to be de-ployed on dif-fer-ent dat
 abase
  []
 
 
-Overfull \hbox (9.14406pt too wide) in paragraph at lines 342--347
+Overfull \hbox (9.14406pt too wide) in paragraph at lines 347--352
 []\T1/ppl/m/n/9 In ad-di-tion, to bet-ter sup-port au-dits that use the log dat
 abase,
  []
 
 
-Overfull \hbox (4.64209pt too wide) in paragraph at lines 357--357
+Overfull \hbox (4.64209pt too wide) in paragraph at lines 362--362
 []\secfnt Bootstrapping, Test En-hance-ment, and De-
  []
 
-[4]
-Overfull \hbox (3.46524pt too wide) in paragraph at lines 367--368
+
+Overfull \hbox (3.46524pt too wide) in paragraph at lines 372--373
 []\T1/ppl/m/n/9 Run the main ex-e-cutable file (main.py) with the -c (clear)
  []
 
 
-Overfull \hbox (3.00656pt too wide) in paragraph at lines 368--369
+Overfull \hbox (3.00656pt too wide) in paragraph at lines 373--374
 []\T1/ppl/m/n/9 Run the test driver pro-gram (Traf-ficProx-y-Driver.py) and
  []
 
 
-Overfull \hbox (5.59792pt too wide) in paragraph at lines 376--379
+Overfull \hbox (5.59792pt too wide) in paragraph at lines 381--384
 []\T1/ppl/m/n/9 However, de-spite the in-creased com-plex-ity of the test drive
 r,
  []
 
-
-Overfull \hbox (20.49327pt too wide) in paragraph at lines 412--413
+[5]
+Overfull \hbox (20.49327pt too wide) in paragraph at lines 428--429
 \T1/ppl/m/n/9 user-name/-pass-word, at-tributes are gen-er-ated, database is qu
 eried
  []
 
 
-Overfull \hbox (9.52222pt too wide) in paragraph at lines 415--418
+Overfull \hbox (9.52222pt too wide) in paragraph at lines 431--434
 \T1/ppl/m/n/9 worker tasks that use pre-defined strate-gies for au-dit-ing (sea
 rch
  []
 
-(./abls.bbl [5]) [6] (./abls.aux)
+
+Overfull \hbox (9.3145pt too wide) in paragraph at lines 441--442
+[]\T1/ppl/m/n/9 TODO: public-key au-then-ti-ca-tion us-ing SSL cer-tifi-cates (
+pref-
+ []
+
+(./abls.bbl)
+
+Package balance Warning: You have called \balance in second column
+(balance)                Columns might not be balanced.
+
+[6] (./abls.aux)
 
 LaTeX Warning: There were undefined references.
 
  ) 
 Here is how much of TeX's memory you used:
- 7088 strings out of 493488
- 101418 string characters out of 3141326
- 182891 words of memory out of 3000000
- 10228 multiletter control sequences out of 15000+200000
+ 7089 strings out of 493488
+ 101436 string characters out of 3141326
+ 182894 words of memory out of 3000000
+ 10229 multiletter control sequences out of 15000+200000
  46184 words of font info for 61 fonts, out of 3000000 for 9000
  957 hyphenation exceptions out of 8191
  44i,12n,42p,838b,518s stack positions out of 5000i,500n,10000p,200000b,50000s
@@ -790,7 +801,7 @@ latino/uplb8a.pfb></usr/local/texlive/2012/texmf-dist/fonts/type1/urw/palatino/
 uplr8a.pfb></usr/local/texlive/2012/texmf-dist/fonts/type1/urw/palatino/uplri8a
 .pfb></usr/local/texlive/2012/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr
 /local/texlive/2012/texmf-dist/fonts/type1/urw/times/utmr8a.pfb>
-Output written on abls.pdf (6 pages, 373355 bytes).
+Output written on abls.pdf (6 pages, 375401 bytes).
 PDF statistics:
  166 PDF objects out of 1000 (max. 8388607)
  136 compressed objects within 2 object streams

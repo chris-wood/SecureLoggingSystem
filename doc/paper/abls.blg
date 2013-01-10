@@ -4,45 +4,45 @@ The top-level auxiliary file: abls.aux
 The style file: abbrv.bst
 Database file #1: ../abls.bib
 Warning--empty institution in Bellare1997-ForwardIntegrity
-You've used 5 entries,
+You've used 6 entries,
             2118 wiz_defined-function locations,
-            537 strings with 4738 characters,
-and the built_in function-call counts, 1985 in all, are:
-= -- 219
-> -- 64
+            545 strings with 4930 characters,
+and the built_in function-call counts, 2382 in all, are:
+= -- 258
+> -- 87
 < -- 3
-+ -- 25
-- -- 20
-* -- 123
-:= -- 307
-add.period$ -- 18
-call.type$ -- 5
-change.case$ -- 26
++ -- 34
+- -- 28
+* -- 160
+:= -- 374
+add.period$ -- 21
+call.type$ -- 6
+change.case$ -- 33
 chr.to.int$ -- 0
-cite$ -- 6
-duplicate$ -- 88
-empty$ -- 160
-format.name$ -- 20
-if$ -- 445
+cite$ -- 7
+duplicate$ -- 99
+empty$ -- 187
+format.name$ -- 28
+if$ -- 523
 int.to.chr$ -- 0
-int.to.str$ -- 5
-missing$ -- 4
-newline$ -- 28
-num.names$ -- 10
-pop$ -- 23
+int.to.str$ -- 6
+missing$ -- 5
+newline$ -- 33
+num.names$ -- 12
+pop$ -- 28
 preamble$ -- 1
-purify$ -- 20
+purify$ -- 26
 quote$ -- 0
-skip$ -- 72
+skip$ -- 79
 stack$ -- 0
-substring$ -- 146
-swap$ -- 31
+substring$ -- 176
+swap$ -- 32
 text.length$ -- 3
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 20
+type$ -- 24
 warning$ -- 1
-while$ -- 21
-width$ -- 6
-write$ -- 65
+while$ -- 25
+width$ -- 7
+write$ -- 76
 (There was 1 warning)

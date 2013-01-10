@@ -1,5 +1,5 @@
 '''
-File: TrafficProxy.py
+File: AuditProxy.py
 Author: Christopher A. Wood, caw4567@rit.edu
 '''
 
@@ -14,7 +14,7 @@ import Queue # thread-safe queue for producer/consumer implementations
 from time import clock, time # for time-based extraction
 from pykka.actor import ThreadingActor
 
-class TrafficProxy(threading.Thread):
+class AuditProxy(threading.Thread):
 	''' This is an active object that accepts new data over its TCP socket 
 	(meaning that it is kept separate from the main application that uses it)
 	'''
@@ -31,7 +31,7 @@ class TrafficProxy(threading.Thread):
 
 		# Initialize the connection vars/fields
 		self.HOST = 'localhost'
-		self.PORT = 9998
+		self.PORT = 9999 # TODO:
 		self.BUFFSIZE = 1024
 		self.clientList = []
 		self.handler = None
@@ -46,18 +46,12 @@ class TrafficProxy(threading.Thread):
 		fh.setFormatter(frmt)
 		self.lgr.addHandler(fh)
 
-		# Set up the socket configuration parameters
-		self.context = SSL.Context(SSL.SSLv23_METHOD)
-		self.context.use_privatekey_file('./Keys/key') # our private key
-		self.context.use_certificate_file('./Keys/cert') # our self-signed certificate
-
 	def run(self):
 		''' Run the traffic proxy and listen for incoming connections.
 		'''
 		address = (self.HOST, self.PORT)
 		self.running = True
 		self.serverSock = socket.socket()
-		self.serverSock = SSL.Connection(self.context, self.serverSock)
 		self.serverSock.bind(address)
 		self.serverSock.listen(5)
 
@@ -65,36 +59,28 @@ class TrafficProxy(threading.Thread):
 		while self.running:
 			# Accept a new client connection 
 			newsocket, fromaddr = self.serverSock.accept()
-			
-			# Wrap the socket up in a SSL connection for authentication and encryption
-			'''connstream = ssl.wrap_socket(newsocket,
-                                 server_side=True,
-                                 certfile="./Keys/cert",
-                                 keyfile="./Keys/key",
-                                 ssl_version=ssl.PROTOCOL_TLSv1, # TODO: this should be a configurable parameter for ABLS
-                                 cert_reqs=ssl.CERT_REQUIRED) # we require a certificate from the client for authentication
-			'''
-			#print("Client connected from {}.".format(fromaddr))
+
+			print("Client connected from {}.".format(fromaddr))
 			self.lgr.debug("Client connected from {}.".format(fromaddr))
 
 			# Start the handler thread
-			handler = ClientHandler(self)
+			handler = ClientHandler.ClientHandler(self)
 			handler.start()
-			handler.clientList.append(ClientObject(newsocket, fromaddr, None)) # None should be connstream
+			handler.clientList.append(ClientObject.ClientObject(newsocket, fromaddr, None)) # None should be connstream
 			self.activeSessions.append(handler)
 
 		self.serverSock.close()
 		self.lgr.debug("- end -")
-		#print("- end -")
+		print("- end -")
 
 	def get(self):
-		''' Retrieve teh next element from the LogEntry queue.
+		''' Retrieve the next element from the LogEntry queue.
 		'''
 		return self.queue.get()
 
 	def kill(self):
 		''' Terminate the thread.
 		'''
-		print("Killing the traffic proxy.")
-		self.lgr.deubg("Killing the traffic proxy.")
+		print("Killing the audit proxy.")
+		self.lgr.deubg("Killing the audit proxy.")
 		self.serverSock.close()
