@@ -97,25 +97,24 @@ respectively, is a logging system designed for the cloud to address the aforemen
 describes the motivation and design of ABLS, as well as some implementation details of the prototype. The paper
 concludes with a discussion of the current status of the project and planned work to be completed.
 
-\section{Implementation}
+\section{Prototype Implementation}
 In order to test both the correctness and performance of ABLS, a proof-of-concept system has been
 developed. In this section we provide the design and rationale for the prototype architecture.
 
 \subsection{Deployment}
 \label{sec:deployment}
 ABLS is designed to be a centralized logging system backed by a set of distributed databases. A context
-diagram for the ABLS deployment scheme is shown in Figure \ref{fig:deployment}, and a more detailed
-depiction of the flow of data between application and database servers is shown in Figure \ref{fig:design}.
+diagram for the ABLS deployment scheme is shown in Figure \ref{fig:deployment}.
 
 %TODO: rough deployment diagram for ABLS (different from architecture diagram)
 
-%\begin{figure*}[htb!]
-%\label{fig:design}
-%\begin{center}
-%\includegraphics[width=7in]{images/design.pdf}
-%\caption{The deployment diagram for ABLS.}
-%\end{center}
-%\end{figure*}
+\begin{figure*}[htb!]
+\label{fig:deployment}
+\begin{center}
+\includegraphics[width=7in]{images/design.pdf}
+\caption{The deployment strategy and a detailed design for ABLS.}
+\end{center}
+\end{figure*}
 
 Based on the purpose of each piece of database used in the log, it is best to physically separate databases
 that store data of different security classes rather than rely on MAC with polyinstantiation. Of course, access control
@@ -170,17 +169,16 @@ may lead to violation of user privacy, they are deterministically masked before 
 was inspired by CryptDB \cite{Popa2012-CryptDB}.
 
 This masking procedure works by encrypting the user and session attributes with a symmetric key generated
-by the logger's master key salted by the user's unique identifier. Specifically, the encrypted user and session IDs, 
-$[U_i]$ and $[S_j]$, are generated as follows.
+by the logger's master key salted by the user's unique identifier. Specifically, the encrypted user and session IDs, $[U_i]$ 
+and $[S_j]$, stored in table T are generated as follows.
 \begin{align*}
-[U_i] = E(M_k || H(U_i), U_i) \\
-[S_j] = E(M_k || H(U_i), S_j) \\
+[U_i] = E(M_k || H(U_i) || H(T), U_i) \\
+[S_j] = E(M_k || H(U_i) || H(T), S_j) \\
 \end{align*}
 
-TODO: discuss how the salt changes for each table so attackers can't link things together...
-
-%\section{Auditing}
-%TODO: Initial audit design implemented
+In this context, $M_k$ is the master key for the logger. Using the user and table identifiers as salts to the master key 
+enable ensures that tables do not share any common information about the user, which helps prevent against 
+inference attacks.
 
 \section{Completed Work}
 For Phase 1 of the project, I focused mainly on fixing some of the design and implementation flaws in my previous 
@@ -252,10 +250,13 @@ However, despite the increased complexity of the test driver, it does not, nor w
 diagnostic information from the ABLS runtime. This information is logged by the ABLS runtime to the appropriate log 
 file, and the administrators for the ABLS system can check this information at their discretion.
 
-The system deployment strategy was finalized 
+%The system deployment strategy was finalized 
 
 \subsection{Outstanding Bug Fixes}
-TODO: fixed bugs left over from last quarter, had to get the dev. environment set up again
+As a result of resuming my work from the previous quarter, some of my time spent during Phase 1 was devoted to fixing
+outstanding design and performance bugs in the ABLS prototype. Some of the notable bugs include improper 
+initialization of the verifier threads and incorrect management of the in-memory data structures containing the 
+user session information (i.e. data specific to the generation of log messages).
 
 \subsection{Research and Literature Survey}
 An initial action item for this work was to investigate the possibility of replacing the relational database model with a 
@@ -269,6 +270,9 @@ discussed in Section \ref{sec:databaseDesign}.
 A comprehensive literature survey on related logging and non-repudiation work was also completed during this phase 
 of the project. The corresponding articles that were read are included in this phase's submission package. The digest of this work is expected to be a part of the final report and potential publication.
 
+\subsection{Log Traffic Encryption}
+TODO
+
 \section{Future Work}
 For the remainder of the project I plan to finish up the partially completed work introduced in the previous section and 
 focus on the auditing aspect of ABLS. Auditing will be supported both manually and automatically through
@@ -276,38 +280,87 @@ a robust log query interface, which places the ABLS runtime in the role of the r
 strategy-driven tasks run within the context of the ABLS runtime, respectively. The following sections expand upon all
 of these action items in more detail.
 
-\subsection{Complete Database Masking}
+\subsection{Log Collection - 1/12/13}
+As part of the proposed design, all log messages generated by the logger to be inserted into the 
+database will be handed off to a common log collector to do so. This log collector will be implemented as a 
+separate actor (thread) running within the ABLS process and will assume a portion of the database 
+communication overhead from the logger to free up cycles for processing more log messages. 
+
+\subsection{Complete Database Masking - 1/15/13}
 Following the design outlined in Section \ref{sec:databaseDesign}, the database masking scheme will be completed by
 adding support to the database verifiers. Since the verifiers run within the context of the ABLS system, they will be granted
 permission to all of the database servers so that they may request the appropriate entity and epoch keys used to perform
 strong verification checks on the data in user session log chains. Also, this must be the first activity that is completed 
 because the log querying and automated audit tasks depend on the database columns being properly masked. 
 
-\subsection{Log Collection}
-As part of the proposed design, all log messages generated by the logger to be inserted into the 
-database will be handed off to a common log collector to do so. This log collector will be implemented as a 
-separate actor (thread) running within the ABLS process and will assume a portion of the database 
-communication overhead from the logger to free up cycles for processing more log messages. 
+\subsection{Log Querying - 1/19/13}
+In order to make ABLS fulfill its purpose as a secure logging system, log query support will be added to the audit
+module. Such query support will be exposed to clients through a lightweight API that is used via the auditing protocol.
+To start, only select operations will be supported, and they can be parameterized by the user ID or both the user and 
+session IDs. As an example, the API might have the following function signatures. \\
 
-\subsection{Log Querying}
-- design and implement an easy API for querying information from the log (and only the log) table that checks user authentication privileges first - the logger is the reference monitor to the outside world
+\noindent {\tt selectByUser(int uid)} \\
+{\tt selectByUserAndSession(int uid, int sid)}\\
 
-- variety of selection functions in which the user can specify the user ID or user and session ID, all data that comes back
-is verified using strong verification, contents of the log messages are filtered depending on their policy (only if the policy matches the client's attributes will the results be returned)
+Clients will connect to an audit proxy, which is similar to the log traffic proxy, and issue commands according to
+the audit protocol to invoke either one of these functions. Client authentication is expected to be completed at a later
+point in time as outlined in Section \ref{sec:auth}. Assuming the client has been authenticated, they can issue commands
+wrapped in JSON strings to the audit proxy that have the following format. \\
 
-- outline process of querying (client is authenticated with username/password, attributes are generated, database is queried using encrypted data, results are filtered based on policy, and result is returned)
+\begin{lstlisting}
+{     
+    "command" : command_id
+    "params" : csv_list
+}
+\end{lstlisting}
 
-\subsection{Audit Strategy Design}
+Upon receiving and parsing an incoming command, the audit proxy will issue the appropriate command to the log module
+to select the appropriate log message contents from the database. However, since each client is expected to be a user for
+ABLS, their attributes will be used to filter the resulting database rows that are returned. Thus, the audit proxy will act
+as a reference monitor that enforces access control to the log database through the log query protocol and API.
+
+In order to implement this task, I will perform the following steps.
+
+\begin{enumerate}
+	\item Implement the audit proxy with a corresponding client handler thread using the same technique that was done for the traffic proxy. 
+	\item Implement the functionality in the client handlers to parse messages according to the log query protocol.
+	\item Implement the functionality to collate log message for the specific client in a temporary location.
+	\item Using the client's attributes, filter all messages that cannot be decrypted according to the embedded policy.
+	\item Format the results in a JSON string that is sent back to the client.
+\end{enumerate}
+
+Unlike the traffic proxy, it is expected that the clients for the audit proxy will be authenticated using passwords. Thus, as
+part of supporting client authentication, a proper password storage scheme will need to be implemented, which includes 
+the modification of the user database schema and the proper password hashing (and salting) techniques. 
+
+\subsection{Audit Strategy Design - 1/24/13}
+As the number of contents in the log database grows, manual audits become less appealing. Therefore, the audit module
+will be extended with strategy-driven audit tasks that can scan the log database on-demand to check for policy violations.
+
+TODO: finish
+
 - auditing design and implementation (define automated worker tasks that use pre-defined strategies for
 auditing (search by userID) or whatnot that can be triggered by any web application set in front of ABLS - 
 making it easy for auditors to start their own automated audits). 
 
-\subsection{Audit Protocol}
+\subsection{ABLS Configuration File - 1/25/13} 
+In order to improve the quality of the ABLS prototype, all of the hard-coded configuration strings that set up databases,
+specify cryptographic certificate locations, log file output directories, etc will be removed and placed in a configuration file
+to be managed by system administrators. Access to this file will be restricted to system administrators and enforced by the 
+operating system. An example of how the configuration file might look is shown below.
 
-\subsection{ABLS Configuration File} 
-TODO: implement and make use of a configuration file to read in all parameters for the system (so they're not hardcoded), simple change
+\begin{lstlisting}
+# comment
+log_database: network location string
+key_database: network location string
+user_database: network location string
+log_file: absolute path string
+...
+\end{lstlisting}
 
-\subsection{Client Authentication}
+\subsection{Client Authentication - 1/31/13}
+\label{sec:auth}
+
 TODO: public-key authentication using SSL certificates (prefered), user logins for audit interface
 
 \begin{comment}
