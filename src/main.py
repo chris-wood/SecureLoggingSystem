@@ -3,7 +3,7 @@ File: main.py
 Author: Christopher Wood, caw4567@rit.edu
 Usage:
 
-	python main.py
+	python main.py [-c] [-s]
 
 '''
 
@@ -11,6 +11,7 @@ import sys
 import time
 import threading
 import traceback
+import datetime
 
 # Build the system path
 sys.path.append("./LoggerModule/")
@@ -51,9 +52,11 @@ def bootstrap(debug = True):
 			
 			# Re-populate it with dummy users (alice, bob, chris)
 			print("Initializing dummy data into the users table")
-			shim.insertIntoTable("users", "(userId, name, email, attributes)", (0, "alice", "alice@test.com", "one"))
-			shim.insertIntoTable("users", "(userId, name, email, attributes)", (1, "bob", "bob@test.com", "two"))
-			shim.insertIntoTable("users", "(userId, name, email, attributes)", (2, "chris", "chris@test.com", "three"))
+			shim.insertIntoTable("users", "(userId, name, email, attributes, inserted_at)", (0, "alice", "alice@test.com", "one", datetime.datetime.now()))
+			shim.insertIntoTable("users", "(userId, name, email, attributes, inserted_at)", (1, "bob", "bob@test.com", "two", datetime.datetime.now()))
+			shim.insertIntoTable("users", "(userId, name, email, attributes, inserted_at)", (2, "chris", "chris@test.com", "three", datetime.datetime.now()))
+	else:
+		print("Starting the system in production mode.")
 
 def help():
 	''' Display the available commands to the user.
@@ -71,6 +74,7 @@ def printUsage():
 	'''
 	print("Usage: python main.py [-c] [-s]")
 	print("   -c -> clear the Log database")
+	print("   -s -> start the logging system")
 
 def main():
 	''' The main entry point into the logging system that initializes everything
@@ -87,7 +91,7 @@ def main():
 			if ("-s" in sys.argv[i]):
 				startMode = True
 
-	# Bootstrap the system
+	# Bootstrap the system in the specified debug mode
 	bootstrap(debug = debugMode)
 
 	# Just start the traffic proxy... that will spawn everything else as needed

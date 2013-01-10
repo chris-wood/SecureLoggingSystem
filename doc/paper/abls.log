@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.4-1.40.13 (TeX Live 2012) (format=pdflatex 2012.6.30)  9 JAN 2013 22:27
+This is pdfTeX, Version 3.1415926-2.4-1.40.13 (TeX Live 2012) (format=pdflatex 2012.6.30)  9 JAN 2013 22:57
 entering extended mode
  \write18 enabled.
  file:line:error style messages enabled.
@@ -734,19 +734,35 @@ Overfull \hbox (4.64209pt too wide) in paragraph at lines 388--388
  []
 
 
-Overfull \hbox (5.59792pt too wide) in paragraph at lines 401--404
+Overfull \hbox (3.46524pt too wide) in paragraph at lines 398--399
+[]\T1/ppl/m/n/9 Run the main ex-e-cutable file (main.py) with the -c (clear)
+ []
+
+
+Overfull \hbox (3.00656pt too wide) in paragraph at lines 399--400
+[]\T1/ppl/m/n/9 Run the test driver pro-gram (Traf-ficProx-y-Driver.py) and
+ []
+
+
+Overfull \hbox (5.59792pt too wide) in paragraph at lines 407--410
 []\T1/ppl/m/n/9 However, de-spite the in-creased com-plex-ity of the test drive
 r,
  []
 
+[5]
+Overfull \hbox (20.49327pt too wide) in paragraph at lines 440--441
+\T1/ppl/m/n/9 user-name/-pass-word, at-tributes are gen-er-ated, database is qu
+eried
+ []
 
-Overfull \hbox (9.52222pt too wide) in paragraph at lines 424--427
+
+Overfull \hbox (9.52222pt too wide) in paragraph at lines 443--446
 \T1/ppl/m/n/9 worker tasks that use pre-defined strate-gies for au-dit-ing (sea
 rch
  []
 
-(./abls.bbl [5])
-Overfull \vbox (0.76898pt too high) has occurred while \output is active []
+(./abls.bbl)
+Overfull \vbox (0.47487pt too high) has occurred while \output is active []
 
 
 [6] (./abls.aux)
@@ -778,7 +794,7 @@ latino/uplb8a.pfb></usr/local/texlive/2012/texmf-dist/fonts/type1/urw/palatino/
 uplr8a.pfb></usr/local/texlive/2012/texmf-dist/fonts/type1/urw/palatino/uplri8a
 .pfb></usr/local/texlive/2012/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr
 /local/texlive/2012/texmf-dist/fonts/type1/urw/times/utmr8a.pfb>
-Output written on abls.pdf (6 pages, 373009 bytes).
+Output written on abls.pdf (6 pages, 375238 bytes).
 PDF statistics:
  167 PDF objects out of 1000 (max. 8388607)
  137 compressed objects within 2 object streams

@@ -12,6 +12,7 @@ import Queue
 import json
 import logging # Python logging module
 import pickle
+from datetime import datetime
 
 # Add in the files from the other modules
 sys.path.append("../PolicyEngineModule/")
@@ -95,8 +96,8 @@ class Logger(threading.Thread):
 		encryptedEntityKey = self.encryptionModule.encrypt(entityKey, policy)
 
 		# Persist the encrypted keys
-		self.keyShim.replaceInTable("initialEpochKey", "(userId, sessionId, key)", (userId, sessionId, encryptedEpochKey)) #encryptedEpochKey
-		self.keyShim.replaceInTable("initialEntityKey", "(userId, sessionId, key)", (userId, sessionId, encryptedEntityKey)) #encryptedEntityKey
+		self.keyShim.replaceInTable("initialEpochKey", "(userId, sessionId, key, inserted_at)", (userId, sessionId, encryptedEpochKey, datetime.now().ctime())) #encryptedEpochKey
+		self.keyShim.replaceInTable("initialEntityKey", "(userId, sessionId, key, inserted_at)", (userId, sessionId, encryptedEntityKey, datetime.now().ctime())) #encryptedEntityKey
 
 		# TODO: how to mask the userId and sessionId columns?
 		# What key to use to encrypt the user and session IDs?
@@ -150,16 +151,16 @@ class Logger(threading.Thread):
 			currKey = self.initialEpochKey[(userId, sessionId)]
 			self.epochKey[(userId, sessionId)] = currKey
 			#self.logShim.insertIntoTable("EpochKey", (userId, sessionId, currKey))
-			self.keyShim.insertIntoTable("epochKey", "(userId, sessionId, key)", (userId, sessionId, currKey))
+			self.keyShim.insertIntoTable("epochKey", "(userId, sessionId, key, inserted_at)", (userId, sessionId, currKey, datetime.now().ctime()))
 			lastEpochDigest = hmac.new(currKey, "0", hashlib.sha512).hexdigest()
 
 			# Set the entity key
 			self.entityKey[(userId, sessionId)] = self.initialEntityKey[(userId, sessionId)]
 			#self.logShim.insertIntoTable("EntityKey", (userId, sessionId, self.entityKey[(userId, sessionId)]))
-			self.keyShim.insertIntoTable("entityKey", "(userId, sessionId, key)", (userId, sessionId, self.entityKey[(userId, sessionId)]))
+			self.keyShim.insertIntoTable("entityKey", "(userId, sessionId, key, inserted_at)", (userId, sessionId, self.entityKey[(userId, sessionId)], datetime.now().ctime()))
 
 			# Save the epoch digest
-			self.logShim.insertIntoTable("epoch", "(userId, sessionId, digest)", (userId, sessionId, lastEpochDigest))
+			self.logShim.insertIntoTable("epoch", "(userId, sessionId, digest, inserted_at)", (userId, sessionId, lastEpochDigest, datetime.now().ctime()))
 
 			# Create the entry payload
 			payload = str(userId) + str(sessionId) + str(0) + str(message) + str(0) # hash of this entry is (user, session, epoch, msg, previous == 0)
@@ -181,7 +182,7 @@ class Logger(threading.Thread):
 				newKey = self.sha3.Keccak((len(bytes(currKey)), currKey.encode("hex")))
 				self.epochKey[(userId, sessionId)] = newKey
 				#self.logShim.insertIntoTable("EpochKey", (userId, sessionId, newKey))
-				self.keyShim.insertIntoTable("epochKey", "(userId, sessionId, key)", (userId, sessionId, newKey))
+				self.keyShim.insertIntoTable("epochKey", "(userId, sessionId, key, inserted_at)", (userId, sessionId, newKey, datetime.now().ctime()))
 
 				# Pull the last epoch block
 				length = len(epochResults)
@@ -196,7 +197,7 @@ class Logger(threading.Thread):
 				digest = hmac.new(newKey, payload, hashlib.sha512).hexdigest()
 
 				# Store the epoch digest...
-				self.logShim.insertIntoTable("epoch", "(userId, sessionId, digest)", (userId, sessionId, digest))
+				self.logShim.insertIntoTable("epoch", "(userId, sessionId, digest, inserted_at)", (userId, sessionId, digest, datetime.now().ctime()))
 
 			# Now, generate the payload for this log entry
 			logLength = len(logResults)
@@ -221,13 +222,13 @@ class Logger(threading.Thread):
 		# Store the latest entity digest
 		currEntityKey = str(self.entityKey[(userId, sessionId)])
 		lastEntityDigest = hmac.new(currEntityKey, xi, hashlib.sha512).hexdigest()
-		self.logShim.replaceInTable("entity", "(userId, sessionId, digest)", (userId, sessionId, lastEntityDigest))
+		self.logShim.replaceInTable("entity", "(userId, sessionId, digest, inserted_at)", (userId, sessionId, lastEntityDigest, datetime.now().ctime()))
 		self.entityKey[(userId, sessionId)] = hmac.new(currEntityKey, "some constant value", hashlib.sha512).hexdigest() # update the keys
 		#self.logShim.insertIntoTable("EntityKey", (userId, sessionId, self.entityKey[(userId, sessionId)]))
-		self.keyShim.insertIntoTable("entityKey", "(userId, sessionId, key)", (userId, sessionId, self.entityKey[(userId, sessionId)]))
+		self.keyShim.insertIntoTable("entityKey", "(userId, sessionId, key, inserted_at)", (userId, sessionId, self.entityKey[(userId, sessionId)], datetime.now().ctime()))
 
 		# Store the elements now
-		self.logShim.insertIntoTable("log", "(userId, sessionId, epochId, message, xhash, yhash)", (userId, sessionId, epochLength, message, xi, yi))
+		self.logShim.insertIntoTable("log", "(userId, sessionId, epochId, message, xhash, yhash, inserted_at)", (userId, sessionId, epochLength, message, xi, yi, datetime.now().ctime()))
 
 		# Debug
 		print("Inserted the log: " + str((userId, sessionId, epochLength, message, xi, yi)))
@@ -247,11 +248,12 @@ class Logger(threading.Thread):
 			key = Random.new().read(32)
 
 			# Encrypt the key using the policy and store it in memory and in the database
-			encryptedKey = self.encryptionModule.encrypt(msg, key)
-			self.policyKeyMap[(entry.userId, entry.sessionId, policy)] = key
-			self.keyShim.insertIntoTable("policyKey", "(userId, sessionId, policy, key, id)", (userId, sessionId, policy, encryptedKey, iv))
+			encryptedKey = self.encryptionModule.encrypt(key, policy)
+			self.policyKeyMap[(entry.userId, entry.sessionId, policy)] = (key, iv)
+			self.keyShim.insertIntoTable("policyKey", "(userId, sessionId, policy, key, iv, inserted_at)", (entry.userId, entry.sessionId, policy, encryptedKey, iv, datetime.now().ctime()))
 		else:
-			print "need to load from DB"
+			key = self.policyKeyMap[(entry.userId, entry.sessionId, policy)][0]
+			iv = self.policyKeyMap[(entry.userId, entry.sessionId, policy)][1]
 
 		ciphertext = AES.new(key, self.aesMode, iv).encrypt(key)
 		#ciphertext = self.encryptionModule.encrypt(msg, policy)

@@ -391,10 +391,12 @@ new (empty) versions of the local SQLite databases. The main executable script (
 debug and production modes of operation, in which the debug mode clears the contents of every database and
 then proceeds to insert false user data into the users table to begin the logging process. The test driver program,
 TrafficProxyDriver.py, is then modified accordingly to use the default data contained within the database. With these
-changes, the typical process to start the ABLS system is as follows.
+changes, the typical process to start and interact with the ABLS system is as follows.
 
 \begin{enumerate}
-	\item 
+	\item Run the bootstrap script to create new versions of the local SQLite databases. In the actual deployment of an ABLS system, this script would connect to the remote databases and re-specify their schemas accordingly. Thus, it is meant only for development purposes and should not be used on a live ABLS instance.
+	\item Run the main executable file (main.py) with the -c (clear) to flag to enable debug mode, in which the databases are wiped clean and replaced with a small set of fake data. If you wish to start the ABLS system at this point in time, you may also add the -s (start) flag to the script so that it starts the ABLS instance.
+	\item Run the test driver program (TrafficProxyDriver.py) and point it to the host and port at which the traffic proxy within the ABLS instance is listening. By default, this is ``localhost'' and port 9998, but this can easily be configured in the source code. 
 \end{enumerate}
 
 Aside for the initialization code, the test driver program now includes a more robust suite of tests to simulate varying traffic 
@@ -407,7 +409,8 @@ diagnostic information from the ABLS runtime. This information is logged by the 
 file, and the administrators for the ABLS system can check this information at their discretion.
 
 \subsection{Literature Survey}
-TODO: brief discussion of the literature survey here
+A comprehensive literature survey on related logging and non-repudiation work was also completed during this phase 
+of the project. The corresponding articles that were read are included in this phase's submission package. The digest of this work is expected to be a part of the final report and potential publication.
 
 \section{Future Work}
 For the remainder of the project I plan to finish up the partially completed work introduced in the previous section and 
@@ -416,12 +419,16 @@ a robust log query interface, which places the ABLS runtime in the role of the r
 strategy-driven tasks run within the context of the ABLS runtime, respectively. The following sections expand upon all
 of these action items in more detail.
 
-% expand on this - it should fill 3/4 of a page
-
 \subsection{Complete Database Masking}
-- encrypting and masking user identity attributes in all of the databases
+Following the design outlined in Section \ref{sec:databaseDesign}, the database masking scheme will be completed by
+adding support to the database verifiers. Since the verifiers run within the context of the ABLS system, they will be granted
+permission to all of the database servers so that they may request the appropriate entity and epoch keys used to perform
+strong verification checks on the data in user session log chains. Also, this must be the first activity that is completed 
+because the log querying and automated audit tasks depend on the database columns being properly masked. 
 
 \subsection{Log Collection}
+As part of the proposed design 
+
 TODO: started on the log collection actors
 
 \subsection{Log Querying}

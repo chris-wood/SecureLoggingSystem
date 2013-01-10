@@ -77,7 +77,7 @@ class PolicyManager(ThreadingActor):
 		conj = ''
 		try:
 			attrs = self.userAttributes(str(entry.userId))
-			print("Attributes for user " + str(entry.userId) + ": " + attrs)
+			print("Attributes for user " + str(entry.userId) + ": " + str(attrs))
 			conj = '('
 			for i in range(len(attrs) - 1):
 				conj = conj + str(attrs[i]).lower() + ' and '
