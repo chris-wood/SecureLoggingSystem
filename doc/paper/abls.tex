@@ -266,13 +266,15 @@ ABLS is designed to be a centralized logging system backed by a set of distribut
 diagram for the ABLS deployment scheme is shown in Figure \ref{fig:deployment}, and a more detailed
 depiction of the flow of data between application and database servers is shown in Figure \ref{fig:design}.
 
-\begin{figure*}[htb!]
-\label{fig:design}
-\begin{center}
-\includegraphics[width=7in]{images/design.pdf}
-\caption{The deployment diagram for ABLS.}
-\end{center}
-\end{figure*}
+%TODO: rough deployment diagram for ABLS (different from architecture diagram)
+
+%\begin{figure*}[htb!]
+%\label{fig:design}
+%\begin{center}
+%\includegraphics[width=7in]{images/design.pdf}
+%\caption{The deployment diagram for ABLS.}
+%\end{center}
+%\end{figure*}
 
 Based on the purpose of each piece of database used in the log, it is best to physically separate databases
 that store data of different security classes rather than rely on MAC with polyinstantiation. Of course, access control
@@ -285,12 +287,14 @@ the deployment platform is selected and properly configured, these will be repla
 databases running on separate servers.
 
 \subsection{Key Management}
+\label{sec:keyMgmt}
 In order to increase the performance of log entry encryption during a given user session, symmetric-key encryption
 using AES-256 is chosen to encrypt all log entry messages. The symmetric key is then encrypted using the CP-ABE
 scheme. This design enhancement enables increased improvement without sacrificing the level of confidentiality 
 granularity that is needed for each log entry. 
 
-The basic algorithm for encrypting a log entry is shown in Algorithm \ref{alg:encrypt}.
+The basic algorithm for encrypting a log entry is shown in Algorithm \ref{alg:encrypt}. Once encrypted, the cipher text
+is stored as specified in Section \ref{sec:LogConstruction}.
 
 \begin{algorithm}[ht!] %[htb]
 \caption{Log entry encryption} \label{alg:encrypt}
@@ -310,6 +314,7 @@ The basic algorithm for encrypting a log entry is shown in Algorithm \ref{alg:en
 \end{algorithm}
 
 \subsection{Database Design}
+\label{sec:databaseDesign}
 As shown in section \ref{sec:deployment}, there are four main databases that must be maintained by ABLS:
 the log, key, user, and policy database. The log database maintains the all information in the log chain for every 
 single user and session pair. The key database stores the cryptographic keys that were used to construct
@@ -322,35 +327,115 @@ common user and session IDs are used (though not as the primary key for the tabl
 the uniqueness property). However, because such the storage of such user and session information in plaintext
 may lead to violation of user privacy, they are deterministically masked before being stored in the database. 
 
-% TODO: how is the masking done?
-This masking procedure uses information sensitive to the 
+This masking procedure works by encrypting the user and session attributes with a symmetric key generated
+by the logger's master key salted by the user's unique identifier. Specifically, the encrypted user and session IDs, 
+$[U_i]$ and $[S_j]$, are generated as follows.
+\begin{align*}
+[U_i] = E(M_k || H(U_i), U_i) \\
+[S_j] = E(M_k || H(U_i), S_j) \\
+\end{align*}
 
-% User and session attribute columns masked and encrypted
+TODO: discuss how the salt changes for each table so attackers can't link things together...
 
 %\section{Auditing}
 %TODO: Initial audit design implemented
 
-\section{Completed and Future Work}
-Over the course of this project I have completed the following tasks.
+\newpage
 
-% TODO: expand on all of these - it should fill 3/4 of a page
+\section{Completed Work}
+For Phase 1 of the project, I focused mainly on fixing some of the design and implementation flaws in my previous 
+prototype, redesigning the database to support the new symmetric key management scheme and data 
+partitioning for different security classes, specifying the deployment scheme, and improving the quality test
+of my internal unit tests and the functionality of the test driver program. The specifics of each of these improvements is
+outlined in the following sections.
+
+\subsection{Symmetric Key Management}
+As described in Section \ref{sec:keyMgmt}, the process of encryption log messages was changed to use symmetric-key
+encryption instead of CP-ABE due to the added performance improvement. Pairing-based cryptography is computationally
+expensive, and under the assumption that ABLS might be subject to very heavy traffic loads at any particular time, the 
+overhead of encrypting data to be stored in the database should be as minimal as possible. Therefore, each unique
+policy that is needed to encrypt a log message is associated with a symmetric key, which is in turn encrypted and 
+serialized using CP-ABE. The Charm crypto package allows all cryptographic objects (which tend to be nested
+Python dictionaries and other complicated data structures) to be serialized to byte representations for database 
+persistence. 
+
+Also, in order to improve the performance of the logger, the per-policy symmetric keys for a user session are kept
+in memory until the session has been closed. This avoids the need for the logger to query the database for the key 
+when a new piece of data to be inserted into the log. 
+
+\subsection{Relational Database Design}
+The relational database design was modified in order to support the new symmetric key management scheme and provide 
+enhanced security for the stored data. In particular, rather than storing the cryptographic keys in the same database as the
+log information, these two databases are now segregated and are expected to be deployed on different database servers.
+By hardening both databases, a malicious attacker would need to circumvent the access control mechanisms protecting
+two physically disjoint databases, rather than just one. 
+
+In addition, to better support audits that use the log database, a timestamp field was added to each table as a required
+attribute. Not only does such information capture the exact timing of critical system events, it acts as a protection
+mechanism in the event that log messages are inserted into the database out of order. Also, it is important to note that
+each and every timestamp for a log message is generated as soon as the {\tt ClientHandler} reads the data from
+its open socket. This is done to provide the most accurate timing information.
+
+%Redesigned the relational database model to account for the different security classes among data that is used by ABLS. This resulted in a physical separation of database servers.
+%TODO: added times, separated the database tables, optimized data types for columns to match what's stored
+
+\subsection{Database Column Masking}
+The initial implementation of the database masking procedure, which is outlined in Section \ref{sec:databaseDesign}
+was started in this phase of the project. Currently, only the ability for the logger to store the encrypted user and session IDs 
+is supported. The verifiers have yet to be updated to use this encrypted data to perform the strong verification check. This 
+will finished in the next phase of the project.
+
+\subsection{Bootstrapping, Test Enhancement, and Deployment}
+In order to streamline the test and deployment phases of development, a bootstrap script was implemented to configure
+new (empty) versions of the local SQLite databases. The main executable script (main.py) was also modified to support
+debug and production modes of operation, in which the debug mode clears the contents of every database and
+then proceeds to insert false user data into the users table to begin the logging process. The test driver program,
+TrafficProxyDriver.py, is then modified accordingly to use the default data contained within the database. With these
+changes, the typical process to start the ABLS system is as follows.
 
 \begin{enumerate}
-	\item Symmetric-key encryption for the log entries was implemented and integrated into the relational database model.
-	\item The application and database bootstrap process was automated.
-	\item Redesigned the relational database model to account for the different security classes among data that is used by ABLS. This resulted in a physical separation of database servers.
-	\item Expanded the test driver program to include a more robust suite of tests to simulate varying traffic loads. The user interface of this program was also improved so as to aid the developers in interacting with the ABLS prototype.
-	\item The initial implementation of the database masking procedure was started.
+	\item 
 \end{enumerate}
 
+Aside for the initialization code, the test driver program now includes a more robust suite of tests to simulate varying traffic 
+loads. The user interface of this program was also improved so as to aid the developers in interacting with the ABLS 
+prototype at runtime. Given the difficulty of testing this distributed system at runtime, creating a more sophisticated
+test driver was crucial to the development process that enabled smoke tests to be run with minimal effort.
+
+However, despite the increased complexity of the test driver, it does not, nor will it ever, support the ability to acquire 
+diagnostic information from the ABLS runtime. This information is logged by the ABLS runtime to the appropriate log 
+file, and the administrators for the ABLS system can check this information at their discretion.
+
+\subsection{Literature Survey}
+TODO: brief discussion of the literature survey here
+
 \section{Future Work}
+For the remainder of the project I plan to finish up the partially completed work introduced in the previous section and 
+focus on the auditing aspect of ABLS. Auditing will be supported both manually and automatically through
+a robust log query interface, which places the ABLS runtime in the role of the reference monitor, and automated
+strategy-driven tasks run within the context of the ABLS runtime, respectively. The following sections expand upon all
+of these action items in more detail.
 
 % expand on this - it should fill 3/4 of a page
 
+\subsection{Complete Database Masking}
+- encrypting and masking user identity attributes in all of the databases
+
+\subsection{Log Collection}
+TODO: started on the log collection actors
+
+\subsection{Log Querying}
+- design and implement an easy API for querying information from the log (and only the log) table that checks user authentication privileges first - the logger is the reference monitor to the outside world
+
+- variety of selection functions in which the user can specify the user ID or user and session ID, all data that comes back
+is verified using strong verification, contents of the log messages are filtered depending on their policy (only if the policy matches the client's attributes will the results be returned)
+
+- outline process of querying (client is authenticated with username/password, attributes are generated, database is queried using encrypted data, results are filtered based on policy, and result is returned)
+
+\subsection{Audit Strategy Design}
 - auditing design and implementation (define automated worker tasks that use pre-defined strategies for
 auditing (search by userID) or whatnot that can be triggered by any web application set in front of ABLS - 
-making it easy for auditors to start their own automated audits)
-- encrypting and masking user identity attributes in all of the databases
+making it easy for auditors to start their own automated audits). 
 
 \begin{comment}
 \begin{table}

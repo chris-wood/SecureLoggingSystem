@@ -241,16 +241,17 @@ class Logger(threading.Thread):
 		policy = self.manager.ask({'command' : 'policy', 'payload' : msg})
 		key = None
 		iv = None
+		print("Policy for the piece of data: " + str(policy))
 		if not ((entry.userId, entry.sessionId, policy) in self.policyKeyMap.keys()):
 			iv = Random.new().read(AES.block_size) # we need an IV of 16-bytes, this is also random...
 			key = Random.new().read(32)
 
-			# Encrypt the key using the policy and store it the database
+			# Encrypt the key using the policy and store it in memory and in the database
 			encryptedKey = self.encryptionModule.encrypt(msg, key)
 			self.policyKeyMap[(entry.userId, entry.sessionId, policy)] = key
-
-			# TODO: store the encrypted key and IV into the database
+			self.keyShim.insertIntoTable("policyKey", "(userId, sessionId, policy, key, id)", (userId, sessionId, policy, encryptedKey, iv))
 		else:
+			print "need to load from DB"
 
 		ciphertext = AES.new(key, self.aesMode, iv).encrypt(key)
 		#ciphertext = self.encryptionModule.encrypt(msg, policy)

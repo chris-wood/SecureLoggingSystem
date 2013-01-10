@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.4-1.40.13 (TeX Live 2012) (format=pdflatex 2012.6.30)  9 JAN 2013 00:20
+This is pdfTeX, Version 3.1415926-2.4-1.40.13 (TeX Live 2012) (format=pdflatex 2012.6.30)  9 JAN 2013 22:27
 entering extended mode
  \write18 enabled.
  file:line:error style messages enabled.
@@ -690,10 +690,6 @@ LaTeX Warning: Reference `fig:deployment' on page \thepage  undefined on input
 line 266.
 
 
-Package caption Warning: \label without proper \caption on input line 270.
-See the caption package documentation for explanation.
-
-
 LaTeX Warning: Reference `fig:design' on page \thepage  undefined on input line
  267.
 
@@ -703,60 +699,66 @@ Overfull \hbox (2.07896pt too wide) in paragraph at lines 265--268
 
  []
 
-<images/design.pdf, id=75, 853.68938pt x 745.28438pt>
-File: images/design.pdf Graphic file (type pdf)
- <use images/design.pdf>
-Package pdftex.def Info: images/design.pdf used on input line 272.
-(pdftex.def)             Requested size: 505.89pt x 441.6586pt.
 
-Overfull \hbox (1.89pt too wide) in paragraph at lines 272--273
- [] 
- []
-
-
-Overfull \hbox (10.58356pt too wide) in paragraph at lines 288--292
+Overfull \hbox (10.58356pt too wide) in paragraph at lines 291--295
 \T1/ppl/m/n/9 The sym-met-ric key is then en-crypted us-ing the CP-ABE scheme.
  []
 
 
-Overfull \hbox (10.05309pt too wide) in paragraph at lines 288--292
+Overfull \hbox (10.05309pt too wide) in paragraph at lines 291--295
 \T1/ppl/m/n/9 This de-sign en-hance-ment en-ables in-creased im-prove-ment with
 -
  []
 
 
-Overfull \hbox (5.1661pt too wide) in paragraph at lines 320--324
+Overfull \hbox (5.1661pt too wide) in paragraph at lines 325--329
 \T1/ppl/m/n/9 spond-ing ver-i-fi-ca-tion and en-cryp-tion keys in the key datab
 ase,
  []
 
-
-Overfull \hbox (12.64558pt too wide) in paragraph at lines 341--342
-\T1/ppl/m/n/9 by ABLS. This re-sulted in a phys-i-cal sep-a-ra-tion of database
-
- []
-
 [4 <./images/tagchain.pdf>]
-Overfull \hbox (2.49332pt too wide) in paragraph at lines 343--344
-[]\T1/ppl/m/n/9 The ini-tial im-ple-men-ta-tion of the database mask-ing pro-
+Overfull \hbox (15.35432pt too wide) in paragraph at lines 367--372
+\T1/ppl/m/n/9 seg-re-gated and are ex-pected to be de-ployed on dif-fer-ent dat
+abase
  []
 
 
-Overfull \hbox (9.52222pt too wide) in paragraph at lines 350--354
+Overfull \hbox (9.14406pt too wide) in paragraph at lines 373--378
+[]\T1/ppl/m/n/9 In ad-di-tion, to bet-ter sup-port au-dits that use the log dat
+abase,
+ []
+
+
+Overfull \hbox (4.64209pt too wide) in paragraph at lines 388--388
+[]\secfnt Bootstrapping, Test En-hance-ment, and De-
+ []
+
+
+Overfull \hbox (5.59792pt too wide) in paragraph at lines 401--404
+[]\T1/ppl/m/n/9 However, de-spite the in-creased com-plex-ity of the test drive
+r,
+ []
+
+
+Overfull \hbox (9.52222pt too wide) in paragraph at lines 424--427
 \T1/ppl/m/n/9 worker tasks that use pre-defined strate-gies for au-dit-ing (sea
 rch
  []
 
-(./abls.bbl [5 <./images/design.pdf>]) [6] (./abls.aux)
+(./abls.bbl [5])
+Overfull \vbox (0.76898pt too high) has occurred while \output is active []
+
+
+[6] (./abls.aux)
 
 LaTeX Warning: There were undefined references.
 
  ) 
 Here is how much of TeX's memory you used:
- 7091 strings out of 493488
- 101482 string characters out of 3141326
- 181908 words of memory out of 3000000
- 10230 multiletter control sequences out of 15000+200000
+ 7088 strings out of 493488
+ 101418 string characters out of 3141326
+ 181888 words of memory out of 3000000
+ 10228 multiletter control sequences out of 15000+200000
  46184 words of font info for 61 fonts, out of 3000000 for 9000
  957 hyphenation exceptions out of 8191
  44i,12n,42p,838b,518s stack positions out of 5000i,500n,10000p,200000b,50000s
@@ -776,10 +778,10 @@ latino/uplb8a.pfb></usr/local/texlive/2012/texmf-dist/fonts/type1/urw/palatino/
 uplr8a.pfb></usr/local/texlive/2012/texmf-dist/fonts/type1/urw/palatino/uplri8a
 .pfb></usr/local/texlive/2012/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr
 /local/texlive/2012/texmf-dist/fonts/type1/urw/times/utmr8a.pfb>
-Output written on abls.pdf (6 pages, 708393 bytes).
+Output written on abls.pdf (6 pages, 373009 bytes).
 PDF statistics:
- 250 PDF objects out of 1000 (max. 8388607)
- 175 compressed objects within 2 object streams
+ 167 PDF objects out of 1000 (max. 8388607)
+ 137 compressed objects within 2 object streams
  0 named destinations out of 1000 (max. 500000)
- 16 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 11 words of extra memory for PDF output out of 10000 (max. 10000000)
 

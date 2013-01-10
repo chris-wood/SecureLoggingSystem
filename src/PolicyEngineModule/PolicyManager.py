@@ -68,8 +68,7 @@ class PolicyManager(ThreadingActor):
 		return conj
 
 	def generatePolicy(self, payload):
-		'''
-		Generate the policy for a specific user by reaching out the user attribute database
+		''' Generate the policy for a specific user by reaching out the user attribute database
 		for this user's attributes.
 
 		TODO: caw:  this is incorrect - it should generate the policy based on the user ID, a colleague flag, and anything else that is event-specific)
@@ -78,11 +77,11 @@ class PolicyManager(ThreadingActor):
 		conj = ''
 		try:
 			attrs = self.userAttributes(str(entry.userId))
-			print(attrs)
+			print("Attributes for user " + str(entry.userId) + ": " + attrs)
 			conj = '('
 			for i in range(len(attrs) - 1):
 				conj = conj + str(attrs[i]).lower() + ' and '
-			conj = conj + str(attrs[len(attrs) - 1].lower() + ')')	
+			conj = conj + str(attrs[len(attrs) - 1].lower() + ')')
 		except:
 			print("Error: invalid result from users database")
 			traceback.print_exc(file=sys.stdout)
@@ -97,8 +96,7 @@ class PolicyManager(ThreadingActor):
 		# invoke the correct event handler 
 
 	def userAttributes(self, userId):
-		'''
-		Reach out to the user database for their attributes
+		''' Reach out to the user database for their attributes.
 		'''
 		result = self.shim.executeQuery("users", "userId", userId)
 		return (result[0]["attributes"].split(','))
