@@ -16,7 +16,7 @@ from charm.core.engine.util import objectToBytes,bytesToObject
 # Type annotations
 pk_t = { 'g':G1, 'g2':G2, 'h':G1, 'f':G1, 'e_gg_alpha':GT }
 mk_t = {'beta':ZR, 'g2_alpha':G2 }
-sk_t = { 'D':G2, 'Dj':G2, 'Djp':G1, 'S':unicode } 
+sk_t = { 'D':G2, 'Dj':G2, 'Djp':G1, 'S':unicode }
 ct_t = { 'C_tilde':GT, 'C':G1, 'Cy':G1, 'Cyp':G2, 'policy':unicode, 'attributes':unicode }
 
 class EncryptionModule:

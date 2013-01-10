@@ -11,8 +11,11 @@ import string
 import logging # Python logging module
 
 # Our own stuff
-import DBShim
+import sys
+sys.path.append("../DatabaseModule")
+from DBShim import DBShim
 import Logger
+from EncryptionModule import EncryptionModule
 
 import Keccak # The SHA-3 candidate, of course
 
@@ -27,82 +30,106 @@ class VerifyCrawler(threading.Thread):
 	actor via a message dictionary.
 	'''
 
-	def __init__(self, server):
+	def __init__(self, vid, logServer, keyServer, masterKey, publicKey):
 		''' Constructor that stores the log server information.
 		'''
 		threading.Thread.__init__(self)
-		self.server = server
+		self.id = vid
+		self.logServer = logServer
+		self.keyServer = keyServer
 		self.running = True
+
+		# Build the encryption module
+		# TODO: does it need to share the same master key as the other main ABLS instance? How will the keys be synchronized?
+		self.encryptionModule = EncryptionModule()
 
 		# Generate the used entry bucket
 		self.usedBin = {}
-		self.MAX_TRIES = 10 # This can (and should) be configured by expermientation.
+		self.MAX_TRIES = 10 # This can (and should) be configured by experimentation.
 
 	def run(self):
 		''' The main thread loop for this verifier.
 		'''
 		# Create the shim
-		self.shim = DBShim.DBShim(self.server)
+		self.logShim = DBShim(self.logServer)
+		self.keyShim = DBShim(self.keyServer)
 
 		# Run the crawler loop indefinitely...
 		while self.running:
+			print("Verifier " + str(self.id) + " is trying to grab a user session to verify...")
 			(userId, sessionId) = self.selectRow()
+			# Check to see if we found some valid data...
+			if (userId != -1 and sessionId != -1):
+				# Query the keys from the database
+				valueMap = {"userId" : userId, "sessionId" : sessionId}
+				epochKey = self.keyShim.executeMultiQuery("initialEpochKey", valueMap)
+				key1 = epochKey[0]["key"]
+				entityKey = self.keyShim.executeMultiQuery("initialEntityKey", valueMap)
+				key2 = entityKey[0]["key"]
 
-			# Query the keys from the database
-			valueMap = {"userId" : userId, "sessionId" : sessionId}
-			epochKey = self.shim.executeMultiQuery("InitialEpochKey", valueMap)
-			key1 = epochKey[0]["key"]
-			entityKey = self.shim.executeMultiQuery("InitialEntityKey", valueMap)
-			key2 = entityKey[0]["key"]
+				# Decrypt the keys using the 'verifier' policy
+				sk = self.encryptionModule.generateUserKey(['VERIFIER'])
+				k1 = self.encryptionModule.decrypt(sk, key1)
+				k2 = self.encryptionModule.decrypt(sk, key2)
 
-			# Query the last digest from the database
-			entityDigest = self.shim.executeMultiQuery("Entity", valueMap)
-			digest = entityDigest[len(entityDigest) - 1]["digest"]			
+				# TODO: need to synchronize the master key between the ABLS instance and verifier
 
-			# Query for the log now.
-			logResult = self.shim.executeMultiQuery("Log", valueMap)
-			log = {}
-			log[(userId, sessionId)] = []
-			for i in range(0, len(logResult)):
-				log[(userId, sessionId)].append([userId, sessionId, logResult[i]["epochId"], logResult[i]["message"], logResult[i]["xhash"], logResult[i]["yhash"]])
+				# QUIT PREMATURELY FOR TESTING PURPOSES
+				sys.exit()
 
-			# Verify.
-			self.strongestVerify(userId, sessionId, log, str(key1), str(key2), digest, Logger.Logger.EPOCH_WINDOW_SIZE)
+				# Query the last digest from the database
+				entityDigest = self.logShim.executeMultiQuery("entity", valueMap)
+				digest = entityDigest[len(entityDigest) - 1]["digest"]			
+
+				# Query for the log now.
+				logResult = self.logShim.executeMultiQuery("log", valueMap)
+				log = {}
+				log[(userId, sessionId)] = []
+				for i in range(0, len(logResult)):
+					log[(userId, sessionId)].append([userId, sessionId, logResult[i]["epochId"], logResult[i]["message"], logResult[i]["xhash"], logResult[i]["yhash"]])
+
+				# Verify.
+				print(log)
+				self.strongestVerify(userId, sessionId, log, str(key1), str(key2), digest, Logger.Logger.EPOCH_WINDOW_SIZE)
 			time.sleep(5)
 
 	def selectRow(self):
-		''' Select a row from the database to perform a strong verification on
+		''' Randomly select a row from the database to check with strong verification.
 		'''
 		userId = sessionId = 0
 		
 		foundNewRow = False
 		tries = 0
 		while not foundNewRow:
-			result = self.shim.randomQuery("Log")
-			userId = result[0]["userId"]
-			sessionId = result[0]["sessionId"]
-			if not ((userId, sessionId) in self.usedBin):
-				self.usedBin[(userId, sessionId)] = 0
+			result = self.logShim.randomQuery("log")
+			if (len(result) > 0):
+				userId = result[0]["userId"]
+				sessionId = result[0]["sessionId"]
+				if not ((userId, sessionId) in self.usedBin):
+					self.usedBin[(userId, sessionId)] = 0
+					foundNewRow = True
+
+				# Upgrade all the instances for 
+				for key in self.usedBin.keys():
+					self.usedBin[key] = self.usedBin[key] + 1
+
+				# See if we ran past the try cap
+				tries = tries + 1
+				if (tries >= self.MAX_TRIES):
+					tk1, tk2, maxNum = 0, 0, 0
+					for (k1, k2) in self.usedBin.keys():
+						if (self.usedBin[(k1, k2)] > maxNum):
+							maxNum = self.usedBin[(k1, k2)]
+							tk1 = -1
+							tk2 = -1
+
+					del self.usedBin[(tk1, tk2)]
+					userId = tk1
+					sessionId = tk2
+					foundNewRow = True # we're going to retry a previous row
+			else:
+				userId = sessionId = -1
 				foundNewRow = True
-
-			# Upgrade all the instances for 
-			for key in self.usedBin.keys():
-				self.usedBin[key] = self.usedBin[key] + 1
-
-			# See if we ran past the try cap
-			tries = tries + 1
-			if (tries >= self.MAX_TRIES):
-				tk1, tk2, maxNum = 0, 0, 0
-				for (k1, k2) in self.usedBin.keys():
-					if (self.usedBin[(k1, k2)] > maxNum):
-						maxNum = self.usedBin[(k1, k2)]
-						tk1 = k1
-						tk2 = k2
-
-				del self.usedBin[(tk1, tk2)]
-				userId = tk1
-				sessionId = tk2
-				foundNewRow = True # we're going to retry a previous row
 
 		return (userId, sessionId)
 
@@ -129,10 +156,16 @@ class VerifyCrawler(threading.Thread):
 			# Check the hash chain first
 			xi = sha3.Keccak((len(bytes(firstPayload)), firstPayload.encode("hex")))
 			computedV = sha3.Keccak((len(xi), xi))
+			print("checking x's")
+			print(xi)
+			print(first[4])
 			assert(xi == first[4])
 
 			# Check the epoch chain next
 			yi = hmac.new(epochKey, lastEpochDigest.encode("hex") + first[4].encode("hex"), hashlib.sha512).hexdigest()
+			print("checking y's")
+			print(yi)
+			print(first[5])
 			assert(yi == first[5])
 
 			# Compute the first part of the entity chain now
@@ -228,8 +261,9 @@ class VerifyCrawler(threading.Thread):
 def main():
 	''' The crawler thread test (watch it go at runtime).
 	'''
-	crawler = VerifyCrawler("/Users/caw/Projects/PrivateProjects/LoggingSystem/src/DatabaseModule/log.db")
-	crawler.run()
+	print("The VerifierCrawler must be run within the ABLS context to share the cryptographic keys necessary for verification")
+	#crawler = VerifyCrawler(1, "/Users/caw/Projects/SecureLoggingSystem/src/DatabaseModule/log.db", "/Users/caw/Projects/SecureLoggingSystem/src/DatabaseModule/key.db")
+	#crawler.run()
 
 if (__name__ == '__main__'):
 	main()

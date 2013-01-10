@@ -18,7 +18,8 @@ sys.path.append("./LoggerModule/")
 sys.path.append("./PolicyEngineModule/")
 sys.path.append("./Common")
 sys.path.append("./DatabaseModule")
-import TrafficProxy
+from TrafficProxy import TrafficProxy
+from VerifyCrawler import VerifyCrawler
 import DBShim
 
 def bootstrap(debug = True):
@@ -96,7 +97,8 @@ def main():
 
 	# Just start the traffic proxy... that will spawn everything else as needed
 	if (startMode):
-		proxy = TrafficProxy.TrafficProxy().start()
+		proxy = TrafficProxy().start()
+		#verifier = VerifyCrawler(1, "/Users/caw/Projects/SecureLoggingSystem/src/DatabaseModule/log.db", "/Users/caw/Projects/SecureLoggingSystem/src/DatabaseModule/key.db").start()
 		print("---------------------------")
 		print("Type 'help' or '?' for help")
 		print("---------------------------")

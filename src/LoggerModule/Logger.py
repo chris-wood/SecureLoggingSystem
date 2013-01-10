@@ -216,7 +216,7 @@ class Logger(threading.Thread):
 		lastEpoch = epochResults[epochLength - 1]["digest"]
 
 		# Here are the elements for the log entry tuple
-		xi = self.sha3.Keccak((len(bytes(payload)), payload.encode("hex"))) # not authentication
+		xi = self.sha3.Keccak((len(bytes(payload)), payload.encode("hex"))) # just a plain old hash
 		yi = hmac.new(currKey, lastEpoch.encode("hex") + xi.encode("hex"), hashlib.sha512).hexdigest()
 
 		# Store the latest entity digest
