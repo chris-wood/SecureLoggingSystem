@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.4-1.40.13 (TeX Live 2012) (format=pdflatex 2012.6.30)  10 JAN 2013 00:06
+This is pdfTeX, Version 3.1415926-2.4-1.40.13 (TeX Live 2012) (format=pdflatex 2012.6.30)  10 JAN 2013 00:15
 entering extended mode
  \write18 enabled.
  file:line:error style messages enabled.
@@ -616,29 +616,18 @@ Underfull \vbox (badness 10000) has occurred while \output is active []
 
 
 ]
-Overfull \hbox (28.03458pt too wide) in paragraph at lines 93--101
+Overfull \hbox (28.03458pt too wide) in paragraph at lines 93--99
 []\T1/ppl/m/n/9 ABLS, an attribute-based log-ging sys-tem that sup-ports cipher
 text-
  []
 
 
-Overfull \hbox (9.94527pt too wide) in paragraph at lines 114--119
-\T1/ppl/m/n/9 graphic keys. Also, since pref-er-ence is given to document-
- []
-
-LaTeX Font Info:    Font shape `T1/ppl/bx/n' in size <9> not available
-(Font)              Font shape `T1/ppl/b/n' tried instead on input line 134.
-
-LaTeX Warning: Citation `Bellare1997-ForwardIntegrity' on page \thepage  undefi
-ned on input line 134.
-
-
-Overfull \hbox (2.59258pt too wide) in paragraph at lines 140--147
+Overfull \hbox (2.59258pt too wide) in paragraph at lines 109--116
 []\T1/ppl/m/n/9 Log in-tegrity is achieved through hash chains and message-
  []
 
 
-Overfull \hbox (4.45491pt too wide) in paragraph at lines 140--147
+Overfull \hbox (4.45491pt too wide) in paragraph at lines 109--116
 \T1/ppl/m/n/9 that con-tains the gen-er-at-ing source in-for-ma-tion, the en-cr
 ypted
  []
@@ -647,126 +636,132 @@ ypted
 File: images/hashchain.pdf Graphic file (type pdf)
 
 <use images/hashchain.pdf>
-Package pdftex.def Info: images/hashchain.pdf used on input line 155.
+Package pdftex.def Info: images/hashchain.pdf used on input line 124.
 (pdftex.def)             Requested size: 275.22862pt x 282.45563pt.
 
-Overfull \hbox (1.30983pt too wide) in paragraph at lines 166--172
+Overfull \hbox (1.30983pt too wide) in paragraph at lines 135--141
 []\T1/ppl/m/n/9 In this con-text, an epoch $\OML/cmm/m/it/9 Ep[]$ \T1/ppl/m/n/9
  sim-ply cor-re-sponds to a fixed-
  []
 
-[2]
+
+Underfull \vbox (badness 1122) has occurred while \output is active []
+
+LaTeX Font Info:    Font shape `T1/ppl/bx/n' in size <9> not available
+(Font)              Font shape `T1/ppl/b/n' tried instead on input line 169.
+
 
 LaTeX Warning: Reference `sec:security' on page \thepage  undefined on input li
-ne 200.
+ne 169.
 
-<images/tagchain.pdf, id=24, 362.10281pt x 181.42781pt>
+<images/tagchain.pdf, id=13, 362.10281pt x 181.42781pt>
 File: images/tagchain.pdf Graphic file (type pdf)
 
 <use images/tagchain.pdf>
-Package pdftex.def Info: images/tagchain.pdf used on input line 224.
+Package pdftex.def Info: images/tagchain.pdf used on input line 193.
 (pdftex.def)             Requested size: 289.68263pt x 145.14244pt.
 
-Overfull \hbox (5.23846pt too wide) in paragraph at lines 235--237
+Overfull \hbox (5.23846pt too wide) in paragraph at lines 204--206
 \T1/ppl/m/n/9 con-trol the fre-quency of data sent to the log server, which
  []
 
 
 LaTeX Warning: Reference `log:ComputationalComplexity' on page \thepage  undefi
-ned on input line 237.
+ned on input line 206.
 
 
 LaTeX Warning: Reference `log:VerificationModes' on page \thepage  undefined on
- input line 238.
+ input line 207.
 
-
-Overfull \hbox (18.32448pt too wide) in paragraph at lines 239--240
+[2]
+Overfull \hbox (18.32448pt too wide) in paragraph at lines 208--209
 \T1/ppl/m/n/9 num-bers, which leads to very fine-grained database queries. 
  []
 
-[3 <./images/hashchain.pdf>]
 
 LaTeX Warning: Reference `fig:deployment' on page \thepage  undefined on input 
-line 266.
+line 235.
 
 
 LaTeX Warning: Reference `fig:design' on page \thepage  undefined on input line
- 267.
+ 236.
 
 
-Overfull \hbox (2.07896pt too wide) in paragraph at lines 265--268
+Overfull \hbox (2.07896pt too wide) in paragraph at lines 234--237
 []\T1/ppl/m/n/9 ABLS is de-signed to be a cen-tral-ized log-ging sys-tem backed
 
  []
 
 
-Overfull \hbox (10.58356pt too wide) in paragraph at lines 291--295
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [3 <./images/hashchain.pdf> <./images/tagchain.pdf
+
+pdfTeX warning: /usr/texbin/pdflatex (file ./images/tagchain.pdf): PDF inclusio
+n: multiple pdfs with page group included in a single page
+>]
+Overfull \hbox (10.58356pt too wide) in paragraph at lines 260--264
 \T1/ppl/m/n/9 The sym-met-ric key is then en-crypted us-ing the CP-ABE scheme.
  []
 
 
-Overfull \hbox (10.05309pt too wide) in paragraph at lines 291--295
+Overfull \hbox (10.05309pt too wide) in paragraph at lines 260--264
 \T1/ppl/m/n/9 This de-sign en-hance-ment en-ables in-creased im-prove-ment with
 -
  []
 
 
-Overfull \hbox (5.1661pt too wide) in paragraph at lines 325--329
+Overfull \hbox (5.1661pt too wide) in paragraph at lines 294--298
 \T1/ppl/m/n/9 spond-ing ver-i-fi-ca-tion and en-cryp-tion keys in the key datab
 ase,
  []
 
-[4 <./images/tagchain.pdf>]
-Overfull \hbox (15.35432pt too wide) in paragraph at lines 367--372
+
+Overfull \hbox (15.35432pt too wide) in paragraph at lines 336--341
 \T1/ppl/m/n/9 seg-re-gated and are ex-pected to be de-ployed on dif-fer-ent dat
 abase
  []
 
 
-Overfull \hbox (9.14406pt too wide) in paragraph at lines 373--378
+Overfull \hbox (9.14406pt too wide) in paragraph at lines 342--347
 []\T1/ppl/m/n/9 In ad-di-tion, to bet-ter sup-port au-dits that use the log dat
 abase,
  []
 
 
-Overfull \hbox (4.64209pt too wide) in paragraph at lines 388--388
+Overfull \hbox (4.64209pt too wide) in paragraph at lines 357--357
 []\secfnt Bootstrapping, Test En-hance-ment, and De-
  []
 
-
-Overfull \hbox (3.46524pt too wide) in paragraph at lines 398--399
+[4]
+Overfull \hbox (3.46524pt too wide) in paragraph at lines 367--368
 []\T1/ppl/m/n/9 Run the main ex-e-cutable file (main.py) with the -c (clear)
  []
 
 
-Overfull \hbox (3.00656pt too wide) in paragraph at lines 399--400
+Overfull \hbox (3.00656pt too wide) in paragraph at lines 368--369
 []\T1/ppl/m/n/9 Run the test driver pro-gram (Traf-ficProx-y-Driver.py) and
  []
 
 
-Overfull \hbox (5.59792pt too wide) in paragraph at lines 407--410
+Overfull \hbox (5.59792pt too wide) in paragraph at lines 376--379
 []\T1/ppl/m/n/9 However, de-spite the in-creased com-plex-ity of the test drive
 r,
  []
 
-[5]
-Overfull \hbox (20.49327pt too wide) in paragraph at lines 443--444
+
+Overfull \hbox (20.49327pt too wide) in paragraph at lines 412--413
 \T1/ppl/m/n/9 user-name/-pass-word, at-tributes are gen-er-ated, database is qu
 eried
  []
 
 
-Overfull \hbox (9.52222pt too wide) in paragraph at lines 446--449
+Overfull \hbox (9.52222pt too wide) in paragraph at lines 415--418
 \T1/ppl/m/n/9 worker tasks that use pre-defined strate-gies for au-dit-ing (sea
 rch
  []
 
-(./abls.bbl)
-
-Package balance Warning: You have called \balance in second column
-(balance)                Columns might not be balanced.
-
-[6] (./abls.aux)
+(./abls.bbl [5]) [6] (./abls.aux)
 
 LaTeX Warning: There were undefined references.
 
@@ -774,7 +769,7 @@ LaTeX Warning: There were undefined references.
 Here is how much of TeX's memory you used:
  7088 strings out of 493488
  101418 string characters out of 3141326
- 181888 words of memory out of 3000000
+ 182891 words of memory out of 3000000
  10228 multiletter control sequences out of 15000+200000
  46184 words of font info for 61 fonts, out of 3000000 for 9000
  957 hyphenation exceptions out of 8191
@@ -795,10 +790,10 @@ latino/uplb8a.pfb></usr/local/texlive/2012/texmf-dist/fonts/type1/urw/palatino/
 uplr8a.pfb></usr/local/texlive/2012/texmf-dist/fonts/type1/urw/palatino/uplri8a
 .pfb></usr/local/texlive/2012/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr
 /local/texlive/2012/texmf-dist/fonts/type1/urw/times/utmr8a.pfb>
-Output written on abls.pdf (6 pages, 375552 bytes).
+Output written on abls.pdf (6 pages, 373355 bytes).
 PDF statistics:
- 167 PDF objects out of 1000 (max. 8388607)
- 137 compressed objects within 2 object streams
+ 166 PDF objects out of 1000 (max. 8388607)
+ 136 compressed objects within 2 object streams
  0 named destinations out of 1000 (max. 500000)
  11 words of extra memory for PDF output out of 10000 (max. 10000000)
 

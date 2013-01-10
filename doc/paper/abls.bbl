@@ -1,5 +1,10 @@
 \begin{thebibliography}{1}
 
+\bibitem{Bellare1997-ForwardIntegrity}
+M.~Bellare and B.~S. Yee.
+\newblock Forward integrity for secure audit logs.
+\newblock Technical report, 1997.
+
 \bibitem{Bethencourt2007-CPABE}
 J.~Bethencourt, A.~Sahai, and B.~Waters.
 \newblock Ciphertext-policy attribute-based encryption.

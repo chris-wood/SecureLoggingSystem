@@ -65,7 +65,7 @@ class Logger(threading.Thread):
 		# Create the log queue
 		self.queue = Queue.Queue()
 
-		# Setup the Python logger
+		# Set up the Python logger
 		self.lgr = logging.getLogger('abls')
 		self.lgr.setLevel(logging.DEBUG)
 		fh = logging.FileHandler('abls.log')
@@ -98,10 +98,7 @@ class Logger(threading.Thread):
 		# Persist the encrypted keys
 		self.keyShim.replaceInTable("initialEpochKey", "(userId, sessionId, key, inserted_at)", (userId, sessionId, encryptedEpochKey, datetime.now().ctime())) #encryptedEpochKey
 		self.keyShim.replaceInTable("initialEntityKey", "(userId, sessionId, key, inserted_at)", (userId, sessionId, encryptedEntityKey, datetime.now().ctime())) #encryptedEntityKey
-
-		# TODO: how to mask the userId and sessionId columns?
-		# What key to use to encrypt the user and session IDs?
-
+		# TODO: here
 		#self.logShim.replaceInTable("InitialEpochKey", (userId, sessionId, epochKey))
 		#self.logShim.replaceInTable("InitialEntityKey", (userId, sessionId, entityKey))
 

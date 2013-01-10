@@ -90,43 +90,12 @@ to logging systems maintained in the cloud and is capable of satisfying the afor
 requirements. In addition, authenticated hash-chains have been shown to be effective at enforcing log file integrity
 in numerous logging schemes  \cite{Schneier1999-Secure}. 
 
-ABLS, an attribute-based logging system that supports ciphertext-policy attribute-based encryption (CP-ABE) \cite{Bethencourt2007-CPABE} 
-and authenticated hash-chain constructions for log file confidentiality and integrity, respectively, was recently designed and implemented
-by the primary author.  The preliminary ABLS architecture and design was weak with regards to the 
-scalability of encryption operations under heavy traffic loads,
-the relational database schema to store log-data and other sensitive information, and the interactions 
-with database servers. To address these issues,
-we propose a set of extensions that modify ABLS in the following ways:
-\begin{enumerate}
-	\item The CP-ABE encryption scheme will be replaced with a hybrid cryptosystem in which the Advanced
-	Encryption Standard (AES), the standardized symmetric-key encryption algorithm, is used to encrypt user
-	session data by a key that is protected with CP-ABE encryption. In the event that a user generates log messages
-	with varying sensitivity levels during a single session, multiple symmetric keys will be produced to maintain
-	the confidentiality of information in different security classes.
-	\item The relational database storage scheme will either be changed to include a masking column in the appropriate
-	log table to hide user identities or replaced entirely with a document- or object-based database. Both of these
-	modern database systems are similar in semantics (if documents are conceptually treated as serialized objects),
-	so a product and literature survey will be conducted prior to selecting an adequate replacement that satisfies
-	the necessary security and performance requirements. Though, based on preferences and architectural experience,
-	a document-based database such as MongoDB will be the likely candidate. Also, since the ABLS architecture is highly
-	structured around a relational schema to store data, this change will require modifications made in the logging, attribute authority, 
-	and auditing modules in order to maintain functional correctness. 
-	\item Database security mechanisms, including fine-grained access policies for protected databases and encryption of data-in-transit, 
-	will be implemented. This is particularly
-	important for the databases that store cryptographic keys. Also, since preference is given to document-based databases such as MongoDB,
-	third-party services such as zNcrypt (provided by Gazzang) that are specifically tailored to this DBMS will likely be used to enforce 
-	access control to sensitive databases.
-	\item The auditing module will be extended to include automated audits of database operations, including changes
-	to the database structure and both successful and unsuccessful client connections with the database. Currently,
-	the auditing module is only designed (and partially implemented) to support strategy-based audits on database contents. However,
-	in this type of application, database performance and security are just as critical. Thus, with this change, there will be two audit 
-	techniques that can roughly be equated to data and policy inspections, both of which will only be accessible to users with the
-	appropriate privileges. This access control will be likely be enforced using username and password credentials.
-\end{enumerate}
-
-Altogether, the security features of database authentication, encryption, and auditing will be further expanded upon
-in the existing ABLS architecture. With these changes, we will then re-evaluate the ABLS at an architectural, security, 
-and performance perspective to determine its usefulness in cloud-based settings. 
+ABLS, an attribute-based logging system that supports 
+ciphertext-policy attribute-based encryption (CP-ABE) 
+\cite{Bethencourt2007-CPABE} and authenticated hash-chain constructions for log file confidentiality and integrity, 
+respectively, is a logging system designed for the cloud to address the aforementioned problems. This paper
+describes the motivation and design of ABLS, as well as some implementation details of the prototype. The paper
+concludes with a discussion of the current status of the project and planned work to be completed.
 
 \section{Log Design}
 In this section we present our log generation and verification schemes.
@@ -286,7 +255,7 @@ In the current ABLS prototype, all database servers are separated as individual 
 the deployment platform is selected and properly configured, these will be replaced with instances of MySQL 
 databases running on separate servers.
 
-\subsection{Key Management}
+\subsection{Hybrid Key Management}
 \label{sec:keyMgmt}
 In order to increase the performance of log entry encryption during a given user session, symmetric-key encryption
 using AES-256 is chosen to encrypt all log entry messages. The symmetric key is then encrypted using the CP-ABE
@@ -349,7 +318,7 @@ partitioning for different security classes, specifying the deployment scheme, a
 of my internal unit tests and the functionality of the test driver program. The specifics of each of these improvements is
 outlined in the following sections.
 
-\subsection{Symmetric Key Management}
+\subsection{Hybrid Key Management}
 As described in Section \ref{sec:keyMgmt}, the process of encryption log messages was changed to use symmetric-key
 encryption instead of CP-ABE due to the added performance improvement. Pairing-based cryptography is computationally
 expensive, and under the assumption that ABLS might be subject to very heavy traffic loads at any particular time, the 

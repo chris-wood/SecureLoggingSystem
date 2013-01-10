@@ -3,44 +3,46 @@ Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
 The top-level auxiliary file: abls.aux
 The style file: abbrv.bst
 Database file #1: ../abls.bib
-You've used 4 entries,
+Warning--empty institution in Bellare1997-ForwardIntegrity
+You've used 5 entries,
             2118 wiz_defined-function locations,
-            532 strings with 4608 characters,
-and the built_in function-call counts, 1752 in all, are:
-= -- 196
-> -- 51
+            537 strings with 4738 characters,
+and the built_in function-call counts, 1985 in all, are:
+= -- 219
+> -- 64
 < -- 3
-+ -- 20
-- -- 16
-* -- 110
-:= -- 262
-add.period$ -- 15
-call.type$ -- 4
-change.case$ -- 20
++ -- 25
+- -- 20
+* -- 123
+:= -- 307
+add.period$ -- 18
+call.type$ -- 5
+change.case$ -- 26
 chr.to.int$ -- 0
-cite$ -- 4
-duplicate$ -- 80
-empty$ -- 145
-format.name$ -- 16
-if$ -- 400
+cite$ -- 6
+duplicate$ -- 88
+empty$ -- 160
+format.name$ -- 20
+if$ -- 445
 int.to.chr$ -- 0
-int.to.str$ -- 4
+int.to.str$ -- 5
 missing$ -- 4
-newline$ -- 23
-num.names$ -- 8
-pop$ -- 18
+newline$ -- 28
+num.names$ -- 10
+pop$ -- 23
 preamble$ -- 1
-purify$ -- 16
+purify$ -- 20
 quote$ -- 0
-skip$ -- 66
+skip$ -- 72
 stack$ -- 0
-substring$ -- 141
+substring$ -- 146
 swap$ -- 31
 text.length$ -- 3
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 16
-warning$ -- 0
-while$ -- 19
-width$ -- 5
-write$ -- 55
+type$ -- 20
+warning$ -- 1
+while$ -- 21
+width$ -- 6
+write$ -- 65
+(There was 1 warning)
