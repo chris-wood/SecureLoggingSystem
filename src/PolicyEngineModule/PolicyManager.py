@@ -71,7 +71,7 @@ class PolicyManager(ThreadingActor):
 		''' Generate the policy for a specific user by reaching out the user attribute database
 		for this user's attributes.
 
-		TODO: caw:  this is incorrect - it should generate the policy based on the user ID, a colleague flag, and anything else that is event-specific)
+		TODO: caw: incorrect - it should generate the policy based on the user ID, a colleague flag, and anything else that is event-specific)
 		'''
 		entry = LogEntry.LogEntry(jsonString = payload)
 		conj = ''

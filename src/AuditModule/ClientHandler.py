@@ -42,8 +42,8 @@ class ClientHandler(threading.Thread):
 		self.logger.start()
 
 	def run(self):
-		''' The main loop for this cliet handler thread. Simply strip messages
-		out of the socket and send them to the logger for processing.
+		''' The main loop for this client handler thread. Strip out a message,
+		parse it according to the protocol, and then invoke the necessary commands.
 		'''
 		while self.running:
 			for client in self.clientList:
@@ -53,3 +53,4 @@ class ClientHandler(threading.Thread):
 
 	def handleMessage(self, message):
 		print("client message: " + str(message))
+		# TODO: invoke command in response to the incoming client message
