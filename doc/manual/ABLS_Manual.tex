@@ -1,0 +1,49 @@
+\documentclass[a4paper,11pt]{report}
+%
+%--------------------   start of the 'preamble'
+%
+\usepackage{graphicx,amssymb,amstext,amsmath,caw,verbatim,dirtree,listings}
+%
+
+%%    homebrew commands -- to save typing
+\newcommand\etc{\textsl{etc}}
+\newcommand\eg{\textsl{eg.}\ }
+\newcommand\etal{\textsl{et al.}}
+\newcommand\Quote[1]{\lq\textsl{#1}\rq}
+\newcommand\fr[2]{{\textstyle\frac{#1}{#2}}}
+\newcommand\miktex{\textsl{MikTeX}}
+\newcommand\comp{\textsl{The Companion}}
+\newcommand\nss{\textsl{Not so Short}}
+
+%
+%---------------------   end of the 'preamble'
+%
+\begin{document}
+%-----------------------------------------------------------
+\title{\textbf{ABLS} \\ An Attribute-Based Logging System for the Cloud {\small User Manual}}
+\author{Christopher A. Wood \\ {\tt caw4567@rit.edu}}
+\maketitle
+%-----------------------------------------------------------
+\begin{abstract}\centering
+User-based non-repudiation is an increasingly important property of cloud-based applica-tions. It provides irrefutable evidence that ties system behavior to specific users, thus enabling strict enforcement of organizational security policies. System logs are typically used as the basis for this property. Thus, the effectiveness of system audits based on log files reduces to the problem of maintaining the integrity and confidentiality of log files. In this project, we study the problem of building secure log files. We investigate the benefits of ciphertext-policy attribute-based encryption (CP-ABE) to solve a variety of log design issues. In addition, we also present the architecture and a preliminary analysis for a proof-of-concept system that fulfills the confidentiality and integrity requirements for a secure log.
+\end{abstract}
+%-----------------------------------------------------------
+\tableofcontents
+%-----------------------------------------------------------
+\include{bootstrap}
+%-----------------------------------------------------------
+%\addcontentsline{toc}{chapter}{\numberline{}Bibliography}
+%\include{biblio}
+%-----------------------------------------------------------
+%\appendix
+%\include{app4}
+%\include{app1}
+%\include{app2}
+%\include{app5}
+%\include{app3}
+%-----------------------------------------------------------
+
+\bibliography{ref}{}
+\bibliographystyle{plain}
+
+\end{document}

@@ -109,10 +109,10 @@ diagram for the ABLS deployment scheme is shown in Figure \ref{fig:deployment}.
 %TODO: rough deployment diagram for ABLS (different from architecture diagram)
 
 \begin{figure*}[htb!]
-\label{fig:deployment}
 \begin{center}
-\includegraphics[width=7in]{images/design.pdf}
-\caption{The deployment strategy and a detailed design for ABLS.}
+\includegraphics[width=4in]{images/deployment.pdf}
+\caption{A high-level depiction of the deployment for an ABLS instance, where each box represents a unique runtime environment (i.e. a unique server).}
+\label{fig:deployment}
 \end{center}
 \end{figure*}
 
@@ -133,9 +133,9 @@ using AES-256 is chosen to encrypt all log entry messages. The symmetric key is 
 scheme. This design enhancement enables increased improvement without sacrificing the level of confidentiality 
 granularity that is needed for each log entry. 
 
-The basic algorithm for encrypting a log entry is shown in Algorithm \ref{alg:encrypt}. Once encrypted, the cipher text
-is stored as specified in Section \ref{sec:LogConstruction}.
-
+The basic algorithm for encrypting a log entry is shown in Algorithm \ref{alg:encrypt}. Once encrypted, the ciphertext
+is stored in the database.
+  
 \begin{algorithm}[ht!] %[htb]
 \caption{Log entry encryption} \label{alg:encrypt}
 \begin{algorithmic}[1]
@@ -145,11 +145,14 @@ is stored as specified in Section \ref{sec:LogConstruction}.
 % I decided not to list the input/output in this case, so that's why the above two lines are commented out
 \STATE{Let $P$ be the access control policy for the message of $L_i$, as determined by the {\tt PolicyManager}}
 \IF{The symmetric key $K$ for $(U_k, S_j)$ has not been generated for $P$}
-	\STATE{Generate $K$ and encrypt it (with the CP-ABE encryption module) using $P$}
-	\STATE{Persist $K$ to the key database}
+	\STATE{Generate $K$ and encrypt it (with the CP-ABE encryption module) using $P$, yielding $K_E$}
+	\STATE{Persist $K_E$ to the key database}
+\ELSE
+	\STATE{Query the database for $K_E$, the encrypted key for policy $P$.}
+	\STATE{Decrypt $K$ using the attributes of user $U_k$}
 \ENDIF
 \STATE{Encrypt $L_i$ with AES-256 using $K$, yielding $E(L_i, K)$}
-\STATE{Persist $(L_i, K)$ to the log database}
+\STATE{Persist $E(L_i, K)$ to the log database}
 \end{algorithmic}
 \end{algorithm}
 
@@ -271,7 +274,10 @@ A comprehensive literature survey on related logging and non-repudiation work wa
 of the project. The corresponding articles that were read are included in this phase's submission package. The digest of this work is expected to be a part of the final report and potential publication.
 
 \subsection{Log Traffic Encryption}
-TODO
+The ABLS prototype now supports SSL encryption of all incoming log traffic to ensure the confidentiality of sensitive
+information as it is sent from the client to the server running the traffic proxy. Unfortunately, this is only one-way SSL 
+in which the client verifies the server. I am currently experimenting with ways to implement two-way SSL authentication
+so the client can be verified as well, which is the ultimate goal. 
 
 \section{Future Work}
 For the remainder of the project I plan to finish up the partially completed work introduced in the previous section and 
@@ -294,6 +300,7 @@ strong verification checks on the data in user session log chains. Also, this mu
 because the log querying and automated audit tasks depend on the database columns being properly masked. 
 
 \subsection{Log Querying - 1/19/13}
+\label{sec:querying}
 In order to make ABLS fulfill its purpose as a secure logging system, log query support will be added to the audit
 module. Such query support will be exposed to clients through a lightweight API that is used via the auditing protocol.
 To start, only select operations will be supported, and they can be parameterized by the user ID or both the user and 
@@ -334,14 +341,28 @@ part of supporting client authentication, a proper password storage scheme will 
 the modification of the user database schema and the proper password hashing (and salting) techniques. 
 
 \subsection{Audit Strategy Design - 1/24/13}
-As the number of contents in the log database grows, manual audits become less appealing. Therefore, the audit module
-will be extended with strategy-driven audit tasks that can scan the log database on-demand to check for policy violations.
+As the number of contents in the log database grows, manual audits conducted by querying the log become less and less 
+feasible. Therefore, the audit module will be extended with strategy-driven audit tasks that can scan the log database 
+on-demand to check for policy violations. In order to enable clients to define these audit strategies, there must be a 
+formal way of mapping security policies into log query strategies. For example, if one such policy is that no user should use 
+the application between the hours of 12:00am and 6:00am, then the audit task must be able to interpret this information
+and query the log database for messages stored in this time frame. 
 
-TODO: finish
+Currently, the plan for implementing this mapping is to provide clients with a set of parameters that they can populate to
+match their desired security policies. A subset of these parameters is shown below.
+\begin{lstlisting}
+eventId: event id
+occurred_flag: flag for event occurrence
+target_user: source user id
+time_range: time range for the event
+\end{lstlisting}
 
-- auditing design and implementation (define automated worker tasks that use pre-defined strategies for
-auditing (search by userID) or whatnot that can be triggered by any web application set in front of ABLS - 
-making it easy for auditors to start their own automated audits). 
+Of course, this information may also be encoded using EPAL or XACML \cite{Anderson2005-ComparisonEAPL_XACML}.
+This homegrown mapping will be used to avoid the implementation of complex XML parsers. 
+
+Also, audit strategies will be developed in two phases. The first phase will enable the ABLS administrator
+to specify audit strategies before deploying an ABLS instance, at which point the strategies will be fixed. The second
+phase will enable clients to dynamically configure audit strategies while an ABLS instance is currently running.
 
 \subsection{ABLS Configuration File - 1/25/13} 
 In order to improve the quality of the ABLS prototype, all of the hard-coded configuration strings that set up databases,
@@ -360,8 +381,25 @@ log_file: absolute path string
 
 \subsection{Client Authentication - 1/31/13}
 \label{sec:auth}
+There are two types of clients that can interact with an ABLS instance at runtime: the clients generating log data and the
+clients requesting log data. To support log message confidentiality, clients generating log data will be authenticated
+using two-way SSL authentication, as shown in Figure \ref{fig:ssl}. This will promote two a bidirectional measure of 
+trust between the client and server while at the same time encrypting all sensitive data as it is sent between the two 
+endpoints.
 
-TODO: public-key authentication using SSL certificates (prefered), user logins for audit interface
+\begin{figure}[ht!]
+\begin{center}
+\includegraphics[width=3in]{images/two_way_ssl.pdf}
+\caption{A pictorial representation of two-way SSL authentication. }
+\label{fig:ssl}
+\end{center}
+\end{figure}
+
+Authentication for the clients that request log data will be done with the use of passwords, similar in style to how the 
+FTP protocol authenticates users. As discussed in Section \ref{sec:querying}, this will require the implementation of 
+a secure password management scheme that uses the appropriate cryptographic techniques. 
+
+%TODO: public-key authentication using SSL certificates (prefered), user logins for audit interface
 
 \begin{comment}
 \begin{table}
@@ -376,7 +414,7 @@ Issue 4 &  40\% & Duh?\\ \hline
 \end{tabular}
 \end{table}
 
-\begin{figure}[htb]
+\begin{figure}[ht!]
 \label{sample graphic}
 \begin{center}
 \includegraphics[width=1.5in]{fly.jpg}

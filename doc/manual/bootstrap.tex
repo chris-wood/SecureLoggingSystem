@@ -1,0 +1,48 @@
+\chapter{Bootstrapping}
+
+ABLS comes packaged with a set of configuration scripts and SQL files that initialize
+the database in a clean state. These files are included in the DatabaseModule directory
+that comes packaged with ABLS, as shown below:
+
+\dirtree{%
+.1 ABLS.
+.2 main - main executable.
+.2 LoggerModule.
+.2 PolicyEngineModule.
+.2 AuditModule.
+.2 Common.
+.2 TestModule.
+.2 DatabaseModule.
+.3 bootstrap - bash script.
+.3 bootstrap SQL files.
+}
+
+In order to configure an new ABLS instance to be run on a server in development mode, one must run
+the following commands from the root ABLS directory.
+
+\begin{lstlisting}
+$> ./DatabaseModule/bootstrap 
+$> python main.py -c 
+\end{lstlisting}
+
+The first bootstrap script will wipe the database files and configure them for use.
+This is the script that should be modified if the user wants to change the physical
+location of each database server. The second command will tell the main ABLS executable
+script to ``configure'' the database with some fake data for testing purposes. As such,
+this should only be used when configuring ABLS for development and testing purposes.
+
+Once complete, the user should then run the following command from the root ABLS directory.
+
+\begin{lstlisting}
+$> python main.py -s
+\end{lstlisting}
+
+This command will ``start'' an ABLS instance on the local host. If one wants to deploy 
+an ABLS instance in production mode, they will only run the main executable with the 
+``-s'' flag, not the ``-c'' flag. Also, these flags can be combined during the bootstrapping
+process to save time, as shown below.
+
+\begin{lstlisting}
+$> ./DatabaseModule/bootstrap 
+$> python main.py -c -s
+\end{lstlisting}

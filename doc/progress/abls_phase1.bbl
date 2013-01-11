@@ -1,5 +1,10 @@
 \begin{thebibliography}{1}
 
+\bibitem{Anderson2005-ComparisonEAPL_XACML}
+A.~Anderson.
+\newblock A comparison of two privacy policy languages: Epal and xacml.
+\newblock 2005.
+
 \bibitem{Bethencourt2007-CPABE}
 J.~Bethencourt, A.~Sahai, and B.~Waters.
 \newblock Ciphertext-policy attribute-based encryption.

@@ -1,0 +1,25 @@
+\newtheorem{thm}{Theorem}
+\newtheorem{cor}[thm]{Corollary}
+\newtheorem{con}[thm]{Conjecture}
+\newtheorem{remark}[thm]{Remark}
+\newtheorem{claim}[thm]{Claim}
+\newtheorem{lem}[thm]{Lemma}
+\newtheorem{problem}[thm]{Problem}
+\newtheorem{dnt}[thm]{Definition}
+\newtheorem{alg}[thm]{Algorithm}
+
+\newenvironment{proof}[1][Proof]
+{\par\noindent{\bf #1.} }{\hspace*{\fill}\nolinebreak{$\Box$}\bigskip\par}
+
+%\numberwithin{table}{section}
+
+\newenvironment{definition}[1][Definition]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}]}{\end{trivlist}}
+
+\usepackage{color}
+\newcommand{\todo}[1] {
+	{\tt \color{red}{[TODO: {#1}]}}
+}
+\newcommand{\caw}[1] {
+	{\color{red}{{\tt [JG: }{#1}]}}
+}
