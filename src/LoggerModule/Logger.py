@@ -98,7 +98,6 @@ class Logger(threading.Thread):
 		# Persist the encrypted keys
 		self.keyShim.replaceInTable("initialEpochKey", "(userId, sessionId, key, inserted_at)", (userId, sessionId, encryptedEpochKey, datetime.now().ctime())) #encryptedEpochKey
 		self.keyShim.replaceInTable("initialEntityKey", "(userId, sessionId, key, inserted_at)", (userId, sessionId, encryptedEntityKey, datetime.now().ctime())) #encryptedEntityKey
-		# TODO: here
 		#self.logShim.replaceInTable("InitialEpochKey", (userId, sessionId, epochKey))
 		#self.logShim.replaceInTable("InitialEntityKey", (userId, sessionId, entityKey))
 

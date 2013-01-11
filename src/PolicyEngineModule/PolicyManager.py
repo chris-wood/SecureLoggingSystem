@@ -71,7 +71,7 @@ class PolicyManager(ThreadingActor):
 		''' Generate the policy for a specific user by reaching out the user attribute database
 		for this user's attributes.
 
-		TODO: caw: incorrect - it should generate the policy based on the user ID, a colleague flag, and anything else that is event-specific)
+		TODO: fix this so it matches the design
 		'''
 		entry = LogEntry.LogEntry(jsonString = payload)
 		conj = ''
@@ -89,11 +89,7 @@ class PolicyManager(ThreadingActor):
 
 	def generateAttributes(self, eventInfo):
 		print(user)
-		return [] # need to reach out to the policyengine to see what's supported.
-		# Use LUT (self.eventMap) to determine if the specified event is supported...
-
-		# everything is a string, so we need to go out to the database for this information and then
-		# invoke the correct event handler 
+		return [] # need to reach out to the policyengine to see what's supported. 
 
 	def userAttributes(self, userId):
 		''' Reach out to the user database for their attributes.

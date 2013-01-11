@@ -40,8 +40,7 @@ class VerifyCrawler(threading.Thread):
 		self.running = True
 
 		# Build the encryption module
-		# TODO: does it need to share the same master key as the other main ABLS instance? How will the keys be synchronized?
-		self.encryptionModule = EncryptionModule()
+		self.encryptionModule = EncryptionModule() # share the key
 
 		# Generate the used entry bucket
 		self.usedBin = {}
@@ -71,8 +70,6 @@ class VerifyCrawler(threading.Thread):
 				sk = self.encryptionModule.generateUserKey(['VERIFIER'])
 				k1 = self.encryptionModule.decrypt(sk, key1)
 				k2 = self.encryptionModule.decrypt(sk, key2)
-
-				# TODO: need to synchronize the master key between the ABLS instance and verifier
 
 				# QUIT PREMATURELY FOR TESTING PURPOSES
 				sys.exit()
