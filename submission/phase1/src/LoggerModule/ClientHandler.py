@@ -49,9 +49,23 @@ class ClientHandler(threading.Thread):
 		'''
 		while self.running:
 			for client in self.clientList:
-				message = client.sock.recv(self.server.BUFFSIZE)
-				#message = client.connstream.read() # this was for SSL-wrapped information
-				if message != None and message != "":
-					self.lgr.debug("client message: ", message)
-					#print("client message: ", message) # debug 
-					self.queue.put(message)
+				try:
+					message = client.sock.recv(self.server.BUFFSIZE)
+					#message = client.connstream.read() # this was for SSL-wrapped information
+					if message != None and message != "":
+						self.handleMessage(message)
+					else:
+						self.running = False
+				except:
+					self.running = False
+
+		print("Terminating the client handler")
+		self.logger.endSession()
+		self.logger.stop()
+
+	def handleMessage(self, message):
+		''' Handle a client message.
+		'''
+		self.lgr.debug("client message: ", message)
+		#print("client message: ", message) # debug 
+		self.queue.put(message)

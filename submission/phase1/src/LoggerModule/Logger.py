@@ -44,8 +44,8 @@ class Logger(threading.Thread):
 	def __init__(self):
 		''' Default constructor.
 		'''	
-		threading.Thread.__init__(self)
-		self.running = False
+		super(Logger, self).__init__()
+		self._stop = threading.Event()
 
 		# Create the policy actor
 		self.manager = PolicyManager.PolicyManager.start()
@@ -111,6 +111,16 @@ class Logger(threading.Thread):
 		'''
 		return self.queue
 
+	def endSession(self):
+		''' End this session - clear the memory
+		'''
+		self.running = False
+		self.initialEpochKey = None
+		self.initialEntityKey = None
+		self.epochKey = None
+		self.entityKey = None
+		self.policyKeyMap = None
+
 	def run(self):
 		''' Empty the queue into the log as fast as possible. We are the bottleneck. >.<
 		'''
@@ -118,8 +128,7 @@ class Logger(threading.Thread):
 		self.logShim = DBShim.DBShim("/Users/caw/Projects/SecureLoggingSystem/src/DatabaseModule/log.db")
 		self.keyShim = DBShim.DBShim("/Users/caw/Projects/SecureLoggingSystem/src/DatabaseModule/key.db")
 
-		self.running = True
-		while self.running:
+		while not self.stopped():
 			msg = self.queue.get()
 			print "processing: " + str(msg)
 			self.processLogEntry(msg)
@@ -268,6 +277,12 @@ class Logger(threading.Thread):
 
 		# Now store the event in the log 
 		self.addNewEvent(int(entry.userId), int(entry.sessionId), ciphertext)
+
+	def stop(self):
+		self._stop.set()
+
+	def stopped(self):
+		return self._stop.isSet()
 
 	def kill(self):
 		''' Terminate this thread.

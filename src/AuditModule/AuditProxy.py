@@ -5,8 +5,8 @@ Author: Christopher A. Wood, caw4567@rit.edu
 
 import threading
 import logging # Python logging module
-from ClientObject import ClientObject
-from ClientHandler import ClientHandler
+from AuditClientObject import AuditClientObject
+from AuditClientHandler import AuditClientHandler
 import socket
 import ssl
 from OpenSSL import SSL
@@ -31,7 +31,7 @@ class AuditProxy(threading.Thread):
 
 		# Initialize the connection vars/fields
 		self.HOST = 'localhost'
-		self.PORT = 9999 # TODO:
+		self.PORT = 9999 # TODO: pull this out into a configuration file
 		self.BUFFSIZE = 1024
 		self.clientList = []
 		self.handler = None
@@ -64,9 +64,9 @@ class AuditProxy(threading.Thread):
 			self.lgr.debug("Client connected from {}.".format(fromaddr))
 
 			# Start the handler thread
-			handler = ClientHandler.ClientHandler(self)
+			handler = ClientHandler(self)
 			handler.start()
-			handler.clientList.append(ClientObject.ClientObject(newsocket, fromaddr, None)) # None should be connstream
+			handler.clientList.append(ClientObject(newsocket, fromaddr, None)) # None should be connstream
 			self.activeSessions.append(handler)
 
 		self.serverSock.close()

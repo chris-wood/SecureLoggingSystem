@@ -125,8 +125,8 @@ Based on the purpose of each piece of data used in the log, it is best to physic
 that store data of different security classes rather than rely on a single, segregated database that uses MAC with 
 polyinstantiation to protect data of different security classes. Of course, access control
 and authentication mechanisms for all of the database servers is enforced at the operating system level, thus
-prohibiting immediate access to all unauthorized users other than the {\tt LoggingModule} and {\tt PolicyEngine} 
-processes. 
+prohibiting immediate access to all unauthorized users other than the internal tasks (i.e. logger, verifier, policy engine, etc) 
+within an ABLS instance. 
 
 In the current ABLS prototype, all database servers are separated as individual SQLite database files. Once
 the deployment platform is selected and properly configured, these will be replaced with instances of MySQL 
@@ -206,27 +206,29 @@ overhead of encrypting data to be stored in the database should be as minimal as
 policy that is needed to encrypt a log message is associated with a symmetric key, which is in turn encrypted using 
 CP-ABE and then serialized to be stored in the key database. The Charm crypto package allows all cryptographic 
 objects (which tend to be nested Python dictionaries and other complicated data structures) to be serialized to byte 
-representations for easy database persistence. 
+representations for database persistence. 
 
 Also, in order to improve the performance of the logger, the per-policy symmetric keys for a user session are kept
 in memory until the session has been closed. This avoids the need for the logger to query the database for the key 
 when a new piece of data to be inserted into the log. 
 
 Unfortunately, with this new key management scheme, the verification procedure becomes dependent on the
-logger's master key. Thus, I have to implement a mechanism to share this key between the two entities. I expect
-to complete this modification for Phase 2 of the project.
+logger's master key. Thus, in order to support the verifiers, I started implementing a mechanism to share this key 
+between them and the logger. I expect to complete this modification in Phase 2 of the project.
 
 \subsection{Relational Database Design}
 The relational database design was modified in order to support the new symmetric key management scheme and provide 
 enhanced security for the stored data. In particular, rather than storing the cryptographic keys in the same database as the
 log information, these two databases are now segregated and are expected to be deployed on different database servers.
-By hardening both databases, a malicious attacker would need to circumvent the access control mechanisms protecting
-two physically disjoint databases, rather than just one, in order to recover log decrypted messages.
+By hardening both databases, a malicious attacker would now need to circumvent the access control 
+mechanisms protecting two physically disjoint databases, rather than just one, in order to recover log 
+decrypted messages. In terms of the actual implementation, this change caused many cascading errors 
+throughout the code base which needed to be fixed before development continued.
 
-In addition, to better support audits that use the log database, a timestamp field was added to each table as a required
+Also, to better support audits that use the log database, a timestamp field was added to each table as a required
 attribute. Not only does such information capture the exact timing of critical system events, it acts as a protection
 mechanism in the event that log messages are inserted into the database out of order. Also, it is important to note that
-each and every timestamp for a log message is generated as soon as the {\tt ClientHandler} reads the data from
+each and every timestamp for a log message is generated as soon as the client handler reads the data from
 its open socket. This is done to provide the most accurate timing information.
 
 %Redesigned the relational database model to account for the different security classes among data that is used by ABLS. This resulted in a physical separation of database servers.
@@ -235,8 +237,8 @@ its open socket. This is done to provide the most accurate timing information.
 \subsection{Database Column Masking}
 The initial implementation of the database masking procedure, which is outlined in Section \ref{sec:databaseDesign}
 was started in this phase of the project. Currently, the ability for the logger to store the encrypted user and session IDs 
-is partially supported. The verifiers have yet to be updated to use this encrypted data to perform the strong 
-verification check. This will finished in the next phase of the project.
+is not fully supported (only pseudocode has been written). In addition, the verifiers have yet to be updated to use 
+this encrypted data to perform the strong verification check. This will finished in the next phase of the project.
 
 \subsection{Bootstrapping, Test Enhancement, and Deployment}
 In order to streamline the test and deployment phases of development, a bootstrap script was implemented to configure
@@ -399,7 +401,9 @@ There are two types of clients that can interact with an ABLS instance at runtim
 clients requesting log data (for the purpose of auditing). To support log message confidentiality, clients generating 
 log data will be authenticated using two-way SSL authentication, as shown in Figure \ref{fig:ssl}. This will 
 promote a bidirectional measure of trust between the client and server while at the same time encrypting 
-all sensitive data as it is sent between the two endpoints.
+all sensitive data as it is sent between the two endpoints. Also, without an appropriate certificate authority, all
+of the certificates will be self-signed for verification purposes. Actual deployments will require these certificates
+to be signed by a legitimate CA.
 
 \begin{figure}[ht!]
 \begin{center}

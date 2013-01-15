@@ -50,6 +50,12 @@ class DBShim(object):
 			emptyVal = emptyVal + "?,"
 		emptyVal = emptyVal + "?)"
 
+		# Masking the data:
+		# 1. pass user ID as a salt and list of columns to be encrypted
+		# 2. hash table name and concat to hash of user ID
+		# 3. hash master key (which can be obtained from the logger) and appent previous string
+		# 4. encrypt the specified columns (indicated by indices) using this new key
+
 		# Execute the query...
 		print('INSERT INTO ' + table + ' ' + rowAttributes + " VALUES " + str(rowContents))
 		self.cursor.execute("INSERT INTO " + table + rowAttributes + " VALUES " + emptyVal, rowContents)

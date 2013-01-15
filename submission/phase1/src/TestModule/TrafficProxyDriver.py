@@ -45,11 +45,39 @@ def stressTest_1():
 	global EventCount
 	global ssl_sock
 
+	payload = "THIS IS A HUGE SIZED PAYLOAD THAT MOST APPLICATIONS WILL PROBABLY GENERATE" * 100
+	user = 0
+	session = 0
+
+	for i in range(0, EventCount):
+		print("Sending message: " + str(i))
+		ssl_sock.write('{"userId":' + str(user) + ',"sessionId":' + str(session) + ',"payload":"' + str(payload) + '"}')
+
+def stressTest_2():
+	''' Run a stress test on the system. 
+	'''
+	global EventCount
+	global ssl_sock
+
 	payload = "THIS IS A NORMAL SIZED PAYLOAD THAT MOST APPLICATIONS WILL PROBABLY GENERATE"
 	user = 0
 	session = 0
 
 	for i in range(0, EventCount):
+		print("Sending message: " + str(i))
+		ssl_sock.write('{"userId":' + str(user) + ',"sessionId":' + str(session) + ',"payload":"' + str(payload) + '"}')
+
+def stressTest_3():
+	''' Run a stress test on the system. 
+	'''
+	global EventCount
+	global ssl_sock
+
+	payload = "SMALL"
+	user = 0
+	session = 0
+
+	for i in range(0, EventCount * 100): # bombard the logging system with messages
 		print("Sending message: " + str(i))
 		ssl_sock.write('{"userId":' + str(user) + ',"sessionId":' + str(session) + ',"payload":"' + str(payload) + '"}')
 
@@ -71,8 +99,10 @@ def handleInput(userInput):
 		close()
 	elif ('test' in userInput):
 		test(0, 0, "TEST PAYLOAD", 10, 1) 
-	elif ('stress1' in userInput):
+	elif ('stress' in userInput):
 		stressTest_1()
+		stressTest_2()
+		stressTest_3()
 
 def prompt():
 	''' Prompt the user to enter a command (if they want).
