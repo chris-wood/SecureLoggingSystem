@@ -108,6 +108,7 @@ def prompt():
 	''' Prompt the user to enter a command (if they want).
 	'''
 	print("-----------------------------------------")
+	print("            Traffic Proxy Driver         ")
 	print("Type 'help' or '?' for available commands")
 	print("-----------------------------------------")
 
