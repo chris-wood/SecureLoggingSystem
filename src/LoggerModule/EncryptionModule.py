@@ -59,20 +59,34 @@ class EncryptionModule:
         # Instantiate a symmetric enc scheme from this key
 		cipher = AuthenticatedCryptoAbstraction(sha1(key))
 		c2 = cipher.encrypt(plaintext)
-		return objectToBytes({ 'c1':c1, 'c2':c2 }, PairingGroup('SS512'))
+		return objectToBytes({ 'c1':c1, 'c2':c2 }, self.groupObj)
 
 	def decrypt(self, sKey, serializedCiphertext):
 		''' Decrypt the provided ciphertext sing the secret key. Decryption is only successful if
 		the policy embedded in the secret key matches the ciphertext access policy.
+
+		NOTE: there is a bug in Charm (?) where a policy of a single value causes an error to be thrown: 
+
+		unsupported right operand types: int, bytes, str
+
+		Sample code that throws the error: 
+		enc2 = EncryptionModule()
+		policy = '(three)' 
+		attrs = ['ONE', 'TWO', 'THREE']
+		msg = "Hello world!"
+		ct2 = enc2.encrypt(msg, policy)
+		sk2 = enc2.generateUserKey(attrs) 
+		enc2.decrypt(sk2, ct2)
+
 		'''
-		ciphertext = bytesToObject(serializedCiphertext, PairingGroup('SS512'))
+		ciphertext = bytesToObject(serializedCiphertext, self.groupObj)
 		c1, c2 = ciphertext['c1'], ciphertext['c2']
 		success = True
 		try:
 			key = self.cpabe.decrypt(self.public, sKey, c1)
 			if (key == False):
 				success = False
-		except: 
+		except:
 			success = False
 
 		# Try to perform the decryption if we were able to recover the key
