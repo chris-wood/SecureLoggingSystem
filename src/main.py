@@ -24,7 +24,7 @@ from VerifyCrawler import VerifyCrawler
 from KeyManager import KeyManager
 import DBShim
 
-def bootstrap(debug = True):
+def bootstrap(keyMgr, debug = True):
 	''' Bootstrap the database from the database evolution file.
 	'''
 	# Wipe the data if we're in debug mode
@@ -33,7 +33,7 @@ def bootstrap(debug = True):
 
 		# Check to see if we need to clear the table
 		# This is specific to SQLite - coupling needs to be removed
-		shim = DBShim.DBShim("/Users/caw/Projects/SecureLoggingSystem/src/DatabaseModule/log.db")
+		shim = DBShim.DBShim("/Users/caw/Projects/SecureLoggingSystem/src/DatabaseModule/log.db", keyMgr)
 		tableResults = shim.executeRawQuery("SELECT name FROM sqlite_master WHERE type='table' AND name='log'")
 		if (len(tableResults) != 0):
 			shim.executeRawQuery("DELETE FROM log")
@@ -47,7 +47,7 @@ def bootstrap(debug = True):
 
 		# Check to see if we need to clear the table
 		# This is specific to SQLite - it needs to be less coupled to SQLite
-		shim = DBShim.DBShim("/Users/caw/Projects/SecureLoggingSystem/src/DatabaseModule/users.db")
+		shim = DBShim.DBShim("/Users/caw/Projects/SecureLoggingSystem/src/DatabaseModule/users.db", keyMgr)
 		tableResults = shim.executeRawQuery("SELECT name FROM sqlite_master WHERE type='table' AND name='users'")
 		if (len(tableResults) != 0):
 			# Delete the contents in the table
@@ -95,11 +95,11 @@ def main():
 				startMode = True
 
 	# Bootstrap the system in the specified debug mode
-	bootstrap(debug = debugMode)
+	keyMgr = KeyManager()
+	bootstrap(keyMgr, debug = debugMode)
 
 	# Just start the traffic proxy... that will spawn everything else as needed
 	if (startMode):
-		keyMgr = KeyManager()
 		proxy = LogProxy(keyMgr).start()
 		verifier = VerifyCrawler(1, "/Users/caw/Projects/SecureLoggingSystem/src/DatabaseModule/log.db", "/Users/caw/Projects/SecureLoggingSystem/src/DatabaseModule/key.db", keyMgr).start()
 		print("---------------------------")

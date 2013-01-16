@@ -12,7 +12,7 @@ sys.path.append("../Common")
 sys.path.append("../DatabaseModule")
 
 # Our own stuff
-import PolicyEngine
+from PolicyEngine import PolicyEngine
 import LogEntry
 import EventInformation
 import DBShim
@@ -23,10 +23,15 @@ class PolicyManager(ThreadingActor):
 	''' The policy engine that will use events to generate keys.
 	'''
 
+	def __init__(self, keyMgr):
+		''' Persist the key manager so we can create our database shim.
+		'''
+		self.keyMgr = keyMgr
+
 	def on_start(self):
 		''' Create the context information for this policy engine.
 		'''
-		self.engine = PolicyEngine.PolicyEngine()
+		self.engine = PolicyEngine()
 
 		# Define the event lookup table here - this is where all of the supported events are defined
 		self.eventMap = {}
@@ -43,7 +48,7 @@ class PolicyManager(ThreadingActor):
 		self.lgr.addHandler(fh)
 
 		# Create the DB shim to connect to the user attribute database
-		self.shim = DBShim.DBShim("/Users/caw/Projects/SecureLoggingSystem/src/DatabaseModule/users.db") 
+		self.shim = DBShim.DBShim("/Users/caw/Projects/SecureLoggingSystem/src/DatabaseModule/users.db", self.keyMgr)
 
 		self.lgr.debug("PolicyManager: actor started.")
 

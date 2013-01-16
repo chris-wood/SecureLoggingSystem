@@ -49,7 +49,7 @@ class Logger(threading.Thread):
 		self._stop = threading.Event()
 
 		# Create the policy actor
-		self.manager = PolicyManager.PolicyManager.start()
+		self.manager = PolicyManager.start(keyMgr)
 
 		# Create the encryption module and Keccak instance
 		self.keyMgr = keyMgr
