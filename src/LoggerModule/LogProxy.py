@@ -1,5 +1,5 @@
 '''
-File: TrafficProxy.py
+File: LogProxy.py
 Author: Christopher A. Wood, caw4567@rit.edu
 '''
 
@@ -14,7 +14,7 @@ import Queue # thread-safe queue for producer/consumer implementations
 from time import clock, time # for time-based extraction
 from pykka.actor import ThreadingActor
 
-class TrafficProxy(threading.Thread):
+class LogProxy(threading.Thread):
 	''' This is an active object that accepts new data over its TCP socket 
 	(meaning that it is kept separate from the main application that uses it)
 	'''
@@ -22,8 +22,8 @@ class TrafficProxy(threading.Thread):
 	# The list of active sessions (IDs) that have been authenticated
 	activeSessions = []
 
-	def __init__(self):	
-		''' Initialize the traffic proxy that intercepts traffic from the incoming source,
+	def __init__(self, keyMgr):	
+		''' Initialize the log proxy that intercepts traffic from the incoming source,
 			makes sure it's authenticated, and then sets up a handler to parse all traffic.
 		'''
 		threading.Thread.__init__(self)
@@ -36,6 +36,9 @@ class TrafficProxy(threading.Thread):
 		self.clientList = []
 		self.handler = None
 		self.serverSock = None
+
+		# Persist the key manager reference
+		self.keyMgr = keyMgr
 
 		# Setup the Python logger
 		self.lgr = logging.getLogger('abls')
@@ -52,7 +55,7 @@ class TrafficProxy(threading.Thread):
 		self.context.use_certificate_file('./Keys/cert') # our self-signed certificate
 
 	def run(self):
-		''' Run the traffic proxy and listen for incoming connections.
+		''' Run the log proxy and listen for incoming connections.
 		'''
 		address = (self.HOST, self.PORT)
 		self.running = True
@@ -78,7 +81,7 @@ class TrafficProxy(threading.Thread):
 			self.lgr.debug("Client connected from {}.".format(fromaddr))
 
 			# Start the handler thread
-			handler = ClientHandler(self)
+			handler = ClientHandler(self, self.keyMgr)
 			handler.start()
 			handler.clientList.append(ClientObject(newsocket, fromaddr, None)) # None should be connstream
 			self.activeSessions.append(handler)

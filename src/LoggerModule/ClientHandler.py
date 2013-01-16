@@ -9,7 +9,7 @@ import threading
 import struct
 import string
 import Queue
-import Logger
+from Logger import Logger
 
 # The Python logging module
 import logging
@@ -21,8 +21,8 @@ class ClientHandler(threading.Thread):
 	actor via a message dictionary.
 	'''
 
-	def __init__(self, serv):
-		''' Initialize the client handler with the parent server (TrafficProxy)
+	def __init__(self, serv, keyMgr):
+		''' Initialize the client handler with the parent server (LogProxy)
 		'''
 		threading.Thread.__init__(self)
 		self.server = serv
@@ -38,8 +38,8 @@ class ClientHandler(threading.Thread):
 		fh.setFormatter(frmt)
 		self.lgr.addHandler(fh)
 
-		# Set the properties for this session.
-		self.logger = Logger.Logger()
+		# Set the properties for this session (forward along the key manager)
+		self.logger = Logger(keyMgr)
 		self.queue = self.logger.getQueue()
 		self.logger.start()
 

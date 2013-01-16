@@ -13,6 +13,7 @@ import logging # Python logging module
 # Our own stuff
 import sys
 sys.path.append("../DatabaseModule")
+sys.path.append("../CryptoModule")
 from DBShim import DBShim
 import Logger
 from EncryptionModule import EncryptionModule
@@ -30,7 +31,7 @@ class VerifyCrawler(threading.Thread):
 	actor via a message dictionary.
 	'''
 
-	def __init__(self, vid, logServer, keyServer, masterKey, publicKey):
+	def __init__(self, vid, logServer, keyServer, keyMgr):
 		''' Constructor that stores the log server information.
 		'''
 		threading.Thread.__init__(self)
@@ -40,7 +41,7 @@ class VerifyCrawler(threading.Thread):
 		self.running = True
 
 		# Build the encryption module
-		self.encryptionModule = EncryptionModule() # share the key
+		self.encryptionModule = EncryptionModule(keyMgr) # pass along the key manager reference
 
 		# Generate the used entry bucket
 		self.usedBin = {}
@@ -258,7 +259,7 @@ class VerifyCrawler(threading.Thread):
 def main():
 	''' The crawler thread test (watch it go at runtime).
 	'''
-	print("The VerifierCrawler must be run within the ABLS context to share the cryptographic keys necessary for verification")
+	raise Exception("The VerifierCrawler must be run within the ABLS context to share the cryptographic keys necessary for verification")
 	#crawler = VerifyCrawler(1, "/Users/caw/Projects/SecureLoggingSystem/src/DatabaseModule/log.db", "/Users/caw/Projects/SecureLoggingSystem/src/DatabaseModule/key.db")
 	#crawler.run()
 

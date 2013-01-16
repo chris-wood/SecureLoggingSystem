@@ -18,8 +18,9 @@ from datetime import datetime
 sys.path.append("../PolicyEngineModule/")
 sys.path.append("../Common")
 sys.path.append("../DatabaseModule")
+sys.path.append("../CryptoModule")
 import PolicyManager
-import TrafficProxy
+import LogProxy
 import EncryptionModule
 import LogEntry
 import DBShim
@@ -41,7 +42,7 @@ class Logger(threading.Thread):
 	# This can (and should) be changed as needed.
 	EPOCH_WINDOW_SIZE = 5
 
-	def __init__(self):
+	def __init__(self, keyMgr):
 		''' Default constructor.
 		'''	
 		super(Logger, self).__init__()
@@ -51,7 +52,7 @@ class Logger(threading.Thread):
 		self.manager = PolicyManager.PolicyManager.start()
 
 		# Create the encryption module and Keccak instance
-		self.encryptionModule = EncryptionModule.EncryptionModule()
+		self.encryptionModule = EncryptionModule.EncryptionModule(keyMgr)
 		self.sha3 = Keccak.Keccak()
 		self.aesMode = AES.MODE_CBC
 
@@ -239,7 +240,7 @@ class Logger(threading.Thread):
 		print("Inserted the log: " + str((userId, sessionId, epochLength, message, xi, yi)))
 
 	def processLogEntry(self, msg):
-		''' This method is responsible for processing a single msg retrieved from the traffic proxy.
+		''' This method is responsible for processing a single msg retrieved from the log proxy.
 		'''
 		# Parse the host application data
 		entry = LogEntry.LogEntry(jsonString = msg)

@@ -26,10 +26,13 @@ class EncryptionModule:
 	key used for encryption and decryption.
 	'''
 
-	def __init__(self):
+	def __init__(self, keyManager):
 		self.groupObj = PairingGroup('SS512')
 		self.cpabe = CPabe_BSW07(self.groupObj)
 		(self.public, self.master) = self.cpabe.setup()
+
+		# Register with the key manager
+		keyManager.addCipher(self)
 
 	def setKeys(self, master, public):
 		''' Set the master and public key for this module. 

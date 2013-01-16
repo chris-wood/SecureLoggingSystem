@@ -1,9 +1,9 @@
 '''
-File: TrafficProxyDriver.py
+File: LogProxyDriver.py
 Author: Christopher A. Wood, caw4567@rit.edu
 Usage:
 
-	python TrafficProxyDriver.py host port
+	python LogProxyDriver.py host port
 
 '''
 
@@ -108,7 +108,7 @@ def prompt():
 	''' Prompt the user to enter a command (if they want).
 	'''
 	print("-----------------------------------------")
-	print("            Traffic Proxy Driver         ")
+	print("              Log Proxy Driver           ") 
 	print("Type 'help' or '?' for available commands")
 	print("-----------------------------------------")
 
@@ -144,7 +144,7 @@ def main():
 			print pprint.pformat(ssl_sock.getpeercert())
 			prompt()
 		else:
-			print("usage: python TrafficProxyDriver.py host port")
+			print("usage: python LogProxyDriver.py host port")
 	except Exception as e:
 		print("[ERROR] " + str(e))
 
