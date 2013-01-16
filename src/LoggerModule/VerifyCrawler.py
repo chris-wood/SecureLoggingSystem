@@ -18,6 +18,9 @@ from DBShim import DBShim
 import Logger
 from EncryptionModule import EncryptionModule
 
+# test...
+from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
+from charm.core.engine.util import objectToBytes,bytesToObject
 import Keccak # The SHA-3 candidate, of course
 
 # For HMAC
@@ -61,6 +64,7 @@ class VerifyCrawler(threading.Thread):
 			# Check to see if we found some valid data...
 			if (userId != -1 and sessionId != -1):
 				# Query the keys from the database
+				print("Verifying: " + str(userId) + " - " + str(sessionId))
 				valueMap = {"userId" : userId, "sessionId" : sessionId}
 				epochKey = self.keyShim.executeMultiQuery("initialEpochKey", valueMap)
 				key1 = epochKey[0]["key"]
@@ -68,14 +72,13 @@ class VerifyCrawler(threading.Thread):
 				key2 = entityKey[0]["key"]
 
 				# Decrypt the keys using the 'verifier' policy
+				print("Trying to decrypt")
 				sk = self.encryptionModule.generateUserKey(['VERIFIER'])
-				k1 = self.encryptionModule.decrypt(sk, key1)
-				k2 = self.encryptionModule.decrypt(sk, key2)
-
-				# QUIT PREMATURELY FOR TESTING PURPOSES
-				sys.exit()
+				k1 = self.encryptionModule.decrypt(sk, key1)[1] # [1] to pull out plaintext, [0] is T/F flag
+				k2 = self.encryptionModule.decrypt(sk, key2)[1] # [1] to pull out plaintext, [0] is T/F flag
 
 				# Query the last digest from the database
+				print("Decryption successful - continue with the verification process")
 				entityDigest = self.logShim.executeMultiQuery("entity", valueMap)
 				digest = entityDigest[len(entityDigest) - 1]["digest"]			
 
@@ -87,9 +90,9 @@ class VerifyCrawler(threading.Thread):
 					log[(userId, sessionId)].append([userId, sessionId, logResult[i]["epochId"], logResult[i]["message"], logResult[i]["xhash"], logResult[i]["yhash"]])
 
 				# Verify.
-				print(log)
-				self.strongestVerify(userId, sessionId, log, str(key1), str(key2), digest, Logger.Logger.EPOCH_WINDOW_SIZE)
-			time.sleep(5)
+				#print(log)
+				self.strongestVerify(userId, sessionId, log, k1, k2, digest, Logger.Logger.EPOCH_WINDOW_SIZE)
+			time.sleep(15)
 
 	def selectRow(self):
 		''' Randomly select a row from the database to check with strong verification.
@@ -168,7 +171,7 @@ class VerifyCrawler(threading.Thread):
 
 			# Compute the first part of the entity chain now
 			lastEntityDigest = hmac.new(entityKey, xi, hashlib.sha512).hexdigest()
-			entityKey = hmac.new(entityKey, "some constant value", hashlib.sha512).hexdigest() 
+			entityKey = hmac.new(entityKey, "some constant value", hashlib.sha512).hexdigest()
 
 			# Append the first message.
 			ctChain.append(first[3])
@@ -214,6 +217,8 @@ class VerifyCrawler(threading.Thread):
 				entityKey = hmac.new(entityKey, "some constant value", hashlib.sha512).hexdigest() 
 
 			assert(lastEntityDigest == lastDigest)
+			print("Verification result:")
+			print(lastEntityDigest == lastDigest)
 
 			return ctChain
 

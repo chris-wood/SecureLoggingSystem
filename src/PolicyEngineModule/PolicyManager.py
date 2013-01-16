@@ -63,7 +63,7 @@ class PolicyManager(ThreadingActor):
 		'''
 		print("PolicyManager: generating verification policy in PolicyManager.")
 		entry = LogEntry.LogEntry(jsonString = payload)
-		conj = '(verifier and ' + str(entry.userId) + ')'
+		conj = '(verifier or ' + str(entry.userId) + ')'
 		print("PolicyManager: the resulting policy is: " + conj)
 		return conj
 

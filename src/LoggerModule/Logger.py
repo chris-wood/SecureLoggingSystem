@@ -158,6 +158,7 @@ class Logger(threading.Thread):
 			self.epochKey[(userId, sessionId)] = currKey
 			#self.logShim.insertIntoTable("EpochKey", (userId, sessionId, currKey))
 			self.keyShim.insertIntoTable("epochKey", "(userId, sessionId, key, inserted_at)", (userId, sessionId, currKey, datetime.now().ctime()))
+			print("****** CURRENT KEY = " + str(currKey))
 			lastEpochDigest = hmac.new(currKey, "0", hashlib.sha512).hexdigest()
 
 			# Set the entity key
