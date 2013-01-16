@@ -20,7 +20,7 @@ import DBShim
 from pykka.actor import ThreadingActor
 
 class PolicyManager(ThreadingActor):
-	''' The policy engine that will use event, source, and requestor to generate keys.
+	''' The policy engine that will use events to generate keys.
 	'''
 
 	def on_start(self):

@@ -47,7 +47,8 @@ class DBShim(object):
 			DBShim.connectionMap[self.dbString] = DBShim.connectionMap[self.dbString] - 1
 
 	def maskData(self, data, table):
-		''' Generate the mask for the database entries.
+		''' Generate the mask for the database entries. This should be invoked on every data 
+		element that is marked as sensitive.
 		'''
 		#firstHalf = self.keyMgr.getMasterKey() + self.keyMgr.getPublicKey()
 		#secondPayload = data + table
