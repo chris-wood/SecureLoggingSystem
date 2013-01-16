@@ -52,6 +52,7 @@ class Logger(threading.Thread):
 		self.manager = PolicyManager.PolicyManager.start()
 
 		# Create the encryption module and Keccak instance
+		self.keyMgr = keyMgr
 		self.encryptionModule = EncryptionModule.EncryptionModule(keyMgr)
 		self.sha3 = Keccak.Keccak()
 		self.aesMode = AES.MODE_CBC
@@ -126,8 +127,8 @@ class Logger(threading.Thread):
 		''' Empty the queue into the log as fast as possible. We are the bottleneck. >.<
 		'''
 		# Create the log shim.
-		self.logShim = DBShim.DBShim("/Users/caw/Projects/SecureLoggingSystem/src/DatabaseModule/log.db")
-		self.keyShim = DBShim.DBShim("/Users/caw/Projects/SecureLoggingSystem/src/DatabaseModule/key.db")
+		self.logShim = DBShim.DBShim("/Users/caw/Projects/SecureLoggingSystem/src/DatabaseModule/log.db", self.keyMgr)
+		self.keyShim = DBShim.DBShim("/Users/caw/Projects/SecureLoggingSystem/src/DatabaseModule/key.db", self.keyMgr)
 
 		while not self.stopped():
 			msg = self.queue.get()

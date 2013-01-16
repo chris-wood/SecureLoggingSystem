@@ -44,6 +44,7 @@ class VerifyCrawler(threading.Thread):
 		self.running = True
 
 		# Build the encryption module
+		self.keyMgr
 		self.encryptionModule = EncryptionModule(keyMgr) # pass along the key manager reference
 
 		# Generate the used entry bucket
@@ -54,8 +55,8 @@ class VerifyCrawler(threading.Thread):
 		''' The main thread loop for this verifier.
 		'''
 		# Create the shim
-		self.logShim = DBShim(self.logServer)
-		self.keyShim = DBShim(self.keyServer)
+		self.logShim = DBShim(self.logServer, self.keyMgr)
+		self.keyShim = DBShim(self.keyServer, self.keyMgr)
 
 		# Run the crawler loop indefinitely...
 		while self.running:

@@ -3,8 +3,12 @@ File: DBShim.py
 Author: Christopher Wood, caw4567@rit.edu
 '''
 
+import sys
+sys.path.append("../CryptoModule/")
+from KeyManager import KeyManager
 import sqlite3 as lite
 import traceback
+import hashlib, hmac
 
 class DBShim(object):
 	''' The shim for the database that is used to store arbitrary user/log/crypto related information.
@@ -17,7 +21,7 @@ class DBShim(object):
 	# Keep track of the number of connections open to each database (for debug/maintenance)
 	connectionMap = {}
 
-	def __init__(self, db):
+	def __init__(self, db, keyMgr):
 		''' Initialize the shim to connect to a database.
 		'''
 		if (db != None and len(db) > 0):
@@ -27,6 +31,7 @@ class DBShim(object):
 			self.cursor = self.conn.cursor()
 			self.connAlive = True
 			self.dbString = db
+			self.keyMgr = keyMgr
 
 			# See if there are other connections to this database
 			if (db in DBShim.connectionMap):
@@ -40,6 +45,14 @@ class DBShim(object):
 		if (self.connAlive):
 			self.conn.close()
 			DBShim.connectionMap[self.dbString] = DBShim.connectionMap[self.dbString] - 1
+
+	def maskData(self, data, table):
+		''' Generate the mask for the database entries.
+		'''
+		#firstHalf = self.keyMgr.getMasterKey() + self.keyMgr.getPublicKey()
+		#secondPayload = data + table
+		#secondHalf = self.sha3.Keccak((len(bytes(secondPayload)), secondPayload.encode("hex")))
+		return hmac.new(self.keyMgr.getMasterKey(), data + table, hashlib.sha512).hexdigest()
 
 	def insertIntoTable(self, table, rowAttributes, rowContents):
 		''' Insert a row into the specified table. Data filtering happens on behalf of the caller.
@@ -127,7 +140,7 @@ def main():
 	shim.insertIntoTable("log", "(userId, sessionId, epochId, message, xhash, yhash)", (1, 2, 0, "HELLO WORLD", 1337, 1337))
 	shim.insertIntoTable("log", "(userId, sessionId, epochId, message, xhash, yhash)", (1, 2, 0, "HELLO WORLD", 123, 4444))
 	shim.insertIntoTable("log", "(userId, sessionId, epochId, message, xhash, yhash)", (1, 2, 0, "HELLO WORLD", 123, 1312337))
-	shim.insertIntoTable("log", "(userId, sessionId, epochId, message, xhash, yhash)", (1, 5, 0, "THIS WILL NOT WORK", 123, 1312337))
+	shim.insertIntoTable("log", "(userId, sessionId, epochId, message, xhash, yhash)", (1, 5, 0, "THIS WILL OR WILL NOT WORK", 123, 1312337))
 	print(shim.executeQuery("log", "userId", 1))
 
 	valueMap = {"userId" : 1, "sessionId" : 2}

@@ -38,6 +38,16 @@ class KeyManager:
 		# Cipher list...
 		self.cipherList = []
 
+	def getMasterKey(self):
+		''' Return the master key.
+		'''
+		return self.master
+
+	def getPublicKey(self):
+		''' Retrieve the public key.
+		'''
+		return self.public
+
 	def addCipher(self, cipher):
 		''' Add a new cipher to the list to be managed.
 		'''
