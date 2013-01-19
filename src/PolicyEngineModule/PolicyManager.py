@@ -99,6 +99,6 @@ class PolicyManager(ThreadingActor):
 	def userAttributes(self, userId):
 		''' Reach out to the user database for their attributes.
 		'''
-		result = self.shim.executeQuery("users", "userId", userId)
+		result = self.shim.executeQuery("users", "userId", userId, True) # indicate that the userId will be masked
 		return (result[0]["attributes"].split(','))
 

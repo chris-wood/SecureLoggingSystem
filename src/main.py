@@ -65,15 +65,15 @@ def bootstrap(keyMgr, debug = True):
 			# Generate the passwords/salts
 			salt = uuid.uuid4().hex
 			hashedPassword = hashlib.sha512(alicePassword + salt).hexdigest()
-			shim.insertIntoTable("users", "(userId, name, email, password, salt, attributes, inserted_at, modified_at)", (0, "alice", "alice@test.com", hashedPassword, salt, "one", date, date))
+			shim.insertIntoTable("users", "(userId, name, email, password, salt, attributes, inserted_at, modified_at)", (0, "alice", "alice@test.com", hashedPassword, salt, "one", date, date), None)
 
 			salt = uuid.uuid4().hex
 			hashedPassword = hashlib.sha512(bobPassword + salt).hexdigest()
-			shim.insertIntoTable("users", "(userId, name, email, password, salt, attributes, inserted_at, modified_at)", (1, "bob", "bob@test.com", hashedPassword, salt, "two", date, date))
+			shim.insertIntoTable("users", "(userId, name, email, password, salt, attributes, inserted_at, modified_at)", (1, "bob", "bob@test.com", hashedPassword, salt, "two", date, date), None)
 
 			salt = uuid.uuid4().hex
 			hashedPassword = hashlib.sha512(chrisPassword + salt).hexdigest()
-			shim.insertIntoTable("users", "(userId, name, email, password, salt, attributes, inserted_at, modified_at)", (2, "chris", "chris@test.com", hashedPassword, salt, "three", date, date))
+			shim.insertIntoTable("users", "(userId, name, email, password, salt, attributes, inserted_at, modified_at)", (2, "chris", "chris@test.com", hashedPassword, salt, "three", date, date), None)
 	else:
 		print("Starting the system in production mode.")
 

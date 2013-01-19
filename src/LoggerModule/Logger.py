@@ -21,7 +21,7 @@ sys.path.append("../DatabaseModule")
 sys.path.append("../CryptoModule")
 from PolicyManager import PolicyManager
 import LogProxy
-import EncryptionModule
+from EncryptionModule import EncryptionModule
 import LogEntry
 import DBShim
 
@@ -53,7 +53,7 @@ class Logger(threading.Thread):
 
 		# Create the encryption module and Keccak instance
 		self.keyMgr = keyMgr
-		self.encryptionModule = EncryptionModule.EncryptionModule(keyMgr)
+		self.encryptionModule = EncryptionModule(keyMgr)
 		self.sha3 = Keccak.Keccak()
 		self.aesMode = AES.MODE_CBC
 
@@ -98,8 +98,8 @@ class Logger(threading.Thread):
 		encryptedEntityKey = self.encryptionModule.encrypt(entityKey, policy)
 
 		# Persist the encrypted keys
-		self.keyShim.replaceInTable("initialEpochKey", "(userId, sessionId, key, inserted_at)", (userId, sessionId, encryptedEpochKey, datetime.now().ctime())) #encryptedEpochKey
-		self.keyShim.replaceInTable("initialEntityKey", "(userId, sessionId, key, inserted_at)", (userId, sessionId, encryptedEntityKey, datetime.now().ctime())) #encryptedEntityKey
+		self.keyShim.replaceInTable("initialEpochKey", "(userId, sessionId, key, inserted_at)", (userId, sessionId, encryptedEpochKey, datetime.now().ctime()), ("userId", "sessionId")) #encryptedEpochKey
+		self.keyShim.replaceInTable("initialEntityKey", "(userId, sessionId, key, inserted_at)", (userId, sessionId, encryptedEntityKey, datetime.now().ctime()), ("userId", "sessionId")) #encryptedEntityKey
 		#self.logShim.replaceInTable("InitialEpochKey", (userId, sessionId, epochKey))
 		#self.logShim.replaceInTable("InitialEntityKey", (userId, sessionId, entityKey))
 
@@ -114,7 +114,7 @@ class Logger(threading.Thread):
 		return self.queue
 
 	def endSession(self):
-		''' End this session - clear the memory
+		''' End this session - clear the memory.
 		'''
 		self.running = False
 		self.initialEpochKey = None
@@ -158,17 +158,17 @@ class Logger(threading.Thread):
 			currKey = self.initialEpochKey[(userId, sessionId)]
 			self.epochKey[(userId, sessionId)] = currKey
 			#self.logShim.insertIntoTable("EpochKey", (userId, sessionId, currKey))
-			self.keyShim.insertIntoTable("epochKey", "(userId, sessionId, key, inserted_at)", (userId, sessionId, currKey, datetime.now().ctime()))
+			self.keyShim.insertIntoTable("epochKey", "(userId, sessionId, key, inserted_at)", (userId, sessionId, currKey, datetime.now().ctime()), ("userId", "sessionId"))
 			print("****** CURRENT KEY = " + str(currKey))
 			lastEpochDigest = hmac.new(currKey, "0", hashlib.sha512).hexdigest()
 
 			# Set the entity key
 			self.entityKey[(userId, sessionId)] = self.initialEntityKey[(userId, sessionId)]
 			#self.logShim.insertIntoTable("EntityKey", (userId, sessionId, self.entityKey[(userId, sessionId)]))
-			self.keyShim.insertIntoTable("entityKey", "(userId, sessionId, key, inserted_at)", (userId, sessionId, self.entityKey[(userId, sessionId)], datetime.now().ctime()))
+			self.keyShim.insertIntoTable("entityKey", "(userId, sessionId, key, inserted_at)", (userId, sessionId, self.entityKey[(userId, sessionId)], datetime.now().ctime()), ("userId", "sessionId"))
 
 			# Save the epoch digest
-			self.logShim.insertIntoTable("epoch", "(userId, sessionId, digest, inserted_at)", (userId, sessionId, lastEpochDigest, datetime.now().ctime()))
+			self.logShim.insertIntoTable("epoch", "(userId, sessionId, digest, inserted_at)", (userId, sessionId, lastEpochDigest, datetime.now().ctime()), ("userId", "sessionId"))
 
 			# Create the entry payload
 			payload = str(userId) + str(sessionId) + str(0) + str(message) + str(0) # hash of this entry is (user, session, epoch, msg, previous == 0)
@@ -190,7 +190,7 @@ class Logger(threading.Thread):
 				newKey = self.sha3.Keccak((len(bytes(currKey)), currKey.encode("hex")))
 				self.epochKey[(userId, sessionId)] = newKey
 				#self.logShim.insertIntoTable("EpochKey", (userId, sessionId, newKey))
-				self.keyShim.insertIntoTable("epochKey", "(userId, sessionId, key, inserted_at)", (userId, sessionId, newKey, datetime.now().ctime()))
+				self.keyShim.insertIntoTable("epochKey", "(userId, sessionId, key, inserted_at)", (userId, sessionId, newKey, datetime.now().ctime()), ("userId", "sessionId"))
 
 				# Pull the last epoch block
 				length = len(epochResults)
@@ -205,7 +205,7 @@ class Logger(threading.Thread):
 				digest = hmac.new(newKey, payload, hashlib.sha512).hexdigest()
 
 				# Store the epoch digest...
-				self.logShim.insertIntoTable("epoch", "(userId, sessionId, digest, inserted_at)", (userId, sessionId, digest, datetime.now().ctime()))
+				self.logShim.insertIntoTable("epoch", "(userId, sessionId, digest, inserted_at)", (userId, sessionId, digest, datetime.now().ctime()), ("userId", "sessionId"))
 
 			# Now, generate the payload for this log entry
 			logLength = len(logResults)
@@ -233,10 +233,15 @@ class Logger(threading.Thread):
 		self.logShim.replaceInTable("entity", "(userId, sessionId, digest, inserted_at)", (userId, sessionId, lastEntityDigest, datetime.now().ctime()))
 		self.entityKey[(userId, sessionId)] = hmac.new(currEntityKey, "some constant value", hashlib.sha512).hexdigest() # update the keys
 		#self.logShim.insertIntoTable("EntityKey", (userId, sessionId, self.entityKey[(userId, sessionId)]))
-		self.keyShim.insertIntoTable("entityKey", "(userId, sessionId, key, inserted_at)", (userId, sessionId, self.entityKey[(userId, sessionId)], datetime.now().ctime()))
+		self.keyShim.insertIntoTable("entityKey", "(userId, sessionId, key, inserted_at)", (userId, sessionId, self.entityKey[(userId, sessionId)], datetime.now().ctime()), ("userId", "sessionId"))
 
 		# Store the elements now
-		self.logShim.insertIntoTable("log", "(userId, sessionId, epochId, message, xhash, yhash, inserted_at)", (userId, sessionId, epochLength, message, xi, yi, datetime.now().ctime()))
+		self.logShim.insertIntoTable(
+			"log", 
+			"(userId, sessionId, epochId, message, xhash, yhash, inserted_at)", 
+			(userId, sessionId, epochLength, message, xi, yi, datetime.now().ctime()),
+			("userId", "sessionId")
+			)
 
 		# Debug
 		print("Inserted the log: " + str((userId, sessionId, epochLength, message, xi, yi)))
@@ -282,12 +287,12 @@ class Logger(threading.Thread):
 		self.addNewEvent(int(entry.userId), int(entry.sessionId), ciphertext)
 
 	def stop(self):
+		''' Stop this logging thread.
+		'''
 		self._stop.set()
 
 	def stopped(self):
+		''' Check to see if this logging thread was stopped correctly.
+		''' 
 		return self._stop.isSet()
 
-	def kill(self):
-		''' Terminate this thread.
-		'''
-		print("Killing the logger thread.")

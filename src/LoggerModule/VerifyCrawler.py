@@ -67,9 +67,9 @@ class VerifyCrawler(threading.Thread):
 				# Query the keys from the database
 				print("Verifying: " + str(userId) + " - " + str(sessionId))
 				valueMap = {"userId" : userId, "sessionId" : sessionId}
-				epochKey = self.keyShim.executeMultiQuery("initialEpochKey", valueMap)
+				epochKey = self.keyShim.executeMultiQuery("initialEpochKey", valueMap, ("userId", "sessionId"))
 				key1 = epochKey[0]["key"]
-				entityKey = self.keyShim.executeMultiQuery("initialEntityKey", valueMap)
+				entityKey = self.keyShim.executeMultiQuery("initialEntityKey", valueMap, ("userId", "sessionId"))
 				key2 = entityKey[0]["key"]
 
 				# Decrypt the keys using the 'verifier' policy
@@ -80,19 +80,20 @@ class VerifyCrawler(threading.Thread):
 
 				# Query the last digest from the database
 				print("Decryption successful - continue with the verification process")
-				entityDigest = self.logShim.executeMultiQuery("entity", valueMap)
+				entityDigest = self.logShim.executeMultiQuery("entity", valueMap, ("userId", "sessionId"))
 				digest = entityDigest[len(entityDigest) - 1]["digest"]			
 
 				# Query for the log now.
-				logResult = self.logShim.executeMultiQuery("log", valueMap)
+				logResult = self.logShim.executeMultiQuery("log", valueMap, ("userId", "sessionId"))
 				log = {}
 				log[(userId, sessionId)] = []
 				for i in range(0, len(logResult)):
 					log[(userId, sessionId)].append([userId, sessionId, logResult[i]["epochId"], logResult[i]["message"], logResult[i]["xhash"], logResult[i]["yhash"]])
 
-				# Verify.
-				#print(log)
+				# Verify the data extracted from the database...
 				self.strongestVerify(userId, sessionId, log, k1, k2, digest, Logger.Logger.EPOCH_WINDOW_SIZE)
+
+			# Don't hog the system resources
 			time.sleep(15)
 
 	def selectRow(self):

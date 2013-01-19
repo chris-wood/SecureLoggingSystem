@@ -55,7 +55,7 @@ class DBShim(object):
 		#secondHalf = self.sha3.Keccak((len(bytes(secondPayload)), secondPayload.encode("hex")))
 		return hmac.new(self.keyMgr.getMasterKey(), data + table, hashlib.sha512).hexdigest()
 
-	def insertIntoTable(self, table, rowAttributes, rowContents):
+	def insertIntoTable(self, table, rowAttributes, rowContents, rowMasks):
 		''' Insert a row into the specified table. Data filtering happens on behalf of the caller.
 		'''
 		# Build the entry value for the query
@@ -75,7 +75,7 @@ class DBShim(object):
 		self.cursor.execute("INSERT INTO " + table + rowAttributes + " VALUES " + emptyVal, rowContents)
 		self.conn.commit()
 
-	def replaceInTable(self, table, rowAttributes, rowContents):
+	def replaceInTable(self, table, rowAttributes, rowContents, rowMasks):
 		''' Insert or replace the row contents into the specified table. This is probably not safe.
 		'''
 		emptyVal = "("
@@ -88,16 +88,27 @@ class DBShim(object):
 		self.cursor.execute('INSERT OR REPLACE INTO ' + table + rowAttributes + ' VALUES ' + emptyVal, rowContents)
 		self.conn.commit()
 
-	def executeMultiQuery(self, table, valueMap):
+	def executeMultiQuery(self, table, valueMap, rowMasks):
 		''' Query for a set of database elements that match all key/value pairs
 		in the valueMap.
 		'''
+
+		# Build the query
 		queryString = "SELECT * from " + table + " WHERE "
 		keys = valueMap.keys()
 		for i in range(0, len(keys) - 1):
-			queryString = queryString + keys[i] + " = '" + str(valueMap[keys[i]]) + "' and "
-		queryString = queryString + keys[len(keys) - 1] + " = '" + str(valueMap[keys[len(keys) - 1]]) + "'"
-		print("executing multiple query: " + str(queryString))
+			if (keys[i] in rowMasks):
+				queryString = queryString + keys[i] + " = '" + self.maskData(valueMap[keys[i]], table) + "' and "
+			else:
+				queryString = queryString + keys[i] + " = '" + str(valueMap[keys[i]]) + "' and "
+		if (keys[len(keys) - 1] in rowMasks):
+			queryString = queryString + keys[len(keys) - 1] + " = '" + self.maskData(valueMap[keys[len(keys) - 1]], table) + "'"
+		else:
+			queryString = queryString + keys[len(keys) - 1] + " = '" + str(valueMap[keys[len(keys) - 1]]) + "'"
+
+		#print("executing multiple query: " + str(queryString))
+
+		# Execute it
 		self.cursor.execute(queryString)
 		return self.cursor.fetchall()
 
@@ -109,11 +120,14 @@ class DBShim(object):
 		self.cursor.execute(query)
 		return self.cursor.fetchall()
 
-	def executeQuery(self, table, key, value):
+	def executeQuery(self, table, key, value, mask):
 		''' Perform a query on the specified table.
 		'''
-		print("SELECT * FROM " + table + " WHERE " + key + " = '%s'" % value)
-		self.cursor.execute("SELECT * FROM " + table + " WHERE " + key + " = '%s'" % value)
+		#print("SELECT * FROM " + table + " WHERE " + key + " = '%s'" % value)
+		if (mask):
+			self.cursor.execute("SELECT * FROM " + table + " WHERE " + key + " = '%s'" % self.maskData(value, table))
+		else:
+			self.cursor.execute("SELECT * FROM " + table + " WHERE " + key + " = '%s'" % value)
 		return self.cursor.fetchall()
 
 	def randomQuery(self, table):
