@@ -11,7 +11,9 @@ import sys
 import time
 import threading
 import traceback
-import datetime
+from datetime import datetime
+import uuid
+import hashlib
 
 # Build the system path
 sys.path.append("./LoggerModule/")
@@ -52,12 +54,26 @@ def bootstrap(keyMgr, debug = True):
 		if (len(tableResults) != 0):
 			# Delete the contents in the table
 			shim.executeRawQuery("DELETE FROM users")
-			
-			# Re-populate it with dummy users (alice, bob, chris)
 			print("Initializing dummy data into the users table")
-			shim.insertIntoTable("users", "(userId, name, email, attributes, inserted_at)", (0, "alice", "alice@test.com", "one", datetime.datetime.now()))
-			shim.insertIntoTable("users", "(userId, name, email, attributes, inserted_at)", (1, "bob", "bob@test.com", "two", datetime.datetime.now()))
-			shim.insertIntoTable("users", "(userId, name, email, attributes, inserted_at)", (2, "chris", "chris@test.com", "three", datetime.datetime.now()))
+			
+			# Create some dummy date for the database
+			date = datetime.now()
+			alicePassword = "alice"
+			bobPassword = "bob"
+			chrisPassword = "chris"
+
+			# Generate the passwords/salts
+			salt = uuid.uuid4().hex
+			hashedPassword = hashlib.sha512(alicePassword + salt).hexdigest()
+			shim.insertIntoTable("users", "(userId, name, email, password, salt, attributes, inserted_at, modified_at)", (0, "alice", "alice@test.com", hashedPassword, salt, "one", date, date))
+
+			salt = uuid.uuid4().hex
+			hashedPassword = hashlib.sha512(bobPassword + salt).hexdigest()
+			shim.insertIntoTable("users", "(userId, name, email, password, salt, attributes, inserted_at, modified_at)", (1, "bob", "bob@test.com", hashedPassword, salt, "two", date, date))
+
+			salt = uuid.uuid4().hex
+			hashedPassword = hashlib.sha512(chrisPassword + salt).hexdigest()
+			shim.insertIntoTable("users", "(userId, name, email, password, salt, attributes, inserted_at, modified_at)", (2, "chris", "chris@test.com", hashedPassword, salt, "three", date, date))
 	else:
 		print("Starting the system in production mode.")
 

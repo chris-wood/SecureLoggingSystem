@@ -19,7 +19,7 @@ sys.path.append("../PolicyEngineModule/")
 sys.path.append("../Common")
 sys.path.append("../DatabaseModule")
 sys.path.append("../CryptoModule")
-import PolicyManager
+from PolicyManager import PolicyManager
 import LogProxy
 import EncryptionModule
 import LogEntry

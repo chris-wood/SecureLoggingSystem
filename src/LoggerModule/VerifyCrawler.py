@@ -44,7 +44,7 @@ class VerifyCrawler(threading.Thread):
 		self.running = True
 
 		# Build the encryption module
-		self.keyMgr
+		self.keyMgr = keyMgr
 		self.encryptionModule = EncryptionModule(keyMgr) # pass along the key manager reference
 
 		# Generate the used entry bucket
