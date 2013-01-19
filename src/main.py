@@ -18,12 +18,14 @@ import hashlib
 # Build the system path
 sys.path.append("./LoggerModule/")
 sys.path.append("./PolicyEngineModule/")
+sys.path.append("./AuditModule/")
 sys.path.append("./Common")
 sys.path.append("./DatabaseModule")
 sys.path.append("./CryptoModule")
 from LogProxy import LogProxy
 from VerifyCrawler import VerifyCrawler
 from KeyManager import KeyManager
+from AuditProxy import AuditProxy
 import DBShim
 
 def bootstrap(keyMgr, debug = True):
@@ -116,8 +118,9 @@ def main():
 
 	# Just start the traffic proxy... that will spawn everything else as needed
 	if (startMode):
-		proxy = LogProxy(keyMgr).start()
-		verifier = VerifyCrawler(1, "/Users/caw/Projects/SecureLoggingSystem/src/DatabaseModule/log.db", "/Users/caw/Projects/SecureLoggingSystem/src/DatabaseModule/key.db", keyMgr).start()
+		auditProxy = AuditProxy().start()
+		#proxy = LogProxy(keyMgr).start()
+		#verifier = VerifyCrawler(1, "/Users/caw/Projects/SecureLoggingSystem/src/DatabaseModule/log.db", "/Users/caw/Projects/SecureLoggingSystem/src/DatabaseModule/key.db", keyMgr).start()
 		print("---------------------------")
 		print("Type 'help' or '?' for help")
 		print("---------------------------")

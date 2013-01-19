@@ -64,9 +64,9 @@ class AuditProxy(threading.Thread):
 			self.lgr.debug("Client connected from {}.".format(fromaddr))
 
 			# Start the handler thread
-			handler = ClientHandler(self)
+			handler = AuditClientHandler(self)
 			handler.start()
-			handler.clientList.append(ClientObject(newsocket, fromaddr, None)) # None should be connstream
+			handler.clientList.append(AuditClientObject(newsocket, fromaddr, None)) # None should be connstream
 			self.activeSessions.append(handler)
 
 		self.serverSock.close()

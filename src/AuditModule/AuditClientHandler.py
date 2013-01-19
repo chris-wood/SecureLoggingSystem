@@ -41,11 +41,6 @@ class AuditClientHandler(threading.Thread):
 		fh.setFormatter(frmt)
 		self.lgr.addHandler(fh)
 
-		# Set the properties for this session.
-		self.logger = Logger.Logger()
-		self.queue = self.logger.getQueue()
-		self.logger.start()
-
 		# Maintain login state of the user is logged in for this session
 		self.loggedIn = False
 
@@ -62,19 +57,22 @@ class AuditClientHandler(threading.Thread):
 					else:
 						self.parseMessage(message)
 
-	def login(self):
+	def login(self, msg):
 		''' Handle the user login process.
 		'''
-		raise Exception("Not implemented.")
-		salt = uuid.uuid4().hex
-		hashed_password = hashlib.sha512(password + salt).hexdigest()
+		parsedMsg = json.loads(message)
+
+		# TODO: perform the hashing here...
+
+		#salt = uuid.uuid4().hex
+		#hashed_password = hashlib.sha512(password + salt).hexdigest()
 
 	def parseMessage(self, message):
 		''' Handle the incoming client message by parsing the JSON string and shipping
 		it off to the execute method. 
 		'''
 		print("client message: " + str(message)) # debug
-		parsedMsg = json.loads(jsonString)
+		parsedMsg = json.loads(message)
 
 		# Verify that the incoming message conforms to the protocol
 		if (len(data) != 2):

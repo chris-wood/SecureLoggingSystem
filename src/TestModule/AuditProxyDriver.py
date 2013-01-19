@@ -15,13 +15,9 @@ import json
 import ssl
 import pprint
 
-# Connection settings
-HOST = 'localhost'
-PORT = 9999
-EventCount = 20
-
 # The socket used in communication
 sock = None
+bufferSize = 1024
 
 def close():
 	''' Close the open socket.
@@ -30,19 +26,31 @@ def close():
 	sock.close()
 	sys.exit(0)
 
-def test(user, params):
-	''' Send some test data to the user.
+def login(userInput):
+	''' Handle the user login part of the protocol.
 	'''
-	for i in range(0, count):
-		sock.write('{"userId":' + str(user) + ',"sessionId":' + str(session) + ',"payload":"' + str(payload) + '"}')
-		print('{"userId":' + str(user) + ',"sessionId":' + str(session) + ',"payload":"' + str(payload) + '"}')
-		time.sleep(sleep)
+	global sock
+	global bufferSize
+
+	# Parse the user's input to execute the command
+	pieces = userInput.split()
+	print(pieces)
+	if (len(pieces) == 3): # login username password
+		message = '{"command":LOGIN,"parameters":' + str(pieces[1] + "," + pieces[2]) + '"}'
+		print("sending: " + message)
+
+		# Follow the log protocol
+		sock.send(message)
+		response = sock.recv(bufferSize)
+	else:
+		raise Exception("Error: Invalid login parameters.")
 
 def help():
 	''' Display the supported commands.
 	'''
 	print("Supported commands:")
 	print("   help or ? - display available commands.")
+	print("   login USER PASSWORD - login the user")
 	print("   quit - quite the test driver")
 
 def handleInput(userInput):
@@ -50,6 +58,8 @@ def handleInput(userInput):
 	'''
 	if (userInput == 'help' or userInput == '?'):
 		help()
+	if ('login' in userInput):
+		login(userInput)
 	elif (userInput == 'quit'):
 		print("Terminating...")
 		close()
@@ -60,7 +70,7 @@ def prompt():
 	''' Prompt the user to enter a command (if they want).
 	'''
 	print("-----------------------------------------")
-	print("             Audit Proxy Driver          ")
+	print("            Audit Proxy Driver           ")
 	print("Type 'help' or '?' for available commands")
 	print("-----------------------------------------")
 
@@ -89,7 +99,7 @@ def main():
 			# Create the socket using the specified host and port
 			host = sys.argv[1]
 			port = int(sys.argv[2])
-			s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+			sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 			sock.connect((host, port))
 			prompt()
 		else:
