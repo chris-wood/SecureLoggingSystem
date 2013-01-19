@@ -11,9 +11,9 @@ import string
 import Queue
 import Logger
 import json
-
-# The Python logging module
 import logging
+import hashlib
+import uuid
 
 # Definitions of the protocol messages
 MSG_SELECT_BY_USER = 1
@@ -46,6 +46,9 @@ class AuditClientHandler(threading.Thread):
 		self.queue = self.logger.getQueue()
 		self.logger.start()
 
+		# Maintain login state of the user is logged in for this session
+		self.loggedIn = False
+
 	def run(self):
 		''' The main loop for this client handler thread. Strip out a message,
 		parse it according to the protocol, and then invoke the necessary commands.
@@ -54,7 +57,17 @@ class AuditClientHandler(threading.Thread):
 			for client in self.clientList:
 				message = client.sock.recv(self.server.BUFFSIZE)
 				if message != None and message != "":
-					self.parseMessage(message)
+					if (self.loggedIn == False):
+						self.login()
+					else:
+						self.parseMessage(message)
+
+	def login(self):
+		''' Handle the user login process.
+		'''
+		raise Exception("Not implemented.")
+		salt = uuid.uuid4().hex
+		hashed_password = hashlib.sha512(password + salt).hexdigest()
 
 	def parseMessage(self, message):
 		''' Handle the incoming client message by parsing the JSON string and shipping
