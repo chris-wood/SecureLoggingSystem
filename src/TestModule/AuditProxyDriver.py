@@ -46,6 +46,14 @@ def login(userInput):
 	else:
 		raise Exception("Error: Invalid login parameters.")
 
+def sendCommand(command, parameters):
+	''' Send the command to the server and then return the response
+	'''
+	message = '{"command":' + str(command) + ',"parameters":"' + str(parameters) + '"}'
+	sock.send(message)
+	response = sock.recv(bufferSize)
+	return response
+
 def help():
 	''' Display the supported commands.
 	'''
@@ -60,7 +68,14 @@ def handleInput(userInput):
 	if (userInput == 'help' or userInput == '?'):
 		help()
 	if ('login' in userInput):
-		login(userInput)
+		params = userInput.split()
+		print(sendCommand(1, params[1] + "," + params[2]))
+	elif ('selectByUser' in userInput):
+		params = userInput.split()
+		print(sendCommand(1, params[1] + "," + params[2]))
+	elif ('selectByUserSession' in userInput):
+		params = userInput.split()
+		print(sendCommand(1, params[1] + "," + params[2]))
 	elif (userInput == 'quit'):
 		print("Terminating...")
 		close()
