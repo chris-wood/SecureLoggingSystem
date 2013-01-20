@@ -8,3 +8,5 @@ echo "Policy database..."
 sqlite3 policy.db < bootstrap_policy.sql
 echo "Users database..."
 sqlite3 users.db < bootstrap_users.sql
+echo "Audit users database..."
+sqlite3 audit_users.db < bootstrap_audit_users.sql

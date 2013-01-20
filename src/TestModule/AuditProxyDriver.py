@@ -36,12 +36,13 @@ def login(userInput):
 	pieces = userInput.split()
 	print(pieces)
 	if (len(pieces) == 3): # login username password
-		message = '{"command":LOGIN,"parameters":' + str(pieces[1] + "," + pieces[2]) + '"}'
+		message = '{"command":1,"parameters":"' + str(pieces[1] + "," + pieces[2]) + '"}'
 		print("sending: " + message)
 
 		# Follow the log protocol
 		sock.send(message)
 		response = sock.recv(bufferSize)
+		print(response)
 	else:
 		raise Exception("Error: Invalid login parameters.")
 

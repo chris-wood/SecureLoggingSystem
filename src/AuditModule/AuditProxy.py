@@ -22,12 +22,15 @@ class AuditProxy(threading.Thread):
 	# The list of active sessions (IDs) that have been authenticated
 	activeSessions = []
 
-	def __init__(self):	
+	def __init__(self, keyMgr):	
 		''' Initialize the traffic proxy that intercepts traffic from the incoming source,
 			makes sure it's authenticated, and then sets up a handler to parse all traffic.
 		'''
 		threading.Thread.__init__(self)
 		self.running = False
+
+		# Persist the key manager
+		self.keyMgr = keyMgr
 
 		# Initialize the connection vars/fields
 		self.HOST = 'localhost'
@@ -64,7 +67,7 @@ class AuditProxy(threading.Thread):
 			self.lgr.debug("Client connected from {}.".format(fromaddr))
 
 			# Start the handler thread
-			handler = AuditClientHandler(self)
+			handler = AuditClientHandler(self,self.keyMgr)
 			handler.start()
 			handler.clientList.append(AuditClientObject(newsocket, fromaddr, None)) # None should be connstream
 			self.activeSessions.append(handler)
