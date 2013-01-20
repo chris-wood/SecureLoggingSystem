@@ -1,9 +1,9 @@
 '''
-File: main.py
+File: Main.py
 Author: Christopher Wood, caw4567@rit.edu
 Usage:
 
-	python main.py [-l] [-a] [-v]
+	python Main.py [-l] [-a] [-v]
 
 '''
 
@@ -21,6 +21,7 @@ sys.path.append("./PolicyEngineModule/")
 sys.path.append("./AuditModule/")
 sys.path.append("./Common")
 sys.path.append("./DatabaseModule")
+sys.path.append("./VerifyModule")
 sys.path.append("./CryptoModule")
 from LogProxy import LogProxy
 from VerifyCrawler import VerifyCrawler

@@ -27,8 +27,7 @@ import Keccak # The SHA-3 candidate, of course
 import hashlib, hmac
 
 class VerifyCrawler(threading.Thread):
-	'''
-	This is an active thread that is responsible for serving all
+	''' This is an active thread that is responsible for serving all
 	messages that come in from the keylogger. It simply strips
 	them out of the socket and forwards them along to the logger
 	actor via a message dictionary.

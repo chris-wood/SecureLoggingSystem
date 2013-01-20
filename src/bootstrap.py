@@ -1,9 +1,9 @@
 '''
-File: bootstrap.py
+File: Bootstrap.py
 Author: Christopher Wood, caw4567@rit.edu
 Usage:
 
-	python bootstrap.py 
+	python Bootstrap.py 
 
 '''
 
