@@ -41,12 +41,12 @@ class KeyManager:
 	def getMasterKey(self):
 		''' Return the master key.
 		'''
-		return self.master
+		return objectToBytes(self.master, self.groupObj)
 
 	def getPublicKey(self):
 		''' Retrieve the public key.
 		'''
-		return self.public
+		return objectToBytes(self.public, self.groupObj)
 
 	def addCipher(self, cipher):
 		''' Add a new cipher to the list to be managed.
@@ -61,7 +61,9 @@ class KeyManager:
 		''' Reset the master/public keys for all of the ciphers that are being used by 
 		the system right now.
 		'''
+		self.master = bytesToObject(keyMap['mk'], self.groupObj)
+		self.public = bytesToObject(keyMap['pk'], self.groupObj)
 		for c in self.cipherQueue:
-			c.setKeys(keyMap['mk'], keyMap['pk'])
+			c.setKeys(self.master, self.public)
 
 	

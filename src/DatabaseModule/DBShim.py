@@ -8,7 +8,7 @@ sys.path.append("../CryptoModule/")
 from KeyManager import KeyManager
 import sqlite3 as lite
 import traceback
-import hashlib, hmac
+import hashlib
 
 class DBShim(object):
 	''' The shim for the database that is used to store arbitrary user/log/crypto related information.
@@ -53,7 +53,9 @@ class DBShim(object):
 		#firstHalf = self.keyMgr.getMasterKey() + self.keyMgr.getPublicKey()
 		#secondPayload = data + table
 		#secondHalf = self.sha3.Keccak((len(bytes(secondPayload)), secondPayload.encode("hex")))
-		return hmac.new(self.keyMgr.getMasterKey(), data + table, hashlib.sha512).hexdigest()
+		hf = hashlib.sha512()
+		hf.update(self.keyMgr.getMasterKey() + data + table)
+		return hf.digest()
 
 	def insertIntoTable(self, table, rowAttributes, rowContents, rowMasks):
 		''' Insert a row into the specified table. Data filtering happens on behalf of the caller.
@@ -125,6 +127,7 @@ class DBShim(object):
 		'''
 		#print("SELECT * FROM " + table + " WHERE " + key + " = '%s'" % value)
 		if (mask):
+			print("SELECT * FROM " + table + " WHERE " + key + " = '%s'" % self.maskData(value, table))
 			self.cursor.execute("SELECT * FROM " + table + " WHERE " + key + " = '%s'" % self.maskData(value, table))
 		else:
 			self.cursor.execute("SELECT * FROM " + table + " WHERE " + key + " = '%s'" % value)

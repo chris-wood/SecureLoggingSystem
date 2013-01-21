@@ -59,6 +59,7 @@ class AuditClientHandler(threading.Thread):
 		global MSG_LOGIN
 
 		self.shim = DBShim("/Users/caw/Projects/SecureLoggingSystem/src/DatabaseModule/audit_users.db", self.keyMgr)
+		self.log = DBShim("/Users/caw/Projects/SecureLoggingSystem/src/DatabaseModule/log.db", self.keyMgr)
 		while self.running:
 			for client in self.clientList:
 				message = client.sock.recv(self.server.BUFFSIZE)
@@ -67,9 +68,9 @@ class AuditClientHandler(threading.Thread):
 						parsedMsg = json.loads(message)
 						if (int(parsedMsg['command']) == MSG_LOGIN):
 							if (self.login(parsedMsg['parameters'])):
-								client.sock.send('{"result":0}')
+								client.sock.send('{"result":True,"message":"Login successful."}')
 						elif (self.loggedIn == True):
-							self.parseMessage(parsedMsg)
+							client.sock.send(self.parseMessage(parsedMsg))
 					except Exception as e:
 						client.sock.send(str(e))
 
@@ -123,17 +124,38 @@ class AuditClientHandler(threading.Thread):
 		global MSG_SELECT_BY_USER
 		global MSG_SELECT_BY_USER_SESSION
 
+		result = ""
+
 		# Handle the incoming message
 		if (command == MSG_SELECT_BY_USER):
 			print("MSG_SELECT_BY_USER")
+			valueMap = {"userId" : entry.userId}
+			rowMasks = ["userId"]
+
+			# TODO: finish up the handling of this method
+
+			try:
+				results = self.keyShim.executeMultiQuery("initialEpochKey", valueMap, rowMasks)
+			except Exception as e:
+				print(e)
 
 			# TODO: implement the message logic here
 
 		elif (command == MSG_SELECT_BY_USER_SESSION):
 			print("MSG_SELECT_BY_USER_SESSION")
+			valueMap = {"userId" : entry.userId, "sessionId" : entry.sessionId}
+			rowMasks = ["userId", "sessionId"]
+
+			# TODO: finish up the handling of this method
+
+			try:
+				results = self.keyShim.executeMultiQuery("initialEpochKey", valueMap, rowMasks)
+			except:
+				print(e)
 
 			# TODO: implement the message logic here
 
 		else: 
 			raise Exception("Unsupported audit command ID: " + str(command))
+
 		

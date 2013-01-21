@@ -52,7 +52,12 @@ def sendCommand(command, parameters):
 	message = '{"command":' + str(command) + ',"parameters":"' + str(parameters) + '"}'
 	sock.send(message)
 	response = sock.recv(bufferSize)
-	return response
+	responseMsg = ""
+	try:
+		responseMsg = json.loads(response)
+	except:
+		responseMsg = response
+	return responseMsg
 
 def help():
 	''' Display the supported commands.
@@ -60,6 +65,8 @@ def help():
 	print("Supported commands:")
 	print("   help or ? - display available commands.")
 	print("   login USER PASSWORD - login the user")
+	print("   selectByUser USER_ID - select all log data for user USER_ID")
+	print("   selectByUserSession USER_ID SESSION_ID - select all log data for user USER_ID in session SESSION_ID")
 	print("   quit - quite the test driver")
 
 def handleInput(userInput):
@@ -72,10 +79,10 @@ def handleInput(userInput):
 		print(sendCommand(1, params[1] + "," + params[2]))
 	elif ('selectByUser' in userInput):
 		params = userInput.split()
-		print(sendCommand(1, params[1] + "," + params[2]))
+		print(sendCommand(2, params[1]))
 	elif ('selectByUserSession' in userInput):
 		params = userInput.split()
-		print(sendCommand(1, params[1] + "," + params[2]))
+		print(sendCommand(3, params[1] + "," + params[2]))
 	elif (userInput == 'quit'):
 		print("Terminating...")
 		close()

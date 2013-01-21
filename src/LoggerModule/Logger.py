@@ -236,12 +236,7 @@ class Logger(threading.Thread):
 		self.keyShim.insertIntoTable("entityKey", "(userId, sessionId, key, inserted_at)", (userId, sessionId, self.entityKey[(userId, sessionId)], datetime.now().ctime()), ("userId", "sessionId"))
 
 		# Store the elements now
-		self.logShim.insertIntoTable(
-			"log", 
-			"(userId, sessionId, epochId, message, xhash, yhash, inserted_at)", 
-			(userId, sessionId, epochLength, message, xi, yi, datetime.now().ctime()),
-			("userId", "sessionId")
-			)
+		self.logShim.insertIntoTable("log", "(userId, sessionId, epochId, message, xhash, yhash, inserted_at)", (userId, sessionId, epochLength, message, xi, yi, datetime.now().ctime()),("userId", "sessionId"))
 
 		# Debug
 		print("Inserted the log: " + str((userId, sessionId, epochLength, message, xi, yi)))
