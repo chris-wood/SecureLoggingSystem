@@ -126,6 +126,7 @@ class DBShim(object):
 		# Build the query
 		queryString = "SELECT * from " + table + " WHERE "
 		keys = valueMap.keys()
+		print(keys)
 		for i in range(0, len(keys) - 1):
 			if (keys[i] in rowMasks):
 				queryString = queryString + keys[i] + " = '" + self.maskData(valueMap[keys[i]], table) + "' and "

@@ -129,13 +129,15 @@ class AuditClientHandler(threading.Thread):
 		# Handle the incoming message
 		if (command == MSG_SELECT_BY_USER):
 			print("MSG_SELECT_BY_USER")
-			valueMap = {"userId" : entry.userId}
+			print(parameters[0])
+			valueMap = {"userId" : parameters[0]}
 			rowMasks = ["userId"]
 
 			# TODO: finish up the handling of this method
 
 			try:
-				results = self.keyShim.executeMultiQuery("initialEpochKey", valueMap, rowMasks)
+				results = self.log.executeMultiQuery("log", valueMap, rowMasks)
+				print results
 			except Exception as e:
 				print(e)
 
@@ -149,7 +151,7 @@ class AuditClientHandler(threading.Thread):
 			# TODO: finish up the handling of this method
 
 			try:
-				results = self.keyShim.executeMultiQuery("initialEpochKey", valueMap, rowMasks)
+				results = self.log.executeMultiQuery("log", valueMap, rowMasks)
 			except:
 				print(e)
 
