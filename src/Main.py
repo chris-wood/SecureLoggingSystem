@@ -66,12 +66,20 @@ def main():
 			if ("-v" in sys.argv[i]):
 				verify = True
 
+	# See if they even started anything
+	if (audit == log == verify == False):
+		printUsage()
+		sys.exit(0)
+
+	# Create the global configuration object...
+
+
 	# Create the master key manager...
 	keyMgr = KeyManager()
 
 	# TODO: load from the configuration file...
 
-	# Just start the traffic proxy... that will spawn everything else as needed
+	# Start whatever services are specified by the user...
 	if (log):
 		print("Starting the log service")
 		logProxy = LogProxy(keyMgr).start()	
@@ -82,13 +90,12 @@ def main():
 		print("Starting the verify service")
 		verifier = VerifyCrawler(1, "/Users/caw/Projects/SecureLoggingSystem/src/DatabaseModule/log.db", "/Users/caw/Projects/SecureLoggingSystem/src/DatabaseModule/key.db", keyMgr).start()
 
+	# Jump into the input-handling loop...
 	print("---------------------------")
 	print("Type 'help' or '?' for help")
 	print("---------------------------")
 	userInput = raw_input(">> ")
 	handleInput(userInput)
-
-	# The user input loop
 	while (userInput != 'quit'):
 		userInput = raw_input(">> ")
 		handleInput(userInput)

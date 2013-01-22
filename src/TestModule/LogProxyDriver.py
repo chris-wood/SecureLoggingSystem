@@ -98,7 +98,7 @@ def handleInput(userInput):
 		print("Terminating...")
 		close()
 	elif ('test' in userInput):
-		test(0, 0, "TEST PAYLOAD", 10, 1) 
+		test(1, 0, "TEST PAYLOAD", 10, 1) 
 	elif ('stress' in userInput):
 		stressTest_1()
 		stressTest_2()

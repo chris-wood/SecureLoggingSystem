@@ -17,14 +17,14 @@ sys.path.append("../CryptoModule")
 from DBShim import DBShim
 import Logger
 from EncryptionModule import EncryptionModule
-
-# test...
+from KeyManager import KeyManager
 from charm.toolbox.pairinggroup import PairingGroup,ZR,G1,G2,GT,pair
 from charm.core.engine.util import objectToBytes,bytesToObject
 import Keccak # The SHA-3 candidate, of course
-
-# For HMAC
 import hashlib, hmac
+import hashlib
+from Crypto.Cipher import AES
+from Crypto import Random
 
 class VerifyCrawler(threading.Thread):
 	''' This is an active thread that is responsible for serving all
@@ -63,12 +63,32 @@ class VerifyCrawler(threading.Thread):
 			(userId, sessionId) = self.selectRow()
 			# Check to see if we found some valid data...
 			if (userId != -1 and sessionId != -1):
+				# Decrypt the user/session ID to get the original data
+				userCT = userId.decode("hex")
+				sessionCT = sessionId.decode("hex")
+				key = hashlib.sha256(self.keyMgr.getMasterKey() + "log").digest()
+				cipher = AES.new(key, AES.MODE_ECB)
+				userPT = cipher.decrypt(userCT)
+				sessionPT = cipher.decrypt(sessionCT)
+
+				#key = hashlib.sha256(self.keyMgr.getMasterKey() + str(data) + str(table)).digest()
+				#cipher = AES.new(key, AES.MODE_ECB)	
+
+				# Make sure we're an even multiple of length 16
+				#plaintext = str(data)
+				#if (len(str(plaintext)) % 16 != 0):
+				#plaintext = plaintext + (' ' * (16 - len(plaintext) % 16))
+
+				#ciphertext = cipher.encrypt(plaintext)
+				#return ciphertext.encode("hex")
+
 				# Query the keys from the database
-				print("Verifying: " + str(userId) + " - " + str(sessionId))
-				valueMap = {"userId" : userId, "sessionId" : sessionId}
-				epochKey = self.keyShim.executeMultiQuery("initialEpochKey", valueMap, ("userId", "sessionId"))
+				print("Verifying: " + str(userPT) + " - " + str(sessionPT))
+				valueMap = {"userId" : userPT, "sessionId" : sessionPT}
+				epochKey = self.keyShim.executeMultiQuery("initialEpochKey", valueMap, ["userId", "sessionId"])
+				print epochKey
 				key1 = epochKey[0]["key"]
-				entityKey = self.keyShim.executeMultiQuery("initialEntityKey", valueMap, ("userId", "sessionId"))
+				entityKey = self.keyShim.executeMultiQuery("initialEntityKey", valueMap, ["userId", "sessionId"])
 				key2 = entityKey[0]["key"]
 
 				# Decrypt the keys using the 'verifier' policy
@@ -79,12 +99,15 @@ class VerifyCrawler(threading.Thread):
 
 				# Query the last digest from the database
 				print("Decryption successful - continue with the verification process")
-				entityDigest = self.logShim.executeMultiQuery("entity", valueMap, ("userId", "sessionId"))
+				entityDigest = self.logShim.executeMultiQuery("entity", valueMap, ["userId", "sessionId"])
 				digest = entityDigest[len(entityDigest) - 1]["digest"]			
 
 				# Query for the log now.
-				logResult = self.logShim.executeMultiQuery("log", valueMap, ("userId", "sessionId"))
+				valueMap = {"userId" : userId, "sessionId" : sessionId}
+				logResult = self.logShim.executeMultiQuery("log", valueMap, [])
 				log = {}
+				userId = int(userPT)
+				sessionId = int(sessionPT)
 				log[(userId, sessionId)] = []
 				for i in range(0, len(logResult)):
 					log[(userId, sessionId)].append([userId, sessionId, logResult[i]["epochId"], logResult[i]["message"], logResult[i]["xhash"], logResult[i]["yhash"]])

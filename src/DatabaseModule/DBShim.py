@@ -9,6 +9,8 @@ from KeyManager import KeyManager
 import sqlite3 as lite
 import traceback
 import hashlib
+from Crypto.Cipher import AES
+from Crypto import Random
 
 class DBShim(object):
 	''' The shim for the database that is used to store arbitrary user/log/crypto related information.
@@ -32,6 +34,7 @@ class DBShim(object):
 			self.connAlive = True
 			self.dbString = db
 			self.keyMgr = keyMgr
+			self.aesMode = AES.MODE_CBC
 
 			# See if there are other connections to this database
 			if (db in DBShim.connectionMap):
@@ -53,9 +56,24 @@ class DBShim(object):
 		#firstHalf = self.keyMgr.getMasterKey() + self.keyMgr.getPublicKey()
 		#secondPayload = data + table
 		#secondHalf = self.sha3.Keccak((len(bytes(secondPayload)), secondPayload.encode("hex")))
-		hf = hashlib.sha512()
-		hf.update(self.keyMgr.getMasterKey() + data + table)
-		return hf.digest()
+
+		#iv = Random.new().read(AES.block_size) # we need an IV of 16-bytes, this is also random...
+		#key = Random.new().read(32)
+		#ciphertext = AES.new(key, self.aesMode, iv).encrypt(key)
+		key = hashlib.sha256(self.keyMgr.getMasterKey() + str(table)).digest()
+		cipher = AES.new(key, AES.MODE_ECB)	
+
+		# Make sure we're an even multiple of length 16
+		plaintext = str(data)
+		if (len(str(plaintext)) % 16 != 0):
+			plaintext = plaintext + (' ' * (16 - len(plaintext) % 16))
+
+		ciphertext = cipher.encrypt(plaintext)
+		return ciphertext.encode("hex")
+
+		#hf = hashlib.sha512()
+		#hf.update(self.keyMgr.getMasterKey() + str(data) + str(table))
+		#return hf.hexdigest()
 
 	def insertIntoTable(self, table, rowAttributes, rowContents, rowMasks):
 		''' Insert a row into the specified table. Data filtering happens on behalf of the caller.
@@ -66,15 +84,17 @@ class DBShim(object):
 			emptyVal = emptyVal + "?,"
 		emptyVal = emptyVal + "?)"
 
-		# Masking the data:
-		# 1. pass user ID as a salt and list of columns to be encrypted
-		# 2. hash table name and concat to hash of user ID
-		# 3. hash master key (which can be obtained from the logger) and appent previous string
-		# 4. encrypt the specified columns (indicated by indices) using this new key
+		# Mask the data based on what's in rowMasks
+		newRowContents = []
+		for i in range(0, len(rowContents)):
+			if (rowMasks[i]):
+				newRowContents.append(self.maskData(rowContents[i], table))
+			else:
+				newRowContents.append(rowContents[i])
 
-		# Execute the query...
-		print('INSERT INTO ' + table + ' ' + rowAttributes + " VALUES " + str(rowContents))
-		self.cursor.execute("INSERT INTO " + table + rowAttributes + " VALUES " + emptyVal, rowContents)
+		# Execute the query
+		print('INSERT INTO ' + table + ' ' + rowAttributes + " VALUES " + str(newRowContents))
+		self.cursor.execute("INSERT INTO " + table + rowAttributes + " VALUES " + emptyVal, newRowContents)
 		self.conn.commit()
 
 	def replaceInTable(self, table, rowAttributes, rowContents, rowMasks):
@@ -85,9 +105,17 @@ class DBShim(object):
 			emptyVal = emptyVal + "?,"
 		emptyVal = emptyVal + "?)"
 
+		# Mask the data based on what's in rowMasks
+		newRowContents = []
+		for i in range(0, len(rowContents)):
+			if (rowMasks[i]):
+				newRowContents.append(self.maskData(rowContents[i], table))
+			else:
+				newRowContents.append(rowContents[i])
+
 		# Execute the query...
-		print('INSERT OR REPLACE INTO ' + table + rowAttributes + ' VALUES ' + emptyVal)
-		self.cursor.execute('INSERT OR REPLACE INTO ' + table + rowAttributes + ' VALUES ' + emptyVal, rowContents)
+		print('INSERT OR REPLACE INTO ' + table + rowAttributes + ' VALUES ' + str(newRowContents))
+		self.cursor.execute('INSERT OR REPLACE INTO ' + table + rowAttributes + ' VALUES ' + emptyVal, newRowContents)
 		self.conn.commit()
 
 	def executeMultiQuery(self, table, valueMap, rowMasks):
@@ -108,7 +136,7 @@ class DBShim(object):
 		else:
 			queryString = queryString + keys[len(keys) - 1] + " = '" + str(valueMap[keys[len(keys) - 1]]) + "'"
 
-		#print("executing multiple query: " + str(queryString))
+		print("executing multiple query: " + str(queryString))
 
 		# Execute it
 		self.cursor.execute(queryString)
@@ -143,8 +171,8 @@ def main():
 	''' Unit test for this small module - verified by output inspection.
 	'''
 	print("Starting DB shim test...")
-	shim = DBShim("users.db")
-	rows = shim.executeQuery("users", "userId", "1")
+	shim = DBShim("users.db", KeyManager())
+	rows = shim.executeQuery("users", "userId", "1", True)
 	print(rows[0]["userId"])
 	print(rows[0]["name"])
 	print(rows[0]["email"])

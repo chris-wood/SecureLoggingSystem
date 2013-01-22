@@ -52,9 +52,9 @@ def bootstrap():
 		
 		# Create some dummy data for the database
 		date = datetime.now()
-		shim.insertIntoTable("users", "(userId, name, email, attributes, inserted_at, modified_at)", (0, "alice", "alice@test.com", "one", date, date), None)
-		shim.insertIntoTable("users", "(userId, name, email, attributes, inserted_at, modified_at)", (1, "bob", "bob@test.com", "two", date, date), None)
-		shim.insertIntoTable("users", "(userId, name, email, attributes, inserted_at, modified_at)", (2, "chris", "chris@test.com", "three", date, date), None)
+		shim.insertIntoTable("users", "(name, email, attributes, inserted_at, modified_at)", ["alice", "alice@test.com", "one", date, date], [False, False, False, False, False])
+		shim.insertIntoTable("users", "(name, email, attributes, inserted_at, modified_at)", ["bob", "bob@test.com", "two", date, date], [False, False, False, False, False])
+		shim.insertIntoTable("users", "(name, email, attributes, inserted_at, modified_at)", ["chris", "chris@test.com", "three", date, date], [False, False, False, False, False])
 
 	# Check to see if we need to clear the table
 	# This is specific to SQLite - it needs to be less coupled to SQLite
@@ -74,13 +74,13 @@ def bootstrap():
 		# Generate the passwords/salts
 		salt = str(uuid.uuid4())
 		hashed_password = hashlib.sha512(alicePassword + salt).hexdigest()
-		shim.insertIntoTable("audit_users", "(userId, userName, email, password, salt, inserted_at, modified_at)", (0, "alice", "alice@test.com", hashed_password, salt, date, date), None)
+		shim.insertIntoTable("audit_users", "(userName, email, password, salt, inserted_at, modified_at)", ["alice", "alice@test.com", hashed_password, salt, date, date], [False, False, False, False, False, False])
 		salt = str(uuid.uuid4())
 		hashed_password = hashlib.sha512(bobPassword + salt).hexdigest()
-		shim.insertIntoTable("audit_users", "(userId, userName, email, password, salt, inserted_at, modified_at)", (1, "bob", "bob@test.com", hashed_password, salt, date, date), None)
+		shim.insertIntoTable("audit_users", "(userName, email, password, salt, inserted_at, modified_at)", ["bob", "bob@test.com", hashed_password, salt, date, date], [False, False, False, False, False, False])
 		salt = str(uuid.uuid4())
 		hashed_password = hashlib.sha512(chrisPassword + salt).hexdigest()
-		shim.insertIntoTable("audit_users", "(userId, userName, email, password, salt, inserted_at, modified_at)", (2, "chris", "chris@test.com", hashed_password, salt, date, date), None)
+		shim.insertIntoTable("audit_users", "(userName, email, password, salt, inserted_at, modified_at)", ["chris", "chris@test.com", hashed_password, salt, date, date], [False, False, False, False, False, False])
 
 if (__name__ == "__main__"):
 	bootstrap()

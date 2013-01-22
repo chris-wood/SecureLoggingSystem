@@ -66,6 +66,6 @@ class ClientHandler(threading.Thread):
 	def handleMessage(self, message):
 		''' Handle a client message.
 		'''
-		self.lgr.debug("client message: ", message)
+		#self.lgr.debug("client message: ", message)
 		#print("client message: ", message) # debug 
 		self.queue.put(message)

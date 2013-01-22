@@ -16,9 +16,6 @@ class LogEntry(object):
 		'''
 		# Parse the string and check its validity (if JSON string was provided)
 		if (jsonString != None):
-
-			print jsonString
-
 			data = json.loads(jsonString)
 			if (len(data) != 3):
 				raise Exception("Corrupt JSON string retrieved from client.")
