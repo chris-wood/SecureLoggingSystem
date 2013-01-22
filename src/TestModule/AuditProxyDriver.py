@@ -54,6 +54,8 @@ def sendCommand(command, parameters):
 	response = sock.recv(bufferSize)
 	responseMsg = ""
 	try:
+		print("response: ")
+		print(response)
 		responseMsg = json.loads(response)
 	except:
 		responseMsg = response

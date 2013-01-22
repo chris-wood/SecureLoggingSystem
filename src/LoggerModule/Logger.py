@@ -279,7 +279,7 @@ class Logger(threading.Thread):
 			self.createSession(int(entry.userId), int(entry.sessionId))
 
 		# Now store the event in the log 
-		self.addNewEvent(int(entry.userId), int(entry.sessionId), ciphertext)
+		self.addNewEvent(int(entry.userId), int(entry.sessionId), ciphertext.encode("hex"))
 
 	def stop(self):
 		''' Stop this logging thread.

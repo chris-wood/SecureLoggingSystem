@@ -112,7 +112,7 @@ class AuditClientHandler(threading.Thread):
 
 		# Let it rip
 		try:
-			self.execute(int(message['command']), message['parameters'])
+			return self.execute(int(message['command']), message['parameters'])
 		except:
 			print("Error occured when executing the command")
 
@@ -133,31 +133,43 @@ class AuditClientHandler(threading.Thread):
 			valueMap = {"userId" : parameters[0]}
 			rowMasks = ["userId"]
 
-			# TODO: finish up the handling of this method
-
 			try:
 				results = self.log.executeMultiQuery("log", valueMap, rowMasks)
-				print results
+
+				# Format the results to return only the ciphertext
+				#print(results)
+				logList = []
+				for i in range(0, len(results)):
+					logList.append(results[i][4]) # these are encoded in "hex" - decode with .decode("hex")
+				print("log list")
+				print(logList)
+				print(json.dumps({"result" : True, "message" : json.dumps(logList)}))
+				return json.dumps({"result" : True, "message" : json.dumps(logList)})
 			except Exception as e:
 				print(e)
-
-			# TODO: implement the message logic here
-
 		elif (command == MSG_SELECT_BY_USER_SESSION):
 			print("MSG_SELECT_BY_USER_SESSION")
+			print(parameters[0])
 			valueMap = {"userId" : entry.userId, "sessionId" : entry.sessionId}
 			rowMasks = ["userId", "sessionId"]
 
-			# TODO: finish up the handling of this method
-
 			try:
 				results = self.log.executeMultiQuery("log", valueMap, rowMasks)
+
+				# Format the results to return only the ciphertext
+				print(results)
+				logList = []
+				for i in range(0, len(results)):
+					logList.append(results[i][4]) # these are encoded in "hex" - decode with .decode("hex")
+				print(logList)
+				print(json.dumps({"result" : True, "message" : json.dumps(logList)}))
+				return json.dumps({"result" : True, "message" : json.dumps(logList)})
 			except:
 				print(e)
-
-			# TODO: implement the message logic here
-
 		else: 
 			raise Exception("Unsupported audit command ID: " + str(command))
+
+		# Default return (if other messages don't work)
+		return json.dumps({"result" : False, "message" : "Error parsing message: " + str(command)})
 
 		
