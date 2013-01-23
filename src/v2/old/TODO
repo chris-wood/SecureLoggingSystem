@@ -1,5 +1,0 @@
-1. test code for key management scheme... check to see if I'm decrypting the key correctly and storing it correctly
-2. pseudocode for the column masking
-3. audit proxy finish (let it handle incoming traffic and accept connections)
-4. Model the traffic proxy and create the audit proxy driver
-5. stub out the log collector
