@@ -1,0 +1,23 @@
+
+	'''
+    attrs = ['ONE', 'TWO', 'THREE']
+    access_policy = '((four or three) and (three or one))'
+    if debug:
+        print("Attributes =>", attrs); print("Policy =>", access_policy)
+
+    (pk, mk) = cpabe.setup()
+    print("mk=>", mk)
+
+    sk = cpabe.keygen(pk, mk, attrs)
+    print("sk :=>", sk)
+
+    rand_msg = groupObj.random(GT)
+    if debug: print("msg =>", rand_msg)
+    ct = cpabe.encrypt(pk, rand_msg, access_policy)
+    if debug: print("\n\nCiphertext...\n")
+    groupObj.debug(ct)
+
+    rec_msg = cpabe.decrypt(pk, sk, ct)
+    if debug: print("\n\nDecrypt...\n")
+    if debug: print("Rec msg =>", rec_msg)
+    '''

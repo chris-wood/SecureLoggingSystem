@@ -20,6 +20,9 @@
 \usepackage[noend]{algorithmic}
 \usepackage{fancybox, fancyvrb}
 \usepackage{listings}
+\usepackage{amsmath}
+\usepackage{array}
+\usepackage{txfonts}
 
 \permission{}
 \CopyrightYear{2012}
@@ -44,11 +47,11 @@ In this paper we discuss ABLS, an attribute-based logging system that supports c
 attribute-based encryption (CP-ABE) \cite{Bethencourt2007-CPABE} and authenticated hash-chain 
 constructions for log file confidentiality and integrity, respectively. ABLS was designed for
 the cloud and is capable of addressing the aforementioned problems with secure logging. 
-We first start with the implementation highlights that were completed in Phase 1 of the project. We then
-conclude with a discussion of the current status of the project and planned work to be completed.
+We first start with progress that has been made since the first phase, which includes versions
+1 and 2 of ABLS, and then present a plan of attack for the next phase in the project. 
 \end{abstract}
 
-\section{Version 1 Prototype}
+\section{ABLS-V1 Progress}
 A proof-of-concept system has been developed in order to test both the correctness and performance of ABLS. 
 In this section we provide some highlights of the prototype implementation.
 
@@ -141,7 +144,27 @@ In this context, $M_k$ is the master key for the logger. Using the user and tabl
 enable ensures that tables do not share any common information about the user, which helps prevent against 
 inference attacks in the event that the database servers are compromised.
 
-\section{Version 2 - Design}
+\section{ABLS-V2 Design for Automated Audits}
+TODO: audit specification language (who, what, when) - where omitted because it's captured in who, and why omitted because it's too context-sensitive to define
+
+LAudit, the language for specifying audit rules, is a language for specifying audit rules and policies. The CFG for LAudit 
+is presented below, where LRULE is a non-terminal audit rule, LAN is a non-terminal element in the grammar, and LAL 
+is a leaf (or terminal) in the grammar.
+
+USERS, ROLES, OPS, OBS
+
+USER/ROLE - OPS - [OBS] - [USER/ROLE]
+
+who: user/role
+what: actions and objects
+
+{\setlength\tabcolsep{4pt}
+\begin{tabular}{>{$}l<{$}>{$}r<{$}>{$}l<{$}}
+  \text{LRULE} &\Coloneqq & \text{USER OPS}\\
+  &| & \text{USER OPS OBS} \\
+  &| & \text{USER OPS OBS USER}
+\end{tabular}}
+
 TODO: outline the new design decisions for v2 (highlights of major design changes in progress)
 
 \subsection{Log Audits}
@@ -152,6 +175,7 @@ TODO: log query through audit protocol (users are stored in database, must login
 TODO: new 
 
 \subsection{Structured Log Format Language (LFL)}
+TODO: see board...
 
 \section{Completed Work}
 For Phase 1 of the project, I focused mainly on fixing some of the design and implementation flaws in my previous 
@@ -330,7 +354,7 @@ a robust log query interface, which places the ABLS runtime in the role of the l
 automated strategy-driven tasks run within the context of the ABLS runtime, respectively. The following 
 sections expand upon all of these action items in more detail.
 
-\subsection{Audit Strategy Design - 1/24/13}
+\subsection{Audit Strategy Design}
 As the number of contents in the log database grows, manual audits conducted by querying the log become less and less 
 feasible. Therefore, the audit module will be extended with strategy-driven audit tasks that can scan the log database 
 on-demand to check for policy violations. In order to enable clients to define these audit strategies, there must be a 
@@ -357,7 +381,9 @@ clients to dynamically configure audit strategies while an ABLS instance is curr
 by parsing client-provided JSON strings containing the aforementioned parameters. The audit protocol will also 
 be updated to include a command to specify a new audit task strategy.
 
-\subsection{Client Authentication - 1/31/13}
+\section{Postponed Work}
+
+\subsection{Client Authentication}
 \label{sec:auth}
 There are two types of clients that can interact with an ABLS instance at runtime: the clients generating log data and the
 clients requesting log data (for the purpose of auditing). To support log message confidentiality, clients generating 
