@@ -13,6 +13,7 @@ import json
 import logging # Python logging module
 import pickle
 from datetime import datetime
+import logging
 
 # Add in the files from the other modules
 sys.path.append("../PolicyEngineModule/")
@@ -42,14 +43,15 @@ class Logger(threading.Thread):
 	# This can (and should) be changed as needed.
 	EPOCH_WINDOW_SIZE = 5
 
-	def __init__(self, keyMgr):
+	def __init__(self, params, keyMgr):
 		''' Default constructor.
 		'''	
 		super(Logger, self).__init__()
 		self._stop = threading.Event()
+		self.params = params
 
 		# Create the policy actor
-		self.manager = PolicyManager.start(keyMgr)
+		self.manager = PolicyManager.start(params, keyMgr)
 
 		# Create the encryption module and Keccak instance
 		self.keyMgr = keyMgr
@@ -68,22 +70,13 @@ class Logger(threading.Thread):
 		self.queue = Queue.Queue()
 
 		# Set up the Python logger
-		self.lgr = logging.getLogger('abls')
-		self.lgr.setLevel(logging.DEBUG)
-		fh = logging.FileHandler('abls.log')
-		fh.setLevel(logging.WARNING)
-		frmt = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-		fh.setFormatter(frmt)
-		self.lgr.addHandler(fh)
+		logFile = 'abls.log'
+		logging.basicConfig(filename=logFile,level=logging.DEBUG)
 
 	def createSession(self, userId, sessionId):
 		''' Initialize the authentication keys that are used when verifying the 
 		entries in the log database.
 		'''
-
-		# Generate symmetric keys for this session - OLD APPROACH
-		#epochKey = hmac.new("\EFx" * 20, str(time.time() * (1000000 * random.random())), hashlib.sha512).hexdigest()
-		#entityKey = hmac.new("\EFx" * 20, str(time.time() * (1000000 * random.random())), hashlib.sha512).hexdigest()
 
 		# Generate the epoch and entity keys (both are random 32-bytes strings) - used for verification (integrity) only
 		epochKey = Random.new().read(32)
@@ -92,20 +85,18 @@ class Logger(threading.Thread):
 		# These keys should be encrypted using CPABE for the (verifier role and user role)
 		# so they can easily be recovered for verification
 		msg = '{"userId":' + str(userId) + ',"sessionId":' + str(sessionId) + ',"payload":' + str(0) + '}' 
-		print "verify msg: " + str(msg)
+		logging.debug("verify msg: " + str(msg))
 		policy = self.manager.ask({'command' : 'verifyPolicy', 'payload' : msg})
 		encryptedEpochKey = self.encryptionModule.encrypt(epochKey, policy)
 		encryptedEntityKey = self.encryptionModule.encrypt(entityKey, policy)
 
 		# Persist the encrypted keys
-		self.keyShim.replaceInTable("initialEpochKey", "(userId, sessionId, key, inserted_at)", (userId, sessionId, encryptedEpochKey, datetime.now().ctime()), [True, True, False, False]) #encryptedEpochKey
-		self.keyShim.replaceInTable("initialEntityKey", "(userId, sessionId, key, inserted_at)", (userId, sessionId, encryptedEntityKey, datetime.now().ctime()), [True, True, False, False]) #encryptedEntityKey
-		#self.logShim.replaceInTable("InitialEpochKey", (userId, sessionId, epochKey))
-		#self.logShim.replaceInTable("InitialEntityKey", (userId, sessionId, entityKey))
+		self.keyShim.replaceInTable("initialEpochKey", "(userId, sessionId, key, inserted_at)", (userId, sessionId, encryptedEpochKey, datetime.now().ctime()), [True, True, False, False]) 
+		self.keyShim.replaceInTable("initialEntityKey", "(userId, sessionId, key, inserted_at)", (userId, sessionId, encryptedEntityKey, datetime.now().ctime()), [True, True, False, False]) 
 
-		print("adding data to the in-memory dictionaries")
+		logging.debug("adding data to the in-memory dictionaries")
 		self.initialEpochKey[(userId, sessionId)] = epochKey
-		print("initial epoch key dict = " + str(self.initialEpochKey))
+		logging.debug("initial epoch key dict = " + str(self.initialEpochKey))
 		self.initialEntityKey[(userId, sessionId)] = entityKey
 
 	def getQueue(self):
@@ -127,8 +118,8 @@ class Logger(threading.Thread):
 		''' Empty the queue into the log as fast as possible. We are the bottleneck. >.<
 		'''
 		# Create the log shim.
-		self.logShim = DBShim.DBShim("/Users/caw/Projects/SecureLoggingSystem/src/DatabaseModule/log.db", self.keyMgr)
-		self.keyShim = DBShim.DBShim("/Users/caw/Projects/SecureLoggingSystem/src/DatabaseModule/key.db", self.keyMgr)
+		self.logShim = DBShim.DBShim(self.params["LOG_DB"], self.keyMgr)
+		self.keyShim = DBShim.DBShim(self.params["KEY_DB"], self.keyMgr)
 
 		while not self.stopped():
 			msg = self.queue.get()
@@ -153,17 +144,15 @@ class Logger(threading.Thread):
 		# Check to see if we are starting a new chain or appending to an existing one.
 		if (len(logResults) == 0):
 			# Create the initial epoch block
-			print ("initial epoch key dict = " + str(self.initialEpochKey))
+			logging.debug("initial epoch key dict = " + str(self.initialEpochKey))
 			currKey = self.initialEpochKey[(userId, sessionId)]
 			self.epochKey[(userId, sessionId)] = currKey
-			#self.logShim.insertIntoTable("EpochKey", (userId, sessionId, currKey))
 			self.keyShim.insertIntoTable("epochKey", "(userId, sessionId, key, inserted_at)", (userId, sessionId, currKey, datetime.now().ctime()), [True, True, False, False])
-			print("****** CURRENT KEY = " + str(currKey))
+			logging.debug("****** CURRENT KEY = " + str(currKey))
 			lastEpochDigest = hmac.new(currKey, "0", hashlib.sha512).hexdigest()
 
 			# Set the entity key
 			self.entityKey[(userId, sessionId)] = self.initialEntityKey[(userId, sessionId)]
-			#self.logShim.insertIntoTable("EntityKey", (userId, sessionId, self.entityKey[(userId, sessionId)]))
 			self.keyShim.insertIntoTable("entityKey", "(userId, sessionId, key, inserted_at)", (userId, sessionId, self.entityKey[(userId, sessionId)], datetime.now().ctime()), [True, True, False, False])
 
 			# Save the epoch digest
@@ -175,8 +164,6 @@ class Logger(threading.Thread):
 			# Update the epoch/entity key values from the database
 			length = len(logResults)
 			valueMap = {"userId" : userId, "sessionId" : sessionId}
-			#epochKeyResults = self.logShim.executeMultiQuery("EpochKey", valueMap)
-			#entityKeyResults = self.logShim.executeMultiQuery("EntityKey", valueMap)
 			epochKeyResults = self.keyShim.executeMultiQuery("epochKey", valueMap, ["userId", "sessionId"])
 			entityKeyResults = self.keyShim.executeMultiQuery("entityKey", valueMap, ["userId", "sessionId"])
 			self.epochKey[(userId, sessionId)] = epochKeyResults[len(epochKeyResults) - 1]["key"]
@@ -188,7 +175,6 @@ class Logger(threading.Thread):
 				currKey = str(self.epochKey[(userId, sessionId)])
 				newKey = self.sha3.Keccak((len(bytes(currKey)), currKey.encode("hex")))
 				self.epochKey[(userId, sessionId)] = newKey
-				#self.logShim.insertIntoTable("EpochKey", (userId, sessionId, newKey))
 				self.keyShim.insertIntoTable("epochKey", "(userId, sessionId, key, inserted_at)", (userId, sessionId, newKey, datetime.now().ctime()), [True, True, False, False])
 
 				# Pull the last epoch block
@@ -219,7 +205,7 @@ class Logger(threading.Thread):
 		# Now hash the hash chain entry... But first, build up the data that's needed
 		currKey = str(self.epochKey[(userId, sessionId)])
 		epochLength = len(epochResults)
-		print("epoch results = " + str(epochResults))
+		logging.debug("epoch results = " + str(epochResults))
 		lastEpoch = epochResults[epochLength - 1]["digest"]
 
 		# Here are the elements for the log entry tuple
@@ -231,14 +217,13 @@ class Logger(threading.Thread):
 		lastEntityDigest = hmac.new(currEntityKey, xi, hashlib.sha512).hexdigest()
 		self.logShim.replaceInTable("entity", "(userId, sessionId, digest, inserted_at)", (userId, sessionId, lastEntityDigest, datetime.now().ctime()), [True, True, False, False])
 		self.entityKey[(userId, sessionId)] = hmac.new(currEntityKey, "some constant value", hashlib.sha512).hexdigest() # update the keys
-		#self.logShim.insertIntoTable("EntityKey", (userId, sessionId, self.entityKey[(userId, sessionId)]))
 		self.keyShim.insertIntoTable("entityKey", "(userId, sessionId, key, inserted_at)", (userId, sessionId, self.entityKey[(userId, sessionId)], datetime.now().ctime()), [True, True, False, False])
 
 		# Store the elements now
 		self.logShim.insertIntoTable("log", "(userId, sessionId, epochId, message, xhash, yhash, inserted_at)", (userId, sessionId, epochLength, message, xi, yi, datetime.now().ctime()), [True, True, False, False, False, False, False])
 
 		# Debug
-		print("Inserted the log: " + str((userId, sessionId, epochLength, message, xi, yi)))
+		logging.debug("Inserted the log: " + str((userId, sessionId, epochLength, message, xi, yi)))
 
 	def processLogEntry(self, msg):
 		''' This method is responsible for processing a single msg retrieved from the log proxy.
@@ -246,11 +231,11 @@ class Logger(threading.Thread):
 		# Parse the host application data
 		entry = LogEntry.LogEntry(jsonString = msg)
 
-		print("requesting policy")
+		logging.debug("requesting policy")
 		policy = self.manager.ask({'command' : 'policy', 'payload' : msg})
 		key = None
 		iv = None
-		print("Policy for the piece of data: " + str(policy))
+		logging.debug("Policy for the piece of data: " + str(policy))
 		if not ((entry.userId, entry.sessionId, policy) in self.policyKeyMap.keys()):
 			iv = Random.new().read(AES.block_size) # we need an IV of 16-bytes, this is also random...
 			key = Random.new().read(32)
@@ -264,8 +249,7 @@ class Logger(threading.Thread):
 			iv = self.policyKeyMap[(entry.userId, entry.sessionId, policy)][1]
 
 		ciphertext = AES.new(key, self.aesMode, iv).encrypt(key)
-		#ciphertext = self.encryptionModule.encrypt(msg, policy)
-		print("ciphertext = " + str(ciphertext))
+		logging.debug("ciphertext = " + str(ciphertext))
 
 		# See if this is a new session that we need to manage, or if it's part of an existing session
 		valueMap = {"userId" : entry.userId, "sessionId" : entry.sessionId}
@@ -273,7 +257,7 @@ class Logger(threading.Thread):
 		try:
 			results = self.keyShim.executeMultiQuery("initialEpochKey", valueMap, ["userId", "sessionId"])
 		except:
-			print("Error: Unable to update the initialEpochKey table")
+			logging.debug("Error: Unable to update the initialEpochKey table")
 			traceback.print_exc(file=sys.stdout)
 		if (len(results) == 0):
 			self.createSession(int(entry.userId), int(entry.sessionId))

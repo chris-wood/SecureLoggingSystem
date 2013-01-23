@@ -48,7 +48,7 @@ We first start with the implementation highlights that were completed in Phase 1
 conclude with a discussion of the current status of the project and planned work to be completed.
 \end{abstract}
 
-\section{Prototype Implementation}
+\section{Version 1 Prototype}
 A proof-of-concept system has been developed in order to test both the correctness and performance of ABLS. 
 In this section we provide some highlights of the prototype implementation.
 
@@ -141,9 +141,17 @@ In this context, $M_k$ is the master key for the logger. Using the user and tabl
 enable ensures that tables do not share any common information about the user, which helps prevent against 
 inference attacks in the event that the database servers are compromised.
 
+\section{Version 2 - Design}
+TODO: outline the new design decisions for v2 (highlights of major design changes in progress)
+
 \subsection{Log Audits}
 \label{sec:audit}
 TODO: log query through audit protocol (users are stored in database, must login, can ask for data, and its formatted and returned to them)
+
+\subsection{Restructured Relational Data Model}
+TODO: new 
+
+\subsection{Structured Log Format Language (LFL)}
 
 \section{Completed Work}
 For Phase 1 of the project, I focused mainly on fixing some of the design and implementation flaws in my previous 

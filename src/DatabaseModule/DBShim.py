@@ -7,6 +7,7 @@ import sys
 sys.path.append("../CryptoModule/")
 from KeyManager import KeyManager
 import sqlite3 as lite
+import logging
 import traceback
 import hashlib
 from Crypto.Cipher import AES
@@ -41,6 +42,10 @@ class DBShim(object):
 				DBShim.connectionMap[db] = DBShim.connectionMap[db] + 1
 			else: 
 				DBShim.connectionMap[db] = 1
+
+			# Setup the logger
+			logFile = 'abls.log'
+			logging.basicConfig(filename=logFile,level=logging.DEBUG)
 
 	def closeConnection(self):
 		''' Terminate the database connection.
@@ -93,7 +98,7 @@ class DBShim(object):
 				newRowContents.append(rowContents[i])
 
 		# Execute the query
-		print('INSERT INTO ' + table + ' ' + rowAttributes + " VALUES " + str(newRowContents))
+		logging.debug('INSERT INTO ' + table + ' ' + rowAttributes + " VALUES " + str(newRowContents))
 		self.cursor.execute("INSERT INTO " + table + rowAttributes + " VALUES " + emptyVal, newRowContents)
 		self.conn.commit()
 
@@ -114,7 +119,7 @@ class DBShim(object):
 				newRowContents.append(rowContents[i])
 
 		# Execute the query...
-		print('INSERT OR REPLACE INTO ' + table + rowAttributes + ' VALUES ' + str(newRowContents))
+		logging.debug('INSERT OR REPLACE INTO ' + table + rowAttributes + ' VALUES ' + str(newRowContents))
 		self.cursor.execute('INSERT OR REPLACE INTO ' + table + rowAttributes + ' VALUES ' + emptyVal, newRowContents)
 		self.conn.commit()
 
@@ -126,7 +131,6 @@ class DBShim(object):
 		# Build the query
 		queryString = "SELECT * from " + table + " WHERE "
 		keys = valueMap.keys()
-		print(keys)
 		for i in range(0, len(keys) - 1):
 			if (keys[i] in rowMasks):
 				queryString = queryString + keys[i] + " = '" + self.maskData(valueMap[keys[i]], table) + "' and "
@@ -137,7 +141,7 @@ class DBShim(object):
 		else:
 			queryString = queryString + keys[len(keys) - 1] + " = '" + str(valueMap[keys[len(keys) - 1]]) + "'"
 
-		print("executing multiple query: " + str(queryString))
+		logging.debug("executing multiple query: " + str(queryString))
 
 		# Execute it
 		self.cursor.execute(queryString)
@@ -156,7 +160,7 @@ class DBShim(object):
 		'''
 		#print("SELECT * FROM " + table + " WHERE " + key + " = '%s'" % value)
 		if (mask):
-			print("SELECT * FROM " + table + " WHERE " + key + " = '%s'" % self.maskData(value, table))
+			logging.debug("SELECT * FROM " + table + " WHERE " + key + " = '%s'" % self.maskData(value, table))
 			self.cursor.execute("SELECT * FROM " + table + " WHERE " + key + " = '%s'" % self.maskData(value, table))
 		else:
 			self.cursor.execute("SELECT * FROM " + table + " WHERE " + key + " = '%s'" % value)
@@ -203,3 +207,4 @@ def main():
 # Let it rip...
 if (__name__ == '__main__'):
 	main()
+

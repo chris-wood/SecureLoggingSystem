@@ -8,8 +8,6 @@ import logging # Python logging module
 from AuditClientObject import AuditClientObject
 from AuditClientHandler import AuditClientHandler
 import socket
-import ssl
-from OpenSSL import SSL
 import Queue # thread-safe queue for producer/consumer implementations
 from time import clock, time # for time-based extraction
 from pykka.actor import ThreadingActor
@@ -22,15 +20,16 @@ class AuditProxy(threading.Thread):
 	# The list of active sessions (IDs) that have been authenticated
 	activeSessions = []
 
-	def __init__(self, keyMgr):	
+	def __init__(self, params, keyMgr):	
 		''' Initialize the traffic proxy that intercepts traffic from the incoming source,
 			makes sure it's authenticated, and then sets up a handler to parse all traffic.
 		'''
 		threading.Thread.__init__(self)
 		self.running = False
 
-		# Persist the key manager
+		# Persist the key manager and params
 		self.keyMgr = keyMgr
+		self.params = params
 
 		# Initialize the connection vars/fields
 		self.HOST = 'localhost'
@@ -39,15 +38,6 @@ class AuditProxy(threading.Thread):
 		self.clientList = []
 		self.handler = None
 		self.serverSock = None
-
-		# Setup the Python logger
-		self.lgr = logging.getLogger('abls')
-		self.lgr.setLevel(logging.DEBUG)
-		fh = logging.FileHandler('abls.log')
-		fh.setLevel(logging.WARNING)
-		frmt = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-		fh.setFormatter(frmt)
-		self.lgr.addHandler(fh)
 
 	def run(self):
 		''' Run the traffic proxy and listen for incoming connections.
@@ -63,18 +53,13 @@ class AuditProxy(threading.Thread):
 			# Accept a new client connection 
 			newsocket, fromaddr = self.serverSock.accept()
 
-			print("Client connected from {}.".format(fromaddr))
-			self.lgr.debug("Client connected from {}.".format(fromaddr))
-
 			# Start the handler thread
-			handler = AuditClientHandler(self,self.keyMgr)
+			handler = AuditClientHandler(self,self.params,self.keyMgr)
 			handler.start()
 			handler.clientList.append(AuditClientObject(newsocket, fromaddr, None)) # None should be connstream
 			self.activeSessions.append(handler)
 
 		self.serverSock.close()
-		self.lgr.debug("- end -")
-		print("- end -")
 
 	def get(self):
 		''' Retrieve the next element from the LogEntry queue.
@@ -84,6 +69,4 @@ class AuditProxy(threading.Thread):
 	def kill(self):
 		''' Terminate the thread.
 		'''
-		print("Killing the audit proxy.")
-		self.lgr.deubg("Killing the audit proxy.")
 		self.serverSock.close()

@@ -8,7 +8,7 @@ import time
 import threading
 import struct
 import string
-import logging # Python logging module
+import logging 
 
 # Our own stuff
 import sys
@@ -50,6 +50,10 @@ class VerifyCrawler(threading.Thread):
 		self.usedBin = {}
 		self.MAX_TRIES = 10 # This can (and should) be configured by experimentation.
 
+		# Configure the logger
+		logFile = 'abls.log'
+		logging.basicConfig(filename=logFile,level=logging.DEBUG)
+
 	def run(self):
 		''' The main thread loop for this verifier.
 		'''
@@ -59,7 +63,7 @@ class VerifyCrawler(threading.Thread):
 
 		# Run the crawler loop indefinitely...
 		while self.running:
-			print("Verifier " + str(self.id) + " is trying to grab a user session to verify...")
+			logging.debug("Verifier " + str(self.id) + " is trying to grab a user session to verify.")
 			(userId, sessionId) = self.selectRow()
 			# Check to see if we found some valid data...
 			if (userId != -1 and sessionId != -1):
@@ -71,34 +75,22 @@ class VerifyCrawler(threading.Thread):
 				userPT = cipher.decrypt(userCT)
 				sessionPT = cipher.decrypt(sessionCT)
 
-				#key = hashlib.sha256(self.keyMgr.getMasterKey() + str(data) + str(table)).digest()
-				#cipher = AES.new(key, AES.MODE_ECB)	
-
-				# Make sure we're an even multiple of length 16
-				#plaintext = str(data)
-				#if (len(str(plaintext)) % 16 != 0):
-				#plaintext = plaintext + (' ' * (16 - len(plaintext) % 16))
-
-				#ciphertext = cipher.encrypt(plaintext)
-				#return ciphertext.encode("hex")
-
 				# Query the keys from the database
-				print("Verifying: " + str(userPT) + " - " + str(sessionPT))
+				logging.debug("Verifying: " + str(userPT) + " - " + str(sessionPT))
 				valueMap = {"userId" : userPT, "sessionId" : sessionPT}
 				epochKey = self.keyShim.executeMultiQuery("initialEpochKey", valueMap, ["userId", "sessionId"])
-				print epochKey
 				key1 = epochKey[0]["key"]
 				entityKey = self.keyShim.executeMultiQuery("initialEntityKey", valueMap, ["userId", "sessionId"])
 				key2 = entityKey[0]["key"]
 
 				# Decrypt the keys using the 'verifier' policy
-				print("Trying to decrypt")
+				logging.debug("Trying to decrypt")
 				sk = self.encryptionModule.generateUserKey(['VERIFIER'])
 				k1 = self.encryptionModule.decrypt(sk, key1)[1] # [1] to pull out plaintext, [0] is T/F flag
 				k2 = self.encryptionModule.decrypt(sk, key2)[1] # [1] to pull out plaintext, [0] is T/F flag
 
 				# Query the last digest from the database
-				print("Decryption successful - continue with the verification process")
+				logging.debug("Decryption successful - continue with the verification process")
 				entityDigest = self.logShim.executeMultiQuery("entity", valueMap, ["userId", "sessionId"])
 				digest = entityDigest[len(entityDigest) - 1]["digest"]			
 
@@ -181,16 +173,10 @@ class VerifyCrawler(threading.Thread):
 			# Check the hash chain first
 			xi = sha3.Keccak((len(bytes(firstPayload)), firstPayload.encode("hex")))
 			computedV = sha3.Keccak((len(xi), xi))
-			print("checking x's")
-			print(xi)
-			print(first[4])
 			assert(xi == first[4])
 
 			# Check the epoch chain next
 			yi = hmac.new(epochKey, lastEpochDigest.encode("hex") + first[4].encode("hex"), hashlib.sha512).hexdigest()
-			print("checking y's")
-			print(yi)
-			print(first[5])
 			assert(yi == first[5])
 
 			# Compute the first part of the entity chain now
@@ -241,8 +227,7 @@ class VerifyCrawler(threading.Thread):
 				entityKey = hmac.new(entityKey, "some constant value", hashlib.sha512).hexdigest() 
 
 			assert(lastEntityDigest == lastDigest)
-			print("Verification result:")
-			print(lastEntityDigest == lastDigest)
+			logging.debug("Verification result:" + str(lastEntityDigest == lastDigest))
 
 			return ctChain
 
@@ -278,7 +263,6 @@ class VerifyCrawler(threading.Thread):
 				previousHash = log[(userId, sessionId)][i - 1][4]
 				
 				# Verify that the first entry is correct
-				print(i)
 				firstPayload =  str(userId) + str(0) + str(i) + str(firstMessage) + str(previousHash)
 				firstComputedHash = sha3.Keccak((len(bytes(firstPayload)), firstPayload.encode("hex")))
 				assert(currentHash == firstComputedHash)
@@ -289,8 +273,6 @@ def main():
 	''' The crawler thread test (watch it go at runtime).
 	'''
 	raise Exception("The VerifierCrawler must be run within the ABLS context to share the cryptographic keys necessary for verification")
-	#crawler = VerifyCrawler(1, "/Users/caw/Projects/SecureLoggingSystem/src/DatabaseModule/log.db", "/Users/caw/Projects/SecureLoggingSystem/src/DatabaseModule/key.db")
-	#crawler.run()
 
 if (__name__ == '__main__'):
 	main()

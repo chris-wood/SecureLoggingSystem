@@ -21,13 +21,14 @@ class ClientHandler(threading.Thread):
 	actor via a message dictionary.
 	'''
 
-	def __init__(self, serv, keyMgr):
+	def __init__(self, serv, params, keyMgr):
 		''' Initialize the client handler with the parent server (LogProxy)
 		'''
 		threading.Thread.__init__(self)
 		self.server = serv
 		self.clientList = []
 		self.running = True
+		self.params = params
 
 		# Setup the Python logger
 		self.lgr = logging.getLogger('abls')
@@ -39,7 +40,7 @@ class ClientHandler(threading.Thread):
 		self.lgr.addHandler(fh)
 
 		# Set the properties for this session (forward along the key manager)
-		self.logger = Logger(keyMgr)
+		self.logger = Logger(self.params, keyMgr)
 		self.queue = self.logger.getQueue()
 		self.logger.start()
 

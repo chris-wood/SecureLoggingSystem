@@ -29,7 +29,7 @@ class AuditClientHandler(threading.Thread):
 	messages that come in from audit proxy.
 	'''
 
-	def __init__(self, serv, keyMgr):
+	def __init__(self, serv, params, keyMgr):
 		''' Initialize the client handler with the parent server (AuditProxy)
 		'''
 		threading.Thread.__init__(self)
@@ -38,16 +38,12 @@ class AuditClientHandler(threading.Thread):
 		self.running = True
 
 		# Setup the Python logger
-		self.lgr = logging.getLogger('abls')
-		self.lgr.setLevel(logging.DEBUG)
-		fh = logging.FileHandler('abls.log')
-		fh.setLevel(logging.WARNING)
-		frmt = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-		fh.setFormatter(frmt)
-		self.lgr.addHandler(fh)
+		logFile = 'abls.log'
+		logging.basicConfig(filename=logFile,level=logging.DEBUG)
 
-		# Persist the key manager
+		# Persist the key manager and params
 		self.keyMgr = keyMgr
+		self.params = params
 
 		# Maintain login state of the user is logged in for this session
 		self.loggedIn = False
@@ -58,8 +54,8 @@ class AuditClientHandler(threading.Thread):
 		'''
 		global MSG_LOGIN
 
-		self.shim = DBShim("/Users/caw/Projects/SecureLoggingSystem/src/DatabaseModule/audit_users.db", self.keyMgr)
-		self.log = DBShim("/Users/caw/Projects/SecureLoggingSystem/src/DatabaseModule/log.db", self.keyMgr)
+		self.shim = DBShim(params["AUDIT_USER_DB"], self.keyMgr)
+		self.log = DBShim(params["LOG_DB"], self.keyMgr)
 		while self.running:
 			for client in self.clientList:
 				message = client.sock.recv(self.server.BUFFSIZE)
@@ -137,13 +133,9 @@ class AuditClientHandler(threading.Thread):
 				results = self.log.executeMultiQuery("log", valueMap, rowMasks)
 
 				# Format the results to return only the ciphertext
-				#print(results)
 				logList = []
 				for i in range(0, len(results)):
 					logList.append(results[i][4]) # these are encoded in "hex" - decode with .decode("hex")
-				print("log list")
-				print(logList)
-				print(json.dumps({"result" : True, "message" : json.dumps(logList)}))
 				return json.dumps({"result" : True, "message" : json.dumps(logList)})
 			except Exception as e:
 				print(e)
@@ -157,12 +149,9 @@ class AuditClientHandler(threading.Thread):
 				results = self.log.executeMultiQuery("log", valueMap, rowMasks)
 
 				# Format the results to return only the ciphertext
-				print(results)
 				logList = []
 				for i in range(0, len(results)):
 					logList.append(results[i][4]) # these are encoded in "hex" - decode with .decode("hex")
-				print(logList)
-				print(json.dumps({"result" : True, "message" : json.dumps(logList)}))
 				return json.dumps({"result" : True, "message" : json.dumps(logList)})
 			except:
 				print(e)

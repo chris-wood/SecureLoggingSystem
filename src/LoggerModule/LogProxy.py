@@ -22,7 +22,7 @@ class LogProxy(threading.Thread):
 	# The list of active sessions (IDs) that have been authenticated
 	activeSessions = []
 
-	def __init__(self, keyMgr):	
+	def __init__(self, params, keyMgr):	
 		''' Initialize the log proxy that intercepts traffic from the incoming source,
 			makes sure it's authenticated, and then sets up a handler to parse all traffic.
 		'''
@@ -37,8 +37,9 @@ class LogProxy(threading.Thread):
 		self.handler = None
 		self.serverSock = None
 
-		# Persist the key manager reference
+		# Persist the key manager reference and parameters 
 		self.keyMgr = keyMgr
+		self.params = params
 
 		# Setup the Python logger
 		self.lgr = logging.getLogger('abls')
@@ -81,7 +82,7 @@ class LogProxy(threading.Thread):
 			self.lgr.debug("Client connected from {}.".format(fromaddr))
 
 			# Start the handler thread
-			handler = ClientHandler(self, self.keyMgr)
+			handler = ClientHandler(self, self.params, self.keyMgr)
 			handler.start()
 			handler.clientList.append(ClientObject(newsocket, fromaddr, None)) # None should be connstream
 			self.activeSessions.append(handler)

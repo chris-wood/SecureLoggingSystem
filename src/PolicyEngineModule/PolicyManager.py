@@ -3,7 +3,7 @@ File: PolicyManager.py
 Author: Christopher Wood, caw4567@rit.edu
 '''
 
-import logging # Python logging module
+import logging 
 import traceback
 
 import sys
@@ -23,10 +23,11 @@ class PolicyManager(ThreadingActor):
 	''' The policy engine that will use events to generate keys.
 	'''
 
-	def __init__(self, keyMgr):
+	def __init__(self, params, keyMgr):
 		''' Persist the key manager so we can create our database shim.
 		'''
 		self.keyMgr = keyMgr
+		self.params = params
 
 	def on_start(self):
 		''' Create the context information for this policy engine.
@@ -39,18 +40,13 @@ class PolicyManager(ThreadingActor):
 		self.eventMap['eventB'] = self.engine.handleEventB
 
 		# Setup the Python logger
-		self.lgr = logging.getLogger('abls')
-		self.lgr.setLevel(logging.DEBUG)
-		fh = logging.FileHandler('abls.log')
-		fh.setLevel(logging.WARNING)
-		frmt = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-		fh.setFormatter(frmt)
-		self.lgr.addHandler(fh)
+		logFile = 'abls.log'
+		logging.basicConfig(filename=logFile,level=logging.DEBUG)
 
 		# Create the DB shim to connect to the user attribute database
-		self.shim = DBShim.DBShim("/Users/caw/Projects/SecureLoggingSystem/src/DatabaseModule/users.db", self.keyMgr)
+		self.shim = DBShim.DBShim(self.params["USER_DB"], self.keyMgr)
 
-		self.lgr.debug("PolicyManager: actor started.")
+		logging.debug("PolicyManager: actor started.")
 
 	def on_receive(self, message):
 		''' Handle an incoming message.
@@ -66,10 +62,10 @@ class PolicyManager(ThreadingActor):
 		''' Generate the policy for verification data (containing the verify policy and
 			the source user ID).
 		'''
-		print("PolicyManager: generating verification policy in PolicyManager.")
+		logging.debug("PolicyManager: generating verification policy in PolicyManager.")
 		entry = LogEntry.LogEntry(jsonString = payload)
 		conj = '(verifier or ' + str(entry.userId) + ')'
-		print("PolicyManager: the resulting policy is: " + conj)
+		logging.debug("PolicyManager: the resulting policy is: " + conj)
 		return conj
 
 	def generatePolicy(self, payload):
@@ -82,24 +78,22 @@ class PolicyManager(ThreadingActor):
 		conj = ''
 		try:
 			attrs = self.userAttributes(str(entry.userId))
-			print("Attributes for user " + str(entry.userId) + ": " + str(attrs))
+			logging.debug("Attributes for user " + str(entry.userId) + ": " + str(attrs))
 			conj = '('
 			for i in range(len(attrs) - 1):
 				conj = conj + str(attrs[i]).lower() + ' and '
 			conj = conj + str(attrs[len(attrs) - 1].lower() + ')')
 		except:
-			print("Error: invalid result from users database")
+			logging.debug("Error: invalid result from users database")
 			traceback.print_exc(file=sys.stdout)
 		return conj
 
 	def generateAttributes(self, eventInfo):
-		print(user)
 		return [] # need to reach out to the policyengine to see what's supported. 
 
 	def userAttributes(self, userId):
 		''' Reach out to the user database for their attributes.
 		'''
 		result = self.shim.executeQuery("users", "userId", userId, False) # userId is not masked in the user table - there's no point, right?
-		print(result)
 		return (result[0]["attributes"].split(','))
 
