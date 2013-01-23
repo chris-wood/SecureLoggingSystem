@@ -133,11 +133,11 @@ existence may lead to a violation of user privacy. Therefore, using a technique 
 CryptDB \cite{Popa2012-CryptDB}, this information is now deterministically masked before being stored in the database.
 
 This masking procedure works by encrypting the user and session attributes with a symmetric key generated
-by the logger's master key salted by the user's unique identifier and target table identifier. In mathematical
+by the logger's master key salted by the target table identifier. In mathematical
 terms, the encrypted user and session IDs, $[U_i]$ and $[S_j]$, stored in table $T$ are generated as follows.
 \begin{align*}
-[U_i] = E(M_k || H(U_i) || H(T), U_i) \\
-[S_j] = E(M_k || H(U_i) || H(T), S_j) \\
+[U_i] = E(M_k || H(T), U_i) \\
+[S_j] = E(M_k || H(T), S_j) \\
 \end{align*}
 
 In this context, $M_k$ is the master key for the logger. Using the user and table identifiers as salts to the master key 
