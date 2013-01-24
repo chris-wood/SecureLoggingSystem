@@ -410,9 +410,43 @@ a secure password management scheme that uses the appropriate cryptographic tech
 \section{Attack Strategy}
 \label{sec:attack}
 
-TODO: combination of static/dynamic automated and manual tests (look for config and code errors)
+My attack strategy for the next phase of the project is two-fold. First, I will use a variety of applicable security-assessment 
+tools to automate the detection and exploitation of common vulnerabilities in web applications. 
+Specifically, I will use IBM Appscan (TODO: cite), Nessus, and metasploit to dynamically test the behavior
+of the application once it is deployed. AppScan will serve to automatically scan the application to identify
+known vulnerabilities like SQL injection, cross-site scripting, and cross-site request forgeries. Nessus will be used
+analyze the network configuration of the application deployment environment. Finally, metasploit, an open-source
+alternative to Nessus and Appscan, will be used in the event that neither of these two enterprise products provides
+sufficient results. Altogether, these tests will be dynamic in nature and rely on the application being deployed at a publicly
+accessible server. The goal of these tests is to determine the presence of vulnerabilities like SQL-injection, cross-site
+scripting, and cross-site request forgery in the web application and how they can be used to exploit the backend
+database. 
 
-Appscan for the web app, Nessus and metasploit for the server and then some database specific tool to check for default configs and shit
+http://www-01.ibm.com/software/awdtools/appscan/
+http://www.tenable.com/products/nessus/nessus-product-overview
+http://www.metasploit.com/
+
+In addition to testing the behavior of the application using these tools, I will also conduct a source-code review 
+to determine how the database is being used. In particular, I will examine the implementation of authentication code
+(i.e. password hashing and persistence techniques), user input handling on both the client- and server-sides of
+the environment, and search for hard-coded strings embedded in the source code that reveal sensitive information.
+
+%Common vulnerabilities like SQL injections and buffer overflows can
+%be detected by examining source code, and if the dynamic analysis tools fail to reveal any such vulnerabilities, 
+%this manual examination will hopefully yield better results.
+
+Using the results from these tests, I will then focus intimately on the database using the guidance set forth by 
+Ben Natan (CITE). In this part of the ``attack'' phase I make the assumption that I will be given access to the 
+server on which the application is deployed, so as to avoid the need to ``hack'' in to conduct a further analysis. 
+Depending on the type of DBMS deployed in the application, I will follow the database hardening checklists 
+provided by Ben Natan 
+and the SANS institute (http://www.sans.org/score/checklists/Oracle\_Database\_Checklist.pdf) to verify that the
+databases environments are properly configured. 
+
+TODO:
+1. examine SQL code for table creation, role definitions, and trigger code
+2. determine where DB passwords are stored and how this information is managed
+3. auditing is enforced within the database and for what data
 
 \begin{comment}
 \begin{table}
