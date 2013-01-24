@@ -5,9 +5,12 @@
 import json
 
 log1 = '{"use": 0, "session": 0}'
-log2 = ""
-log3 = ""
-log4 = ""
-log5 = ""
+log2 = '{"use": 0, "session": 0}'
+log3 = '{"use": 0, "session": 0}'
+log4 = '{"use": 0, "session": 0}'
+log5 = '{"use": 0, "session": 0}'
 
 print (json.loads(log1))
+
+
+# TODO: write the code to parse everything here
