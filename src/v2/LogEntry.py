@@ -24,6 +24,8 @@ class LogEntry(object):
 			self.userId = data['userId']
 			self.sessionId = data['sessionId']
 			self.action = data['action']
+			self.object = None
+			self.affectedUsers = None
 
 			# Check the key set
 			if ("object" in data.keys()):
@@ -31,6 +33,7 @@ class LogEntry(object):
 			if ("affectedUsers" in data.keys()):
 				self.affectedUsers = data['affectedUsers']
 
+			# Save the original JSON string, just in case
 			self.json = jsonString
 		else:
 			self.userId = userId
