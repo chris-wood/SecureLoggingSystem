@@ -74,6 +74,7 @@ def createSession(userId, sessionId):
 	initialLogEntityKey[(userId, sessionId)] = logEntityKey
 	initialEventEntityKey[(userId, sessionId)] = eventEntityKey
 	print(initialLogEntityKey[(userId, sessionId)])
+	print(initialEventEntityKey[(userId, sessionId)])
 
 def addNewEvent(userId, sessionId, message, logInfo):
 	''' Construct a new event to add to the log. It is assumed the epoch key is 
@@ -84,7 +85,6 @@ def addNewEvent(userId, sessionId, message, logInfo):
 	yi = None
 	zi = None
 	payload = ""
-	lastEpochDigest = None
 
 	# Generate the initial log results
 	valueMap = {"userId" : userId, "sessionId" : sessionId}
@@ -96,7 +96,7 @@ def addNewEvent(userId, sessionId, message, logInfo):
 		keyShim.insertIntoTable("LogEntityKey", "(userId, sessionId, key, inserted_at)", (userId, sessionId, logEntityKey[(userId, sessionId)], datetime.now().ctime()), [True, True, False, False])
 		payload = str(userId) + str(sessionId) + str(0) + str(message) + str(0) # hash of this entry is (user, session, epoch, msg, previous == 0)
 
-
+		# TODO: Create the appropriate event information (check to see what's in the log info object)
 	else:
 		# Update the epoch/entity key values from the database
 		length = len(logResults)
@@ -108,6 +108,8 @@ def addNewEvent(userId, sessionId, message, logInfo):
 		logLength = len(logResults)
 		lastHash = logResults[length - 1]["digest"]
 		payload = str(userId) + str(0) + str(logLength) + str(message) + str(lastHash)
+
+		# TODO: Create the appropriate event information (check to see what's in the log info object)
 
 	# Finally, query the data to build the final log entry
 	valueMap = {"userId" : userId, "sessionId" : sessionId}
