@@ -248,7 +248,7 @@ class Logger(threading.Thread):
 			key = self.policyKeyMap[(entry.userId, entry.sessionId, policy)][0]
 			iv = self.policyKeyMap[(entry.userId, entry.sessionId, policy)][1]
 
-		# Pad the data if necessary to make it a multiple of 16
+		# Pad the msg if necessary to make it a multiple of 16
 		plaintext = entry.payload
 		#print(plaintext)
 		if (len(str(plaintext)) % 16 != 0):

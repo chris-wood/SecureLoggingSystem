@@ -1,0 +1,8 @@
+echo "Bootstrapping the system databases."
+rm -f *.db
+echo "Log database..."
+sqlite3 log.db < bootstrap_log.sql
+echo "Key database..."
+sqlite3 key.db < bootstrap_key.sql
+echo "User database..."
+sqlite3 user.db < bootstrap_user.sql
