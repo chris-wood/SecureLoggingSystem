@@ -29,8 +29,10 @@ OBJECT_Y = 2
 OBJECT_Z = 3
 
 # Maps for crypto data structures
-initialEntityKey = {}
-entityKey = {}
+initialLogEntityKey = {}
+initialEventEntityKey = {}
+logEntityKey = {}
+eventEntityKey = {}
 policyKeyMap = {}
 
 # Crypto entities
@@ -54,22 +56,26 @@ def createSession(userId, sessionId):
 
 	# Generate the epoch and entity keys (both are random 32-bytes strings) - used for verification (integrity) only
 	epochKey = Random.new().read(32)
-	entityKey = Random.new().read(32)
+	logEntityKey = Random.new().read(32)
+	eventEntityKey = Random.new().read(32)
 
 	# These keys should be encrypted using CPABE for the (verifier role and user role)
 	# so they can easily be recovered for verification
 	msg = '{"userId":' + str(userId) + ',"sessionId":' + str(sessionId) + ',"action":' + str(0) + '}' 
 	print("verify msg: " + str(msg))
 	policy = manager.ask({'command' : 'verifyPolicy', 'payload' : msg})
-	encryptedEntityKey = encryptionModule.encrypt(entityKey, policy)
+	encryptedLogEntityKey = encryptionModule.encrypt(logEntityKey, policy)
+	encryptedEventEntityKey = encryptionModule.encrypt(eventEntityKey, policy)
 
 	# Persist the encrypted keys
-	keyShim.replaceInTable("initialEntityKey", "(userId, sessionId, key, inserted_at)", (userId, sessionId, encryptedEntityKey, datetime.now().ctime()), [True, True, False, False]) 
-	print("setting initial entity key...")
-	initialEntityKey[(userId, sessionId)] = entityKey
-	print(initialEntityKey[(userId, sessionId)])
+	keyShim.replaceInTable("InitialLogEntityKey", "(userId, sessionId, key, inserted_at)", (userId, sessionId, encryptedLogEntityKey, datetime.now().ctime()), [True, True, False, False]) 
+	keyShim.replaceInTable("InitialEventEntityKey", "(userId, sessionId, key, inserted_at)", (userId, sessionId, encryptedEventEntityKey, datetime.now().ctime()), [True, True, False, False]) 
+	print("setting initial log and event entity key...")
+	initialLogEntityKey[(userId, sessionId)] = logEntityKey
+	initialEventEntityKey[(userId, sessionId)] = eventEntityKey
+	print(initialLogEntityKey[(userId, sessionId)])
 
-def addNewEvent(userId, sessionId, message):
+def addNewEvent(userId, sessionId, message, logInfo):
 	''' Construct a new event to add to the log. It is assumed the epoch key is 
 	already initialized before this happens.
 	'''
@@ -82,31 +88,33 @@ def addNewEvent(userId, sessionId, message):
 
 	# Generate the initial log results
 	valueMap = {"userId" : userId, "sessionId" : sessionId}
-	logResults = logShim.executeMultiQuery("log", valueMap, ["userId", "sessionId"])
+	logResults = logShim.executeMultiQuery("Log", valueMap, ["userId", "sessionId"])
 
 	# Check to see if we are starting a new chain or appending to an existing one.
 	if (len(logResults) == 0):
-		entityKey[(userId, sessionId)] = initialEntityKey[(userId, sessionId)]
-		keyShim.insertIntoTable("entityKey", "(userId, sessionId, key, inserted_at)", (userId, sessionId, entityKey[(userId, sessionId)], datetime.now().ctime()), [True, True, False, False])
+		logEntityKey[(userId, sessionId)] = initialLogEntityKey[(userId, sessionId)]
+		keyShim.insertIntoTable("LogEntityKey", "(userId, sessionId, key, inserted_at)", (userId, sessionId, logEntityKey[(userId, sessionId)], datetime.now().ctime()), [True, True, False, False])
 		payload = str(userId) + str(sessionId) + str(0) + str(message) + str(0) # hash of this entry is (user, session, epoch, msg, previous == 0)
+
+
 	else:
 		# Update the epoch/entity key values from the database
 		length = len(logResults)
 		valueMap = {"userId" : userId, "sessionId" : sessionId}
-		entityKeyResults = keyShim.executeMultiQuery("entityKey", valueMap, ["userId", "sessionId"])
-		entityKey[(userId, sessionId)] = entityKeyResults[len(entityKeyResults) - 1]["key"]
+		logEntityKeyResults = keyShim.executeMultiQuery("LogEntityKey", valueMap, ["userId", "sessionId"])
+		logEntityKey[(userId, sessionId)] = logEntityKeyResults[len(logEntityKeyResults) - 1]["key"]
 
 		# Now, generate the payload for this log entry
 		logLength = len(logResults)
-		lastHash = logResults[length - 1]["xhash"]
+		lastHash = logResults[length - 1]["digest"]
 		payload = str(userId) + str(0) + str(logLength) + str(message) + str(lastHash)
 
 	# Finally, query the data to build the final log entry
 	valueMap = {"userId" : userId, "sessionId" : sessionId}
-	logResults = logShim.executeMultiQuery("log", valueMap, ["userId", "sessionId"])
+	logResults = logShim.executeMultiQuery("Log", valueMap, ["userId", "sessionId"])
 
 	# Now hash the hash chain entry... But first, build up the data that's needed
-	currKey = str(entityKey[(userId, sessionId)])
+	currKey = str(logEntityKey[(userId, sessionId)])
 
 	# Here are the elements for the log entry tuple
 	xi = sha3.Keccak((len(bytes(payload)), payload.encode("hex"))) # just a plain old hash
@@ -115,8 +123,8 @@ def addNewEvent(userId, sessionId, message):
 	# Store the latest entity digest
 	lastEntityDigest = hmac.new(currKey, xi, hashlib.sha512).hexdigest()
 	logShim.replaceInTable("LogChainEntity", "(userId, sessionId, digest, inserted_at)", (userId, sessionId, lastEntityDigest, datetime.now().ctime()), [True, True, False, False])
-	entityKey[(userId, sessionId)] = hmac.new(currKey, "some constant value", hashlib.sha512).hexdigest() # update the keys
-	keyShim.insertIntoTable("entityKey", "(userId, sessionId, key, inserted_at)", (userId, sessionId, entityKey[(userId, sessionId)], datetime.now().ctime()), [True, True, False, False])
+	logEntityKey[(userId, sessionId)] = hmac.new(currKey, "some constant value", hashlib.sha512).hexdigest() # update the keys
+	keyShim.insertIntoTable("LogEntityKey", "(userId, sessionId, key, inserted_at)", (userId, sessionId, logEntityKey[(userId, sessionId)], datetime.now().ctime()), [True, True, False, False])
 
 	# Store the elements now
 	logShim.insertIntoTable("Log", "(userId, sessionId, payload, digest, link, inserted_at)", (userId, sessionId, message, xi, yi, datetime.now().ctime()), [True, True, False, False, False, False])
@@ -155,15 +163,16 @@ def processLogEntry(msg):
 
 	# See if this is a new session that we need to manage, or if it's part of an existing session
 	valueMap = {"userId" : entry.userId, "sessionId" : entry.sessionId}
+	results = []
 	try:
-		results = keyShim.executeMultiQuery("initialEntityKey", valueMap, ["userId", "sessionId"])
+		results = keyShim.executeMultiQuery("InitialLogEntityKey", valueMap, ["userId", "sessionId"])
 	except:
 		print("Error: Unable to update the initialEpochKey table")
 	if (len(results) == 0):
 		createSession(int(entry.userId), int(entry.sessionId))
 
 	# Now store the event in the log 
-	addNewEvent(int(entry.userId), int(entry.sessionId), ciphertext.encode("hex"))
+	addNewEvent(userId = int(entry.userId), sessionId = int(entry.sessionId), message = ciphertext.encode("hex"), logInfo = entry)
 
 def main():
 	# Some sample log messages
