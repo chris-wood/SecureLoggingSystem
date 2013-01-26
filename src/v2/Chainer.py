@@ -1,6 +1,7 @@
-# 1. define JSON test data
-# 2. define stub for function that parses test data and extracts information for the log tables
-# 3. write up some basic audit rules
+'''
+File: Chainer.py
+Author: Christopher Wood, caw4567@rit.edu
+'''
 
 from Keccak import Keccak 
 from DBShim import DBShim
@@ -17,11 +18,9 @@ import time
 from datetime import datetime
 
 # Action IDs
-ACTION_LOGIN = 1
-ACTION_LOGOUT = 2
-ACTION_ADD = 3
-ACTION_DELETE = 4
-ACTION_MODIFY = 5
+ACTION_ADD = 1
+ACTION_DELETE = 2
+ACTION_MODIFY = 3
 
 # Object IDs
 OBJECT_X = 1
@@ -68,8 +67,8 @@ def createSession(userId, sessionId):
 	encryptedEventEntityKey = encryptionModule.encrypt(eventEntityKey, policy)
 
 	# Persist the encrypted keys
-	keyShim.replaceInTable("InitialLogEntityKey", "(userId, sessionId, key, inserted_at)", (userId, sessionId, encryptedLogEntityKey, datetime.now().ctime()), [True, True, False, False]) 
-	keyShim.replaceInTable("InitialEventEntityKey", "(userId, sessionId, key, inserted_at)", (userId, sessionId, encryptedEventEntityKey, datetime.now().ctime()), [True, True, False, False]) 
+	keyShim.replaceInTable("InitialLogEntityKey", "(userId, sessionId, key, inserted_at)", (userId, sessionId, encryptedLogEntityKey, datetime.now().ctime()), [False, False, False, False]) 
+	keyShim.replaceInTable("InitialEventEntityKey", "(userId, sessionId, key, inserted_at)", (userId, sessionId, encryptedEventEntityKey, datetime.now().ctime()), [False, False, False, False]) 
 	#print("setting initial log and event entity key...")
 	initialLogEntityKey[(userId, sessionId)] = logEntityKey
 	initialEventEntityKey[(userId, sessionId)] = eventEntityKey
@@ -125,22 +124,22 @@ def addNewEvent(userId, sessionId, message, logInfo):
 
 	# Store the latest entity digest
 	lastEntityDigest = hmac.new(currKey, xi, hashlib.sha512).hexdigest()
-	logShim.replaceInTable("LogChainEntity", "(userId, sessionId, digest, inserted_at)", (userId, sessionId, lastEntityDigest, datetime.now().ctime()), [True, True, False, False])
+	logShim.replaceInTable("LogChainEntity", "(userId, sessionId, digest, inserted_at)", (userId, sessionId, lastEntityDigest, datetime.now().ctime()), [False, False, False, False])
 	logEntityKey[(userId, sessionId)] = hmac.new(currKey, "some constant value", hashlib.sha512).hexdigest() # update the keys
-	keyShim.insertIntoTable("LogEntityKey", "(userId, sessionId, key, inserted_at)", (userId, sessionId, logEntityKey[(userId, sessionId)], datetime.now().ctime()), [True, True, False, False])
+	keyShim.insertIntoTable("LogEntityKey", "(userId, sessionId, key, inserted_at)", (userId, sessionId, logEntityKey[(userId, sessionId)], datetime.now().ctime()), [False, False, False, False])
 
 	# Store the log element now
-	logShim.insertIntoTable("Log", "(userId, sessionId, payload, digest, link, inserted_at)", (userId, sessionId, message, xi, yi, datetime.now().ctime()), [True, True, False, False, False, False])
+	logShim.insertIntoTable("Log", "(userId, sessionId, payload, digest, link, inserted_at)", (userId, sessionId, message, xi, yi, datetime.now().ctime()), [False, False, False, False, False, False])
 
 	# Store the appropriate event information now (handle all three cases as needed)
 	salt = Random.new().read(32) # some random salt... always stored, just in case
 	print("Salt: " + str(salt))
 	if (logInfo.object == None and logInfo.affectedUsers == None): # Only event with null object and affectedUsers
-		logShim.insertIntoTable("Event", "(userId, sessionId, action, salt)", (userId, sessionId, logInfo.action, salt), [True, True, False, False])
+		logShim.insertIntoTable("Event", "(userId, sessionId, action, salt)", (userId, sessionId, logInfo.action, salt), [False, False, False, False])
 	elif (logInfo.object == None): # Only event with object 
-		logShim.insertIntoTable("Event", "(userId, sessionId, action, salt)", (userId, sessionId, logInfo.action, salt), [True, True, False, False])
+		logShim.insertIntoTable("Event", "(userId, sessionId, action, salt)", (userId, sessionId, logInfo.action, salt), [False, False, False, False])
 		valueMap = {"userId" : userId, "sessionId" : sessionId}
-		eventResults = logShim.executeMultiQuery("Event", valueMap, ["userId", "sessionId"])
+		eventResults = logShim.executeMultiQuery("Event", valueMap, [])
 		lastEvent = eventResults[len(eventResults) - 1]
 
 		# Insert info info the affected user table
@@ -148,11 +147,11 @@ def addNewEvent(userId, sessionId, message, logInfo):
 		for uid in logInfo.affectedUsers:
 			logShim.insertIntoTable("AffectedUserGroup", "(eventId, userId)", (eventId, uid), [False, True])
 	elif (logInfo.affectedUsers == None): #
-		logShim.insertIntoTable("Event", "(userId, sessionId, action, object, salt)", (userId, sessionId, logInfo.action, logInfo.object, salt), [True, True, False, False, False])
+		logShim.insertIntoTable("Event", "(userId, sessionId, action, object, salt)", (userId, sessionId, logInfo.action, logInfo.object, salt), [False, False, False, False, False])
 	else:
-		logShim.insertIntoTable("Event", "(userId, sessionId, action, object, salt)", (userId, sessionId, logInfo.action, logInfo.object, salt), [True, True, False, False, False])
+		logShim.insertIntoTable("Event", "(userId, sessionId, action, object, salt)", (userId, sessionId, logInfo.action, logInfo.object, salt), [False, False, False, False, False])
 		valueMap = {"userId" : userId, "sessionId" : sessionId}
-		eventResults = logShim.executeMultiQuery("Event", valueMap, ["userId", "sessionId"])
+		eventResults = logShim.executeMultiQuery("Event", valueMap, [])
 		lastEvent = eventResults[len(eventResults) - 1]
 
 		# Insert info info the affected user table
@@ -213,12 +212,14 @@ def help():
 def insertGoodLog():
 	''' Insert a good entry into the log (i.e. it doesn't violate the audit rule).
 	'''
-	print("NOT IMPLEMENTED YET")
+	logEntry = '{"userId": 1, "sessionId": 1, "action": ' + str(ACTION_MODIFY) + '}'
+	processLogEntry(logEntry)
 
 def insertBadLog():
-	''' Insert a bad entry into the log (i.e. it violates the audit rule).
+	''' Insert a bad entry into the log (i.e. it violates an audit rule).
 	'''
-	print("NOT IMPLEMENTED YET")
+	logEntry = '{"userId": 3, "sessionId": 1, "action": ' + str(ACTION_MODIFY) + ', "object": ' + str(OBJECT_X) + '}' # bad action
+	processLogEntry(logEntry)
 
 def handleInput(userInput):
 	''' Helper function to handle user input.
@@ -232,18 +233,15 @@ def handleInput(userInput):
 
 def main():
 	# Some sample log messages that adhere to the log format
-	log1 = '{"userId": 1, "sessionId": 1, "action": ' + str(ACTION_LOGIN) + '}'
-	log2 = '{"userId": 1, "sessionId": 1, "action": ' + str(ACTION_LOGIN) + ', "object": ' + str(OBJECT_X) + '}'
-	log3 = '{"userId": 1, "sessionId": 1, "action": ' + str(ACTION_LOGIN) + ', "affectedUsers" : [1,2,3]}'
-	log4 = '{"userId": 1, "sessionId": 1, "action": ' + str(ACTION_LOGIN) + ', "object": ' + str(OBJECT_X) + ', "affectedUsers" : [1,2,3]}'
+	log1 = '{"userId": 1, "sessionId": 1, "action": ' + str(ACTION_MODIFY) + '}'
+	log3 = '{"userId": 1, "sessionId": 1, "action": ' + str(ACTION_MODIFY) + ', "affectedUsers" : [1,2,3]}'
+	log4 = '{"userId": 1, "sessionId": 1, "action": ' + str(ACTION_MODIFY) + ', "object": ' + str(OBJECT_X) + ', "affectedUsers" : [1,2,3]}'
 	print (json.loads(log1))
-	print (json.loads(log2))
 	print (json.loads(log3))
 	print (json.loads(log4))
 
 	# Shove the test logs into the log parsing method...
 	processLogEntry(log1)
-	processLogEntry(log2)
 	processLogEntry(log3)
 	processLogEntry(log3)
 	processLogEntry(log4)
