@@ -1,6 +1,26 @@
-\chapter{Configuration}
+\section{Configuration}
 
-1. configuration file
-2. database locations
-3. example: SQLite for local distribution
+The network and database connectivity options for an ABLS instance are defined in the file {\tt abls.conf}, which
+is located in the root directory of an ABLS system. Users can modify this file to change the network settings (i.e. 
+host name, log proxy port, audit proxy port, etc) and the database connections. An example configuration file
+is shown below.
+
+\begin{lstlisting}
+# Network configuration paramters
+abls_host = localhost
+abls_logger_port = 9998
+abls_audit_port = 9999
+
+# Database configuration string
+location.db.log = ~/DatabaseModule/log.db
+location.db.key = ~/DatabaseModule/key.db
+location.db.users = ~/DatabaseModule/users.db
+location.db.audit_users = ~/DatabaseModule/audit_users.db
+location.db.policy = ~/DatabaseModule/policy.db
+\end{lstlisting}
+
+Since ABLS is in the prototype phase and does not need to be deployed to a production environment, it only 
+supports local SQLite databases. Thus, the database location strings simply correspond to the names of 
+local database files that are used to persist all log information used at runtime. Future versions of ABLS will 
+provide the user with a more comprehensive set of database configuration options.
 

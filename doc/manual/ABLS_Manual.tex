@@ -2,7 +2,7 @@
 %
 %--------------------   start of the 'preamble'
 %
-\usepackage{graphicx,amssymb,amstext,amsmath,caw,verbatim,dirtree,listings}
+\usepackage{graphicx,amssymb,amstext,amsmath,caw,verbatim,dirtree,listings,url}
 %
 
 %%    homebrew commands -- to save typing
@@ -25,14 +25,13 @@
 \maketitle
 %-----------------------------------------------------------
 \begin{abstract}\centering
-User-based non-repudiation is an increasingly important property of cloud-based applications. It provides irrefutable evidence that ties system behavior to specific users, which in turn enables the strict enforcement of organizational security policies. System logs, which can be used to construct audit trails, are typically used as the basis for this property. Thus, the effectiveness of system audits based on log files reduces to the problem of maintaining the integrity and confidentiality of log files. This manual covers the usage of ABLS, an attribute-based logging system for the cloud. It covers everything from system deployment strategies, bootstrapping, and user-defined audit schemes. For more technical information about this project, please see the ABLS research paper. 
+User-based non-repudiation is an increasingly important property of cloud-based applications. It provides irrefutable evidence that ties system behavior to specific users, which in turn enables the strict enforcement of organizational security policies. System logs, which can be used to construct audit trails, are typically used as the basis for this property. Thus, the effectiveness of system audits based on log files reduces to the problem of maintaining the integrity and confidentiality of log files. This manual covers the usage of ABLS, an attribute-based logging system for the cloud. It covers system bootstrapping, configuration, and third-party library installation. For more technical information about this project, please see the ABLS research paper. 
 \end{abstract}
 %-----------------------------------------------------------
 \tableofcontents
 %-----------------------------------------------------------
-\include{bootstrap}
-\include{configuration}
-\include{installation}
+\chapter{Getting Started}
+\include{start}
 %-----------------------------------------------------------
 
 \bibliography{ref}{}

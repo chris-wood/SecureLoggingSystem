@@ -1,0 +1,44 @@
+\begin{thebibliography}{1}
+
+\bibitem{_ibm_appscan}
+{IBM} software - {IBM} security {AppScan} family - united states.
+\newblock http://www-01.ibm.com/software/awdtools/appscan/.
+\newblock Accessed: 2013-01-23.
+
+\bibitem{_nessus}
+Nessus vulnerability scanner.
+\newblock http://www.tenable.com/products/nessus.
+\newblock Accessed: 2013-01-23.
+
+\bibitem{_penetration_metasploit}
+Penetration testing software {\textbar} metasploit.
+\newblock http://www.metasploit.com/.
+\newblock Accessed: 2013-01-23.
+
+\bibitem{ben2005-SDS}
+R.~Ben-Natan.
+\newblock {\em Implementing database security and auditing: a guide for DBAs,
+  information security administrators and auditors}.
+\newblock Digital Press, 2005.
+
+\bibitem{Bethencourt2007-CPABE}
+J.~Bethencourt, A.~Sahai, and B.~Waters.
+\newblock Ciphertext-policy attribute-based encryption.
+\newblock In {\em Proceedings of the 2007 IEEE Symposium on Security and
+  Privacy}, SP '07, pages 321--334, Washington, DC, USA, 2007. IEEE Computer
+  Society.
+
+\bibitem{Popa2012-CryptDB}
+R.~A. Popa, C.~M.~S. Redfield, N.~Zeldovich, and H.~Balakrishnan.
+\newblock Cryptdb: processing queries on an encrypted database.
+\newblock {\em Commun. ACM}, 55(9):103--111, Sept. 2012.
+
+\bibitem{Sandhu2000-nist-rbac}
+R.~Sandhu, D.~Ferraiolo, and R.~Kuhn.
+\newblock The nist model for role-based access control: towards a unified
+  standard.
+\newblock In {\em Symposium on Access Control Models and Technologies:
+  Proceedings of the fifth ACM workshop on Role-based access control},
+  volume~26, pages 47--63, 2000.
+
+\end{thebibliography}
