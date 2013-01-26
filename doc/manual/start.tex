@@ -1,46 +1,16 @@
-\section{Bootstrapping}
+\chapter{Getting Started}
 
-ABLS comes packaged with a set of configuration scripts and SQL files that initialize
-the database to a clean state. These files are included in the DatabaseModule directory
-that comes packaged with ABLS, as shown below:
+\section{Installation}
 
-\dirtree{%
-.1 ABLS.
-.2 Main.py - main executable.
-.2 Bootstrap.py - bootstrap file for the database.
-.2 LoggerModule.
-.2 PolicyEngineModule.
-.2 AuditModule.
-.2 VerifyModule.
-.2 CryptoModule.
-.2 Common.
-.2 TestModule.
-.2 DatabaseModule.
-.3 bootstrap - bash script.
-.3 bootstrap SQL files.
-}
+ABLS utilizes many third-party packages and libraries to run. For brevity, these are listed below
+along with the online locations where they can be downloaded. The user is left with the task of 
+installing them on their own machines in order to deploy an ABLS instance.
 
-In order to bootstrap an ABLS instance for development or debugging purposes, one can simply run the 
-following commands.
-
-\begin{lstlisting}
-$> ./DatabaseModule/bootstrap 
-$> python Boostrap.py
-$> python Main.py -l
-\end{lstlisting}
-
-The first bootstrap script will wipe the database files and configure them for use with an 
-ABLS instance. This script should be modified if the user wants to change the physical
-location of each database server. The second command will tell the Bootstrap program
-to insert a set of fake data into the log, user, and audit\_user databases. This will enable
-the developer to test the new ABLS instance using some predefined data. Finally, the third
-command runs the {\tt Main.py} and starts the logging service (``-l'') so that new log messages
-may be intercepted from a client.
-
-If the user wants to start the verification or audit services as well they can simple pass the ``-v'' or
-``-a'' flags to the {\tt Main.py} program, respectively. Parameters for these services (i.e. the number of 
-verification threads) can be configured by changing the source code in the respective modules
-({\tt VerificationModule} and {\tt AuditModule}).
+\begin{enumerate}
+	\item Charm Crypto - \url{http://charm-crypto.com/Main.html}
+	\item Pykka (Python Akka Library) - \url{http://www.pykka.org/en/latest/}
+	\item SQLite - \url{http://www.sqlite.org/}
+\end{enumerate}
 
 \section{Configuration}
 
@@ -68,16 +38,47 @@ supports local SQLite databases. Thus, the database location strings simply corr
 local database files that are used to persist all log information used at runtime. Future versions of ABLS will 
 provide the user with a more comprehensive set of database configuration options.
 
+\section{Bootstrapping}
 
-\section{Installation}
+ABLS comes packaged with a set of configuration scripts and SQL files that initialize
+the database to a clean state. These files are included in the DatabaseModule directory
+that comes packaged with ABLS, as shown below:
 
-ABLS utilizes many third-party packages and libraries to run. For brevity, these are listed below
-along with the online locations where they can be downloaded. The user is left with the task of 
-installing them on their own machines in order to deploy an ABLS instance.
+\dirtree{%
+.1 ABLS.
+.2 Main.py - main executable.
+.2 Bootstrap.py - bootstrap file for the database.
+.2 LoggerModule.
+.2 PolicyEngineModule.
+.2 AuditModule.
+.2 VerifyModule.
+.2 CryptoModule.
+.2 Common.
+.2 TestModule.
+.2 DatabaseModule.
+.3 bootstrap\_db - bash script.
+.3 bootstrap SQL files.
+}
 
-\begin{enumerate}
-	\item Charm Crypto - \url{http://charm-crypto.com/Main.html}
-	\item Pykka (Python Akka Library) - \url{http://www.pykka.org/en/latest/}
-	\item SQLite - \url{http://www.sqlite.org/}
-\end{enumerate}
+In order to bootstrap an ABLS instance for development or debugging purposes, one can simply run the 
+following commands.
+
+\begin{lstlisting}
+$> ./DatabaseModule/bootstrap_db
+$> python Boostrap.py
+$> python Main.py -l
+\end{lstlisting}
+
+The first bootstrap script will wipe the database files and configure them for use with an 
+ABLS instance. This script should be modified if the user wants to change the physical
+location of each database server. The second command will tell the Bootstrap program
+to insert a set of fake data into the log, user, and audit\_user databases. This will enable
+the developer to test the new ABLS instance using some predefined data. Finally, the third
+command runs the {\tt Main.py} and starts the logging service (``-l'') so that new log messages
+may be intercepted from a client. \\
+
+If the user wants to start the verification or audit services as well they can simple pass the ``-v'' or
+``-a'' flags to the {\tt Main.py} program, respectively. Parameters for these services (i.e. the number of 
+verification threads) can be configured by changing the source code in the respective modules
+({\tt VerificationModule} and {\tt AuditModule}).
 

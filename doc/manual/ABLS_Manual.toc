@@ -1,7 +1,7 @@
-\contentsline {chapter}{\numberline {1}Getting Started}{2}
-\contentsline {section}{\numberline {1.1}Bootstrapping}{3}
+\contentsline {chapter}{\numberline {1}Getting Started}{3}
+\contentsline {section}{\numberline {1.1}Installation}{3}
 \contentsline {section}{\numberline {1.2}Configuration}{3}
-\contentsline {section}{\numberline {1.3}Installation}{4}
+\contentsline {section}{\numberline {1.3}Bootstrapping}{3}
 \contentsline {chapter}{\numberline {2}Usage}{5}
-\contentsline {section}{\numberline {2.1}Log Proxy Test Driver}{6}
-\contentsline {section}{\numberline {2.2}Audit Proxy Test Driver}{6}
+\contentsline {section}{\numberline {2.1}Log Proxy Test Driver}{5}
+\contentsline {section}{\numberline {2.2}Audit Proxy Test Driver}{5}

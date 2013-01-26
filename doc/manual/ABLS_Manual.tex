@@ -1,38 +1,41 @@
-\documentclass[a4paper,11pt]{report}
+\documentclass{book}
 %
 %--------------------   start of the 'preamble'
 %
-\usepackage{graphicx,amssymb,amstext,amsmath,caw,verbatim,dirtree,listings,url}
-%
+\usepackage[a4paper, top=3cm, bottom=3cm]{geometry}
+\usepackage[latin1]{inputenc}
+\usepackage{setspace}
+\usepackage{tocloft}
+\usepackage{fancyhdr}
+\usepackage{graphicx,amssymb,amstext,amsmath,verbatim,dirtree,listings,url}
 
-%%    homebrew commands -- to save typing
-\newcommand\etc{\textsl{etc}}
-\newcommand\eg{\textsl{eg.}\ }
-\newcommand\etal{\textsl{et al.}}
-\newcommand\Quote[1]{\lq\textsl{#1}\rq}
-\newcommand\fr[2]{{\textstyle\frac{#1}{#2}}}
-\newcommand\miktex{\textsl{MikTeX}}
-\newcommand\comp{\textsl{The Companion}}
-\newcommand\nss{\textsl{Not so Short}}
+%\parskip = 1cm
+%\pagestyle{fancy}
 
 %
 %---------------------   end of the 'preamble'
 %
 \begin{document}
 %-----------------------------------------------------------
-\title{\textbf{ABLS} \\ An Attribute-Based Logging System for the Cloud {\small User Manual}}
+
+\pagestyle{empty}
+%\pagenumbering{}
+% Set book title
+\title{\textbf{ABLS} \\ An Attribute-Based Logging System for the Cloud \\{\large User Manual}}
+% Include Author name and Copyright holder name
 \author{Christopher A. Wood \\ {\tt caw4567@rit.edu}}
 \maketitle
+
+\pagestyle{fancy}
+%\fancyhf{}
+%\lhead[]{\thepage}
+%\rhead[\thepage]{}
+
 %-----------------------------------------------------------
-\begin{abstract}\centering
-User-based non-repudiation is an increasingly important property of cloud-based applications. It provides irrefutable evidence that ties system behavior to specific users, which in turn enables the strict enforcement of organizational security policies. System logs, which can be used to construct audit trails, are typically used as the basis for this property. Thus, the effectiveness of system audits based on log files reduces to the problem of maintaining the integrity and confidentiality of log files. This manual covers the usage of ABLS, an attribute-based logging system for the cloud. It covers system bootstrapping, configuration, and third-party library installation. For more technical information about this project, please see the ABLS research paper. 
-\end{abstract}
 %-----------------------------------------------------------
 \tableofcontents
 %-----------------------------------------------------------
-\chapter{Getting Started}
 \include{start}
-\chapter{Usage}
 \include{usage}
 %-----------------------------------------------------------
 

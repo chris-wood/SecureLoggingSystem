@@ -35,10 +35,10 @@ location of each database server. The second command will tell the Bootstrap pro
 to insert a set of fake data into the log, user, and audit\_user databases. This will enable
 the developer to test the new ABLS instance using some predefined data. Finally, the third
 command runs the {\tt Main.py} and starts the logging service (``-l'') so that new log messages
-may be intercepted from a client.
+may be intercepted from a client. \newline
 
 If the user wants to start the verification or audit services as well they can simple pass the ``-v'' or
 ``-a'' flags to the {\tt Main.py} program, respectively. Parameters for these services (i.e. the number of 
 verification threads) can be configured by changing the source code in the respective modules
-({\tt VerificationModule} and {\tt AuditModule}).
+({\tt VerifyModule} and {\tt AuditModule}).
 
