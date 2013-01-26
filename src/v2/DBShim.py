@@ -58,13 +58,6 @@ class DBShim(object):
 		''' Generate the mask for the database entries. This should be invoked on every data 
 		element that is marked as sensitive.
 		'''
-		#firstHalf = self.keyMgr.getMasterKey() + self.keyMgr.getPublicKey()
-		#secondPayload = data + table
-		#secondHalf = self.sha3.Keccak((len(bytes(secondPayload)), secondPayload.encode("hex")))
-
-		#iv = Random.new().read(AES.block_size) # we need an IV of 16-bytes, this is also random...
-		#key = Random.new().read(32)
-		#ciphertext = AES.new(key, self.aesMode, iv).encrypt(key)
 		key = hashlib.sha256(self.keyMgr.getMasterKey() + str(table)).digest()
 		cipher = AES.new(key, AES.MODE_ECB)	
 
@@ -75,10 +68,6 @@ class DBShim(object):
 
 		ciphertext = cipher.encrypt(plaintext)
 		return ciphertext.encode("hex")
-
-		#hf = hashlib.sha512()
-		#hf.update(self.keyMgr.getMasterKey() + str(data) + str(table))
-		#return hf.hexdigest()
 
 	def insertIntoTable(self, table, rowAttributes, rowContents, rowMasks):
 		''' Insert a row into the specified table. Data filtering happens on behalf of the caller.

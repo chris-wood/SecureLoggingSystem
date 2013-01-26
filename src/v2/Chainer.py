@@ -138,18 +138,27 @@ def addNewEvent(userId, sessionId, message, logInfo):
 	if (logInfo.object == None and logInfo.affectedUsers == None): # Only event with null object and affectedUsers
 		logShim.insertIntoTable("Event", "(userId, sessionId, action, salt)", (userId, sessionId, logInfo.action, salt), [True, True, False, False])
 	elif (logInfo.object == None): # Only event with object 
-		
-		# TODO: need to insert event, then return eventId, and insert information into AffectedUserGroup table, and then update
-
 		logShim.insertIntoTable("Event", "(userId, sessionId, action, salt)", (userId, sessionId, logInfo.action, salt), [True, True, False, False])
+		valueMap = {"userId" : userId, "sessionId" : sessionId}
+		eventResults = logShim.executeMultiQuery("Event", valueMap, ["userId", "sessionId"])
+		lastEvent = eventResults[len(eventResults) - 1]
+
+		# Insert info info the affected user table
+		eventId = lastEvent["eventId"]
+		for uid in logInfo.affectedUsers:
+			logShim.insertIntoTable("AffectedUserGroup", "(eventId, userId)", (eventId, uid), [False, True])
 	elif (logInfo.affectedUsers == None): #
 		logShim.insertIntoTable("Event", "(userId, sessionId, action, object, salt)", (userId, sessionId, logInfo.action, logInfo.object, salt), [True, True, False, False, False])
 	else:
-
-		# TODO: do something similar as the above
-
 		logShim.insertIntoTable("Event", "(userId, sessionId, action, object, salt)", (userId, sessionId, logInfo.action, logInfo.object, salt), [True, True, False, False, False])
+		valueMap = {"userId" : userId, "sessionId" : sessionId}
+		eventResults = logShim.executeMultiQuery("Event", valueMap, ["userId", "sessionId"])
+		lastEvent = eventResults[len(eventResults) - 1]
 
+		# Insert info info the affected user table
+		eventId = lastEvent["eventId"]
+		for uid in logInfo.affectedUsers:
+			logShim.insertIntoTable("AffectedUserGroup", "(eventId, userId)", (eventId, uid), [False, True])
 
 	# Debug
 	print("Inserted the log: " + str((userId, sessionId, message, xi, yi)))
@@ -225,15 +234,19 @@ def main():
 	# Some sample log messages that adhere to the log format
 	log1 = '{"userId": 1, "sessionId": 1, "action": ' + str(ACTION_LOGIN) + '}'
 	log2 = '{"userId": 1, "sessionId": 1, "action": ' + str(ACTION_LOGIN) + ', "object": ' + str(OBJECT_X) + '}'
-	log3 = '{"userId": 1, "sessionId": 1, "action": ' + str(ACTION_LOGIN) + ', "object": ' + str(OBJECT_X) + ', "affectedUsers" : [1,2,3]}'
+	log3 = '{"userId": 1, "sessionId": 1, "action": ' + str(ACTION_LOGIN) + ', "affectedUsers" : [1,2,3]}'
+	log4 = '{"userId": 1, "sessionId": 1, "action": ' + str(ACTION_LOGIN) + ', "object": ' + str(OBJECT_X) + ', "affectedUsers" : [1,2,3]}'
 	print (json.loads(log1))
 	print (json.loads(log2))
 	print (json.loads(log3))
+	print (json.loads(log4))
 
 	# Shove the test logs into the log parsing method...
 	processLogEntry(log1)
 	processLogEntry(log2)
 	processLogEntry(log3)
+	processLogEntry(log3)
+	processLogEntry(log4)
 
 	# Jump into the input-handling loop...
 	print("---------------------------")
