@@ -4,7 +4,7 @@ Author: Christopher A. Wood, caw4567@rit.edu
 '''
 
 import threading
-import logging # Python logging module
+import logging 
 from ClientObject import ClientObject
 from ClientHandler import ClientHandler
 import socket
@@ -22,7 +22,7 @@ class LogProxy(threading.Thread):
 	# The list of active sessions (IDs) that have been authenticated
 	activeSessions = []
 
-	def __init__(self, params, keyMgr):	
+	def __init__(self, params, keyMgr, collector):	
 		''' Initialize the log proxy that intercepts traffic from the incoming source,
 			makes sure it's authenticated, and then sets up a handler to parse all traffic.
 		'''
@@ -40,15 +40,11 @@ class LogProxy(threading.Thread):
 		# Persist the key manager reference and parameters 
 		self.keyMgr = keyMgr
 		self.params = params
+		self.collector = collector
 
-		# Setup the Python logger
-		self.lgr = logging.getLogger('abls')
-		self.lgr.setLevel(logging.DEBUG)
-		fh = logging.FileHandler('abls.log')
-		fh.setLevel(logging.WARNING)
-		frmt = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-		fh.setFormatter(frmt)
-		self.lgr.addHandler(fh)
+		# Set up the Python logger
+		logFile = 'abls.log'
+		logging.basicConfig(filename=logFile,level=logging.DEBUG)
 
 		# Set up the socket configuration parameters
 		self.context = SSL.Context(SSL.SSLv23_METHOD)
@@ -79,10 +75,10 @@ class LogProxy(threading.Thread):
                                  cert_reqs=ssl.CERT_REQUIRED) # we require a certificate from the client for authentication
 			'''
 			#print("Client connected from {}.".format(fromaddr))
-			self.lgr.debug("Client connected from {}.".format(fromaddr))
+			logging.debug("Client connected from {}.".format(fromaddr))
 
 			# Start the handler thread
-			handler = ClientHandler(self, self.params, self.keyMgr)
+			handler = ClientHandler(self, self.params, self.keyMgr, self.collector)
 			handler.start()
 			handler.clientList.append(ClientObject(newsocket, fromaddr, None)) # None should be connstream
 			self.activeSessions.append(handler)

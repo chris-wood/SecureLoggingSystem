@@ -14,7 +14,8 @@ import Queue # thread-safe queue for producer/consumer implementations
 from time import clock, time # for time-based extraction
 
 class LogCollector(threading.Thread):
-	''' TODO
+	''' The singleton log collector instance that collates database entries from other active 
+	threads in the system to be persisted to the appropriate database.
 	'''
 
 	# The list of active sessions (IDs) that have been authenticated
@@ -27,76 +28,68 @@ class LogCollector(threading.Thread):
 		threading.Thread.__init__(self)
 		self.running = False
 
-		# Initialize the connection vars/fields
-		self.HOST = 'localhost'
-		self.PORT = 9998
-		self.BUFFSIZE = 1024
-		self.clientList = []
-		self.handler = None
-		self.serverSock = None
-
 		# Persist the key manager reference and parameters 
 		self.keyMgr = keyMgr
 		self.params = params
+		self.queue = []
 
-		# Setup the Python logger
-		self.lgr = logging.getLogger('abls')
-		self.lgr.setLevel(logging.DEBUG)
-		fh = logging.FileHandler('abls.log')
-		fh.setLevel(logging.WARNING)
-		frmt = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-		fh.setFormatter(frmt)
-		self.lgr.addHandler(fh)
-
-		# Set up the socket configuration parameters
-		self.context = SSL.Context(SSL.SSLv23_METHOD)
-		self.context.use_privatekey_file('./Keys/key') # our private key
-		self.context.use_certificate_file('./Keys/cert') # our self-signed certificate
+		# Command IDs for the collector
+		self.INSERT = 1
+		self.REPLACE = 2
+		self.MULTI_QUERY = 3
 
 	def run(self):
-		''' Run the log proxy and listen for incoming connections.
+		''' Run the log collector to collate log messages from the other log instances
 		'''
-		address = (self.HOST, self.PORT)
-		self.running = True
-		self.serverSock = socket.socket()
-		self.serverSock = SSL.Connection(self.context, self.serverSock)
-		self.serverSock.bind(address)
-		self.serverSock.listen(5)
+		# Create the appropriate database shims
+		self.logShim = DBShim.DBShim(self.params["LOG_DB"], self.keyMgr)
+		self.keyShim = DBShim.DBShim(self.params["KEY_DB"], self.keyMgr)
+		self.userShim = DBShim.DBShim(self.params["USER_DB"], self.keyMgr)
 
-		# Wait for incoming connections from clients
-		while self.running:
-			# Accept a new client connection 
-			newsocket, fromaddr = self.serverSock.accept()
-			
-			# Wrap the socket up in a SSL connection for authentication and encryption
-			'''connstream = ssl.wrap_socket(newsocket,
-                                 server_side=True,
-                                 certfile="./Keys/cert",
-                                 keyfile="./Keys/key",
-                                 ssl_version=ssl.PROTOCOL_TLSv1, # TODO: this should be a configurable parameter for ABLS
-                                 cert_reqs=ssl.CERT_REQUIRED) # we require a certificate from the client for authentication
-			'''
-			#print("Client connected from {}.".format(fromaddr))
-			self.lgr.debug("Client connected from {}.".format(fromaddr))
+		# Map the tables to DB shims (based on the DB schema)
+		self.tableMap = {}
+		self.tableMap["log"] = self.logShim
+		self.tableMap["entityKey"] = self.keyShim
+		self.tableMap["epochKey"] = self.keyShim
+		self.tableMap["entity"] = self.logShim
+		self.tableMap["epoch"] = self.logShim
+		self.tableMap["initialEpochKey"] = self.keyShim
+		self.tableMap["initialEntityKey"] = self.keyShim
 
-			# Start the handler thread
-			handler = ClientHandler(self, self.params, self.keyMgr)
-			handler.start()
-			handler.clientList.append(ClientObject(newsocket, fromaddr, None)) # None should be connstream
-			self.activeSessions.append(handler)
+		# Just loop over the queue and wait to handle all incoming database events
+		while not self.stopped():
+			msg = self.queue.get()
+			self.handleDatabaseEntry(msg)
 
-		self.serverSock.close()
-		self.lgr.debug("- end -")
-		#print("- end -")
-
-	def get(self):
-		''' Retrieve teh next element from the LogEntry queue.
+	def handleDatabaseEntry(self, msg):
+		''' Handle the message tuple 
+		    (command, table, [:params])
 		'''
-		return self.queue.get()
+		command = msg(0)
+		table = msg(1)
+		if (command == self.INSERT):
+			cols = msg(2)
+			data = msg(3)
+			mask = msg(4)
+			self.tableMap[table].insertIntoTable(table, cols, data, mask)
+		elif (command == SELF.REPLACE):
+			cols = msg(2)
+			data = msg(3)
+			mask = msg(4)
+			self.tableMap[table].replaceInTable(table, cols, data, mask)
+		elif (command == SELF.MULTI_QUERY):
+			values = msg(2)
+			mask = msg(3)
+			self.tableMap[table].executeMultiQuery(table, values, mask)
+		else:
+			raise Exception("Invalid log collector command.")
 
-	def kill(self):
-		''' Terminate the thread.
+	def stop(self):
+		''' Stop this logging thread.
 		'''
-		print("Killing the traffic proxy.")
-		self.lgr.deubg("Killing the traffic proxy.")
-		self.serverSock.close()
+		self._stop.set()
+
+	def stopped(self):
+		''' Check to see if this logging thread was stopped correctly.
+		''' 
+		return self._stop.isSet()

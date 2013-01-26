@@ -21,7 +21,7 @@ class ClientHandler(threading.Thread):
 	actor via a message dictionary.
 	'''
 
-	def __init__(self, serv, params, keyMgr):
+	def __init__(self, serv, params, keyMgr, collector):
 		''' Initialize the client handler with the parent server (LogProxy)
 		'''
 		threading.Thread.__init__(self)
@@ -29,18 +29,14 @@ class ClientHandler(threading.Thread):
 		self.clientList = []
 		self.running = True
 		self.params = params
+		self.collector = collector
 
-		# Setup the Python logger
-		self.lgr = logging.getLogger('abls')
-		self.lgr.setLevel(logging.DEBUG)
-		fh = logging.FileHandler('abls.log')
-		fh.setLevel(logging.WARNING)
-		frmt = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-		fh.setFormatter(frmt)
-		self.lgr.addHandler(fh)
+		# Set up the Python logger
+		logFile = 'abls.log'
+		logging.basicConfig(filename=logFile,level=logging.DEBUG)
 
 		# Set the properties for this session (forward along the key manager)
-		self.logger = Logger(self.params, keyMgr)
+		self.logger = Logger(self.params, keyMgr, collector)
 		self.queue = self.logger.getQueue()
 		self.logger.start()
 
@@ -60,13 +56,12 @@ class ClientHandler(threading.Thread):
 				except:
 					self.running = False
 
-		print("Terminating the client handler")
+		logging.debug("Terminating the client handler")
 		self.logger.endSession()
 		self.logger.stop()
 
 	def handleMessage(self, message):
 		''' Handle a client message.
 		'''
-		#self.lgr.debug("client message: ", message)
-		#print("client message: ", message) # debug 
+		logging.debug("client message: " + str(message))
 		self.queue.put(message)

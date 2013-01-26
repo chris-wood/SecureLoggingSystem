@@ -43,7 +43,7 @@ class Logger(threading.Thread):
 	# This can (and should) be changed as needed.
 	EPOCH_WINDOW_SIZE = 5
 
-	def __init__(self, params, keyMgr):
+	def __init__(self, params, keyMgr, collector):
 		''' Default constructor.
 		'''	
 		super(Logger, self).__init__()
@@ -55,6 +55,7 @@ class Logger(threading.Thread):
 
 		# Create the encryption module and Keccak instance
 		self.keyMgr = keyMgr
+		self.collector = collector
 		self.encryptionModule = EncryptionModule(keyMgr)
 		self.sha3 = Keccak.Keccak()
 		self.aesMode = AES.MODE_CBC

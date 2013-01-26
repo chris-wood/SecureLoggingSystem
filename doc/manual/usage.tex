@@ -1,0 +1,87 @@
+\section{Log Proxy Test Driver}
+Assuming an ABLS instance has been started with the logging serice enabled, one can interface and send test data
+to the log server as follows:
+
+\begin{lstlisting}
+$> python LogProxyDriver.py localhost 9998
+\end{lstlisting}
+
+Once loaded, the log proxy will display something similar to the following:
+
+\begin{lstlisting}
+('127.0.0.1', 9998)
+('AES256-SHA', 'TLSv1/SSLv3', 256)
+{'notAfter': 'Dec 25 19:21:03 2013 GMT',
+ 'subject': ((('countryName', u'US'),),
+             (('stateOrProvinceName', u'NY'),),
+             (('localityName', u'Rochester'),),
+             (('organizationName', u'RIT'),),
+             (('organizationalUnitName', u'CS'),),
+             (('commonName', u'Chris'),),
+             (('emailAddress', u'NOT_TELLING_YOU@gmail.com'),))}
+-----------------------------------------
+              Log Proxy Driver           
+Type 'help' or '?' for available commands
+-----------------------------------------
+>> 
+\end{lstlisting}
+
+At this point, the user may type ``help'' to see what commands are available, or simply start sending fake
+log data by typing ``test'', which will result in the following:
+
+\begin{lstlisting}
+{"userId":1,"sessionId":0,"payload":"TEST PAYLOAD"}
+{"userId":1,"sessionId":0,"payload":"TEST PAYLOAD"}
+{"userId":1,"sessionId":0,"payload":"TEST PAYLOAD"}
+{"userId":1,"sessionId":0,"payload":"TEST PAYLOAD"}
+{"userId":1,"sessionId":0,"payload":"TEST PAYLOAD"}
+...
+...
+\end{lstlisting}
+
+By examinig the {\tt abls.log} file and the {\tt log.db} databse, the user can verify that the contents of these
+log messages were properly stored.
+
+\section{Audit Proxy Test Driver}
+Assuming an ABLS instance has been started with the audit service enabled, one can interface and request log data
+as follows:
+
+\begin{lstlisting}
+$> python AuditProxyDriver.py localhost 9999
+\end{lstlisting}
+
+Once loaded, the audit proxy will display something similar to the following:
+
+\begin{lstlisting}
+-----------------------------------------
+            Audit Proxy Driver           
+Type 'help' or '?' for available commands
+-----------------------------------------
+>> 
+\end{lstlisting}
+
+At this point, the user must first login before they can request data. Assuming the {\tt Bootstrap.py} file was 
+run prior to loading the ABLS instance, the user may log in as follows:
+
+\begin{lstlisting}
+>> login bob bobPassword
+{"result":True,"message":"Login successful."}
+\end{lstlisting}
+
+Now that the user is verified, they may request log data by specifying user IDs or user and session IDs, as shown below.
+
+\begin{lstlisting}
+>> selectByUser 1
+{u'message': u'["ded2cde2817cd22bc204ef1265dce668", 
+"ded2cde2817cd22bc204ef1265dce668", 
+"ded2cde2817cd22bc204ef1265dce668", 
+"ded2cde2817cd22bc204ef1265dce668", 
+"ded2cde2817cd22bc204ef1265dce668", 
+"ded2cde2817cd22bc204ef1265dce668", 
+"ded2cde2817cd22bc204ef1265dce668", 
+"ded2cde2817cd22bc204ef1265dce668", 
+"ded2cde2817cd22bc204ef1265dce668", 
+"ded2cde2817cd22bc204ef1265dce668"]', 
+u'result': True}
+\end{lstlisting}
+

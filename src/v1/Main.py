@@ -25,6 +25,7 @@ sys.path.append("./DatabaseModule")
 sys.path.append("./VerifyModule")
 sys.path.append("./CryptoModule")
 from LogProxy import LogProxy
+from LogCollector import LogCollector
 from VerifyCrawler import VerifyCrawler
 from KeyManager import KeyManager
 from AuditProxy import AuditProxy
@@ -111,7 +112,8 @@ def main():
 	# Start whatever services are specified by the user...
 	if (log):
 		print("Starting the log service on port " + str(params["LOG_PORT"]))
-		logProxy = LogProxy(params, keyMgr).start()	
+		collector = LogCollector(params, keyMgr)
+		logProxy = LogProxy(params, keyMgr, collector).start()	
 	if (audit):
 		print("Starting the audit service on port " + str(params["AUDIT_PORT"]))
 		auditProxy = AuditProxy(params, keyMgr).start()
