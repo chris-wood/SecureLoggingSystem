@@ -40,14 +40,11 @@ Department of Computer Science \\
 \date{\today}
 \maketitle
 \begin{abstract}
-User-based non-repudiation is an increasingly important property of cloud-based applications. It provides irrefutable evidence that ties system behavior to specific users, which in turn enables the strict enforcement of organizational security policies. System logs, which can be used to construct audit trails, are typically used as the basis for this property. Thus, the effectiveness of system audits based on log files reduces to the problem of maintaining the integrity and confidentiality of log files. We present the design and implementation of an attribute-based logging system, ABLS, that is capable of building secure log files. In doing so, we also present some of the benefits of ciphertext-policy attribute-based encryption (CP-ABE) to solve a variety of log design issues. In addition, we also present the design of an automated auditing procedure
-that is dynamically configurable by its users to aid in security policy enforcement.
-
-In this paper we discuss ABLS, an attribute-based logging system that supports ciphertext-policy 
+User-based non-repudiation is an increasingly important property of cloud-based applications. It provides irrefutable evidence that ties system behavior to specific users, which in turn enables the strict enforcement of organizational security policies. System logs, which can be used to construct audit trails, are typically used as the basis for this property. Thus, the effectiveness of system audits based on log files reduces to the problem of maintaining the integrity and confidentiality of log files. In this paper we discuss ABLS, an attribute-based logging system that supports ciphertext-policy 
 attribute-based encryption (CP-ABE) \cite{Bethencourt2007-CPABE} and authenticated hash-chain 
-constructions for log file confidentiality and integrity, respectively. ABLS was designed for
-the cloud and is capable of addressing the aforementioned problems with secure logging. 
-We first start with progress that has been made since the first phase, which includes versions
+constructions for log file confidentiality and integrity, respectively. In addition, we also present the 
+preliminary design of automated auditing tasks that aid in security policy enforcement. We first start with 
+progress that has been made since the first phase, which includes versions
 1 and 2 of ABLS, and then present a plan of attack for the next phase in the project. 
 \end{abstract}
 
@@ -55,12 +52,18 @@ We first start with progress that has been made since the first phase, which inc
 %A proof-of-concept system has been developed in order to test both the correctness and performance of ABLS. 
 %In this section we provide a discussion of the completed work on the first version of ABLS. 
 
-For Phase 2 of the project, I focused on finishing remaining work from the first phase (including an instance-wide
-key manager to help verifiers work with the log information and finishing the database masking procedure), implementing the log collector to collate log messages to be inserted into the database, and finishing the log query capability. 
-The specifics of each of these tasks is outlined in the following sections. The design and implementation of 
+For phase 2 of the project, I focused on finishing remaining work from the first phase, including an instance-wide
+key manager to help verifiers work with the log information and a complete database masking procedure. I also
+focused on implementing the log collector to collate log messages to be inserted into the database (which was ultimately removed for performance
+reasons) and finishing the log query feature. The specifics of each of these tasks are outlined in the 
+following sections. The design and implementation of 
 the automated audit tasks proved to be more difficult than originally anticipated and required a complete re-design of 
-the relational model and structure of log messages. As such, this feature was omitted to ABLS-V2, and is described 
+the relational data model and structure of log messages. As such, this feature was deferred to ABLS-V2, and is described 
 later in this document.
+
+\textbf{Disclaimer: The ABLS prototype was implemented as a research project with design issues taking precedence 
+over implementation quality. There are many vulnerabilities (i.e. SQL injection) present in the source code, and the 
+time spent on implementing proper mitigation techniques was otherwise spent on improving ABLS design elements}.
 
 \subsection{Deployment}
 \label{sec:deployment}
@@ -78,7 +81,7 @@ diagram for the ABLS deployment scheme is shown in Figure \ref{fig:deployment}.
 Based on the purpose of each piece of data used in the log, it is best to physically separate databases
 that store data of different security classes rather than rely on a single, segregated database that uses MAC with 
 polyinstantiation to protect data of different security classes. Of course, access control
-and authentication mechanisms for all of the database servers is enforced at the operating system level, thus
+and authentication mechanisms for all of the database servers is to be enforced at the operating system level, thus
 prohibiting immediate access to all unauthorized users other than the internal tasks (i.e. logger, verifier, policy engine, etc) 
 within an ABLS instance. 
 
@@ -93,17 +96,17 @@ Pairing-based cryptography is computationally expensive, and under the assumptio
 to very heavy traffic loads at any particular time, the 
 overhead of encrypting data to be stored in the database should be as minimal as possible. Therefore, each unique
 policy that is needed to encrypt a log message is associated with an AES-256 symmetric key, which is in 
-turn encrypted using CP-ABE and then serialized to be stored in the key database. This design enhancement enables 
+turn encrypted using CP-ABE and then serialized to be stored in the key database. The Charm crypto package allows all cryptographic 
+objects (which tend to be nested Python dictionaries and other complicated data structures) to be serialized to byte 
+representations for database persistence. This design enhancement enables 
 increased throughput without sacrificing the level of confidentiality granularity that is needed for each log entry. 
 However, should an unencrypted policy key for a given user's session become compromised, the remaining entries in 
-that log database are at risk of being compromised. The Charm crypto package allows all cryptographic 
-objects (which tend to be nested Python dictionaries and other complicated data structures) to be serialized to byte 
-representations for database persistence. 
+that log database are at risk of being compromised. 
 
 The basic procedure for encrypting a log entry is shown in Algorithm \ref{alg:encrypt}. Once encrypted, the ciphertext
 is stored in the database with the rest of the information necessary to continue the log chain for a given user's session.
   
-\begin{algorithm}[ht!] %[htb]
+\begin{algorithm}[h] %[htb]
 \caption{Log entry encryption} \label{alg:encrypt}
 \begin{algorithmic}[1]
 \REQUIRE{An unencrypted log entry $L_i$ for session $S_j$ of user $U_k$}
@@ -125,12 +128,12 @@ is stored in the database with the rest of the information necessary to continue
 
 In order to improve the performance of the logger, the per-policy symmetric keys for a user session are kept
 in memory until the session has been closed. This avoids the need for the logger to query the database for the key 
-when a new piece of data to be inserted into the log. 
+when a new log message arrives. 
 
 Also, in order to ensure that every encryption module (cipher) contained within loggers, verifiers, and database 
 shims uses the same master key $M_k$, a key manager singleton object was implemented and shared among
 all ABLS entities that require the master key. Upon creation, an encryption module will register itself with the key
-manager so that they receive any key changes in the event that the master (or public) key changes.
+manager in order to receive any changes made to the master or public key.
 
 \subsection{Database Design}
 \label{sec:databaseDesign}
@@ -144,12 +147,12 @@ hard-coded into the {\tt PolicyEngine}.
 
 In order to link the entries in the log tables to their corresponding verification and encryption keys in the key database,
 common user and session IDs are used (though not as the primary key for the tables since they do not satisfy
-the uniqueness property). However, because such user and session information is stored in plaintext, their 
-existence may lead to a violation of user privacy. Therefore, using a technique similar to the ``onion encryption'' design in
-CryptDB \cite{Popa2012-CryptDB}, this information is now deterministically masked before being stored in the database.
+the uniqueness property). However, storing user and session information in plaintext may lead to a privacy violation
+if the database is compromised. Therefore, using a technique similar to the ``onion encryption'' design in
+CryptDB \cite{Popa2012-CryptDB}, this information is now deterministically encrypted before being stored in the database.
 
-This masking procedure works by encrypting the user and session attributes with a symmetric key generated
-by the logger's master key salted by the target table identifier. In mathematical
+This procedure works by encrypting the user and session attributes with a symmetric key generated
+from the logger's master key salted by the target table identifier. In mathematical
 terms, the encrypted user and session IDs, $[U_i]$ and $[S_j]$, stored in table $T$ are generated as follows.
 \begin{align*}
 [U_i] = E(M_k || H(T), U_i) \\
@@ -161,14 +164,6 @@ inference attacks in the event that the database servers are compromised. Furthe
 who will have access to $M_k$ through the key manager, to decrypt log entries and recover the user identifier 
 so that they may check the contents of the other databases as needed.
 
-The relational database design was modified in order to support the new symmetric key management scheme and provide 
-enhanced security for the stored data. In particular, rather than storing the cryptographic keys in the same database as the
-log information, these two databases are now segregated and are expected to be deployed on different database servers.
-By hardening both databases, a malicious attacker would now need to circumvent the access control 
-mechanisms protecting two physically disjoint databases, rather than just one, in order to recover log 
-decrypted messages. In terms of the actual implementation, this change caused many cascading errors 
-throughout the code base which needed to be fixed before development continued.
-
 Also, to better support audits that use the log database, a timestamp field was added to each table as a required
 attribute. Not only does such information capture the exact timing of critical system events, it acts as a protection
 mechanism in the event that log messages are inserted into the database out of order. Also, it is important to note that
@@ -177,18 +172,17 @@ collector.
 
 \subsection{Log Querying}
 \label{sec:querying}
-In order to make ABLS fulfill its purpose as a secure logging system, log query support will be added to the audit
-module. Such query support will be exposed to clients through a lightweight API that is used via the audit protocol.
-To start, only select operations parameterized by the user ID or both the user and session IDs will be supported. 
-As an example, the API might have the following function signatures. \\
+In order to make ABLS fulfill its purpose as a secure logging system, log query support was added to the audit
+module. Such query support is exposed to clients through a lightweight API that is used via the audit protocol.
+Currently, only select operations parameterized by the user ID or both the user and session IDs are supported. 
+The current version of the API has the following function signatures. \\
 
 \noindent {\tt selectByUser(int uid)} \\
 {\tt selectByUserAndSession(int uid, int sid)}\\
 
-Clients will connect to the audit proxy, which is similar to the log traffic proxy, and issue commands according to
-the audit protocol to invoke either one of these functions. Client authentication is expected to be completed at a later
-point in time as outlined in Section \ref{sec:auth}. Assuming the client has been authenticated, they can issue commands
-wrapped in JSON strings with the following format to the audit proxy. \\
+To use this API, clients connect to the audit proxy, which is similar to the log traffic proxy, and issue commands according to
+the audit protocol to invoke either one of these functions. Once the client is authenticated, they can issue commands to the
+audit proxy as JSON strings with the following format. \\
 
 \begin{lstlisting}
 {     
@@ -198,59 +192,68 @@ wrapped in JSON strings with the following format to the audit proxy. \\
 \end{lstlisting}
 
 Upon receiving and parsing an incoming command, the client handler, which is spawned to handle each client connection,
-will issue the appropriate command to the log module to select the appropriate log message contents from the database. 
-However, since each client is expected to be a user for the ABLS instance, their attributes will be used to filter 
-the resulting database rows that are returned. Thus, the audit proxy and client handlers will act
-as a reference monitor that enforces access control to the log database through the log query protocol and API.
+issues the appropriate command to the log module to select log message contents from the database. 
+A visual depiction of this protocol in action is shown in Figure \ref{fig:protocol}.
 
-Unlike the log proxy, it is expected that the clients for the audit proxy will be authenticated using passwords. Thus, as
+\begin{figure}[ht!]
+\begin{center}
+\includegraphics[width=3in]{images/logProtocol.pdf}
+\caption{A simplistic sequence diagram of the log protocol, which is highly motivated by the popular FTP protocol.}
+\label{fig:protocol}
+\end{center}
+\end{figure}
+
+Unlike the log proxy, clients for the audit proxy are authenticated using user-defined passwords. Thus, as
 part of supporting client authentication, a proper password storage scheme was implemented in which the hash of 
 password digests salted by a random string are persisted into the database. In this way, the user password is never sent 
-in plaintext over the network. Also, the salt is stored in plaintext in the same audit\_user record. This is a common
+in plaintext over the network. Also, the salt is stored in plaintext in the same audit\_user record, which is a common
 design decision for web applications.
 
 \subsection{Log Collection}
 As part of the proposed design, all log messages generated by the logger to be inserted into the 
-database will be handed off to a common log collector to do so. This log collector is implemented as a 
-separate thread running within the ABLS process and will assume a portion of the database 
-communication overhead from the logger to free up cycles for processing more log messages. Each logger instance
-points to the same log collector thread. Furthermore, all log collector tasks are spawned when the ABLS 
-instance first loads.
+database were to be handed off to a common log collector to do so. This log collector is implemented as a 
+separate thread running within the ABLS process and was designed to assume a portion of the database 
+communication overhead from loggers to free up cycles for processing more log messages. Each logger instance
+points to the same log collector thread. Furthermore, the log collector task is spawned when the ABLS 
+instance first loads. Unfortunately, initial performance tests showed that the log collector was consuming too
+many CPU cycles from other logger threads, and thus was removed from use in this version of ABLS. 
+Future design enhancements may convert the log collector singleton into a log collection service backed 
+by a pool of worker threads to handle database activity. 
 
 \subsection{Bootstrapping, Test Enhancement, and Deployment}
 In order to streamline the test and deployment phases of development, a bootstrap script was implemented to configure
-new (empty) versions of the local SQLite databases. The main executable script ({\tt Main.py}) was also modified to support
-development and production modes of operation, in which the development mode clears the contents of every 
-database and then proceeds to insert false user data into the users table to begin the logging process. The test 
-driver program, LogProxyDriver.py, was then modified accordingly to use the default data contained within the 
+new (empty) versions of the local SQLite databases. A bootstrap script {\tt Bootstrap.py} was also added to clear the 
+contents of every database and insert false user data into the users table. 
+The test driver program, {\tt LogProxyDriver.py}, was then modified accordingly to use the default data contained within the 
 database. With these changes, the typical process to start and interact with an ABLS instance is as follows.
 
 \begin{enumerate}
 	\item Run the bootstrap script to create new versions of the local SQLite databases. In the actual deployment of an ABLS instance, this script would connect to the remote databases and specify their schemas accordingly. Thus, it is meant only for development purposes and should not be used on a live ABLS instance.
-	\item Run the main executable file ({\tt Main.py}) with the -l (configure) to flag to enable development mode, in which the databases are wiped clean and replaced with a small set of fake data. If one wishes to start an ABLS instance at this point in time, they may also add the -s (start) flag to the script so that it starts the ABLS instance.
-	\item Run the test driver program ({\tt LogProxyDriver.py}) and point it to the host and port at which the traffic proxy within the ABLS instance is listening. By default, these are ``localhost'' and port 9998, but they can easily be changed to any other values in the ABLS configuration file. 
+	\item Run {\tt Bootstrap.py} to insert fake data into the user database table.
+	\item Run the main executable file ({\tt Main.py}) with the -l (log) flag to enable the logging service.	
+	\item Run the test driver program ({\tt LogProxyDriver.py}) and point it to the host and port at which the log proxy within the ABLS instance is listening. By default, these are ``localhost'' and port 9998, but they can easily be changed to any other values in the ABLS configuration file. 
 \end{enumerate}
 
-Aside from the initialization code, the test driver program now includes a more robust suite of tests to simulate varying traffic 
+Aside from the initialization code, the test driver program includes a robust suite of tests to simulate varying traffic 
 loads. The user interface of this program was also improved so as to aid the developers in interacting with the ABLS 
 prototype at runtime. Given the difficulty of testing this distributed system at runtime, creating a more sophisticated
 test driver was crucial to the development process that enabled smoke tests to be run with minimal effort.
 
-However, despite the increased complexity of the test driver, it does not, nor will it ever, support the ability to acquire 
+However, despite the complexity of the test driver, it does not, nor will it ever, support the ability to acquire 
 diagnostic information from the ABLS runtime. This information is logged by the ABLS instances to the appropriate log 
 file, and the administrators for the ABLS system can check this information at their discretion.
 
 \subsection{Log Traffic Encryption}
-The ABLS prototype now supports SSL encryption of all incoming log traffic to ensure the confidentiality of sensitive
-information as it is sent from the client to the server running the traffic proxy. Unfortunately, this is only one-way SSL 
-authentication in which the client verifies the server. I am currently experimenting with ways to implement two-way 
-SSL authentication so the client can be verified as well, which is the ultimate goal. 
+The ABLS prototype supports SSL encryption of all incoming log traffic to ensure the confidentiality of sensitive
+information as it is sent from the client to the server running the log proxy. Unfortunately, this is only one-way SSL 
+authentication in which the client verifies the server. Two-way authentication is left for future work, as discussed in
+Section \ref{sec:auth}.
 
 \subsection{ABLS Configuration File} 
-In order to improve the quality of the ABLS prototype, all of the hard-coded configuration strings that set up databases,
-specify cryptographic certificate locations, and log file output directories will be removed and placed in a configuration file
-to be managed by system administrators. Access to this file will be restricted to system administrators and enforced by the 
-operating system. An example of how the configuration file might look is shown below.
+In order to improve the quality of the ABLS prototype, all of the hard-coded configuration strings that set up databases and 
+network settings were removed and placed in a configuration file ({\tt abls.conf}) that is managed by system administrators.
+Access to this file can be restricted to system administrators and enforced by the 
+operating system. An example of the configuration file is shown below.
 
 \begin{lstlisting}
 # Network configuration paramters
@@ -279,15 +282,16 @@ A comprehensive literature survey on related logging and non-repudiation work wa
 of the project. The corresponding articles that were read are included in this phase's submission package. The digest 
 of this work is expected to be a part of the final paper.
 
-\section{ABLS-V2 Design}
-The final proposed work item for this phase of the project was the automated audits of user information according
+\section{ABLS-V2 Design and Implementation}
+The final work item for this phase of the project was automated audits of user information according
 to audit rules. Unfortunately, given the current log scheme, all context information about a log event is encrypted
-and stored in the log message. Even in the case that an audit task was able to decrypt a log payload and 
+and stored in the log message. Even if an audit task was able to decrypt a log payload and 
 programmatically determine the details of that particular event, the audit task would need to search over every single
-entry in the log database when performing checks against its audit rule. In this context, the current relational data model 
-does not support automated audits. Therefore, I chose to revisit the log generation scheme and corresponding
+entry in the log database when performing checks against an audit rule. The lack of a unified log format
+and audit rule specification made the ultimate task of automating audits infeasible given the current design.
+Therefore, I chose to revisit the log generation scheme and corresponding
 relational model in an attempt to facilitate more efficient audits. The first step in this process was to define exactly
-how audit rules might be specified. To this end, I defined a custom audit language LAudit that enables users to specify
+how audit rules are specified. To this end, I defined a custom audit language LAudit that enables users to specify
 audit rules for automated audit tasks. A grammar for the LAudit language is shown below. \\
 
 {\setlength\tabcolsep{4pt}
@@ -303,9 +307,8 @@ system, as specified by the NIST RBAC model \cite{Sandhu2000-nist-rbac}. While s
 captures the ``who'' and ``what'' of log events. ABLS is capable of appending a timestamp to every that it receives,
 which rounds off the log event with ``when'' information. 
 
-With this language, ABLS clients must submit log messages according to a pre-defined schema that captures
-all of the information in LAudit. The JSON schema used for constructing log messages to be inserted into the 
-log is shown below.
+ABLS clients must submit log messages according to a pre-defined schema that captures
+all of the information in LAudit. The JSON schema used for constructing log messages is shown below.
 
 \begin{lstlisting}
 [
@@ -320,13 +323,12 @@ log is shown below.
 \end{lstlisting}
 
 In order to capture this information in a relational model to enable efficient queries, a new Event table was added
-to the database schema and is backed by an EventEntityChain table for storing the digest of Event chains as they
-are constructed. There is a one-to-one correspondence between Event and Log records, and the security of such Event
+to the database schema. There is a one-to-one correspondence between Event 
+and Log records, and the security of such Event
 and Log information is maintained using the same hash chain construction techniques as in the preliminary design.
-However, for simplicity, the notion of hash chain epochs was removed, and now the log chains are strictly linear sequences
-of log messages that are received from clients.
+However, for simplicity, the notion of hash chain epochs was removed.
 Also, Action, Object, and AffectedUserGroup tables were added to the database schema to store relevant information
-about log events as they are received by the log proxy. A high-level depiction of this new relational model is shown
+about log events as they are received from the log proxy. A high-level depiction of this new relational model is shown
 in Figure \ref{fig:design2}.
 
 \begin{figure}[ht!]
@@ -341,9 +343,11 @@ In this model, all Action and Object records are stored in plaintext. These tabl
 encrypting them would not deter a determined attacker. However, all information about affected users is encrypted 
 (masked) using the same technique discussed in Section \ref{sec:databaseDesign}. As such, an attacker can infer
 information about what types of objects were operated upon, but they cannot determine the specifics of these actions
-or the users who performed them without compromising the ABLS master key $M_k$. 
+or the users who performed them without compromising the ABLS master key $M_k$. We feel as though this strikes
+a good balance between robust audit specification, reasonable measures of audit and log efficiency, and overall 
+log security. 
 
-Audit tasks enforce audit rules using a blacklist approach. That is, audit rules are specified using the aforementioned 
+Audit tasks enforce audit rules using a blacklist approach. Audit rules are specified using the aforementioned 
 log message schema and then assigned to audit tasks that periodically run to see if the rules are being properly enforced.
 For example, an audit rule might be configured as follows:
 
@@ -372,7 +376,7 @@ in the {\tt Chainer.py} and {\tt Auditor.py} files to demonstrate that this new 
 expected.
 
 \section{Postponed Work}
-This section contains work that was omitted from phase 2 due to a lack of time to complete them. However, we include them for completeness since they are essential for future deployments of ABLS.
+This section contains work items that were omitted from phase 2 due to a lack of time to complete them. However, we include them for completeness since they are essential for future deployments of ABLS.
 
 \subsection{Client Authentication}
 \label{sec:auth}
@@ -402,28 +406,32 @@ of the application once it is deployed. AppScan will serve to automatically scan
 known vulnerabilities like SQL injection, cross-site scripting, and cross-site request forgeries. Nessus will be used
 analyze the network configuration of the application deployment environment. Finally, metasploit, an open-source
 alternative to Nessus and Appscan, will be used in the event that neither of these two enterprise products provides
-sufficient results. Altogether, these tests will be dynamic in nature and rely on the application being deployed at a publicly
-accessible server. The goal of these tests is to determine the presence of vulnerabilities like SQL-injection, cross-site
-scripting, and cross-site request forgery in the web application and how they can be used to exploit the backend
-database. 
+sufficient results in a timely manner. Altogether, these tests will be dynamic in nature and rely on the 
+application being deployed at a publicly
+accessible server. The goal of these tests is to determine the presence of common vulnerabilities in the web application
+and see how they can be used to exploit the backend database. 
 
 In addition to testing the behavior of the application using these tools, I will also conduct a source-code review 
-to determine how the database is being used. In particular, I will examine the implementation of authentication code
-(i.e. password hashing and persistence techniques), user input handling on both the client- and server-sides of
-the environment, and search for hard-coded strings embedded in the source code that reveal sensitive information.
+to determine how databases are used, accessed, and modified. In particular, I will examine the implementation of 
+authentication code (i.e. password hashing and persistence techniques), user input handling on 
+both the client- and server-sides of the environment, and search for hard-coded strings embedded in 
+the source code that reveal sensitive information (i.e. database account credentials).
 
 Using the results from these tests, I will then focus intimately on the database using the guidance set forth by 
 Ben Natan \cite{ben2005-SDS}. In this part of the ``attack'' phase I make the assumption that I will be given access to the 
 server on which the application is deployed, so as to avoid the need to ``hack'' in to conduct a further analysis. 
 Depending on the type of DBMS deployed in the application, I will follow the database hardening checklists 
-provided by Ben Natan to verify that the databases environments are properly configured. 
+provided by Ben Natan to verify that the databases environments are properly configured. Where possible, I will
+use automated tools and configuration scanners to speed up this process.
 
-To finish my analysis I will examine the system configuration and source code with regard to the following elements.
+To finish my analysis I will examine the system configuration and middleware source code with regard to the 
+following elements.
 
 \begin{enumerate}
 	\item SQL table creation, role definitions, and trigger code.
-	\item DB password storage locations and management techniques.
+	\item Database password storage locations and management techniques.
 	\item Audit support and configuration.
+	\item Data management, caching, and filtering.
 \end{enumerate}
 
 This attack strategy will cover network, application, and database vulnerabilities from a configuration
