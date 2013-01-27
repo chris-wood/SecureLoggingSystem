@@ -227,6 +227,7 @@ class VerifyCrawler(threading.Thread):
 				entityKey = hmac.new(entityKey, "some constant value", hashlib.sha512).hexdigest() 
 
 			assert(lastEntityDigest == lastDigest)
+			print("Verification result:" + str(lastEntityDigest == lastDigest))
 			logging.debug("Verification result:" + str(lastEntityDigest == lastDigest))
 
 			return ctChain
