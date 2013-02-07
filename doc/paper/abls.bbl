@@ -1,16 +1,29 @@
 \begin{thebibliography}{1}
 
-\bibitem{Bellare1997-ForwardIntegrity}
-M.~Bellare and B.~S. Yee.
-\newblock Forward integrity for secure audit logs.
-\newblock Technical report, 1997.
+\bibitem{Abrams1990-AccessControl}
+M.~Abrams, K.~Eggers, L.~LaPadula, and I.~Olson.
+\newblock A generalized framework for access control: An informal description.
+\newblock In {\em Proceedings of the 13th National Computer Security
+  Conference}, pages 135--143, 1990.
 
-\bibitem{Bethencourt2007-CPABE}
-J.~Bethencourt, A.~Sahai, and B.~Waters.
-\newblock Ciphertext-policy attribute-based encryption.
-\newblock In {\em Proceedings of the 2007 IEEE Symposium on Security and
-  Privacy}, SP '07, pages 321--334, Washington, DC, USA, 2007. IEEE Computer
-  Society.
+\bibitem{David1992-RBAC}
+F.~David and K.~Richard.
+\newblock Role-based access controls.
+\newblock In {\em Proceedings of 15th NIST-NCSC National Computer Security
+  Conference}, volume 563. Baltimore, Maryland: NIST-NCSC, 1992.
+
+\bibitem{Ferraiolo2001-RBAC}
+D.~Ferraiolo, R.~Sandhu, S.~Gavrila, D.~Kuhn, and R.~Chandramouli.
+\newblock Proposed nist standard for role-based access control.
+\newblock {\em ACM Transactions on Information and System Security (TISSEC)},
+  4(3):224--274, 2001.
+
+\bibitem{Goyal2006-ABAC}
+V.~Goyal, O.~Pandey, A.~Sahai, and B.~Waters.
+\newblock Attribute-based encryption for fine-grained access control of
+  encrypted data.
+\newblock In {\em Proceedings of the 13th ACM conference on Computer and
+  communications security}, pages 89--98. ACM, 2006.
 
 \bibitem{Ma2008-FssAgg}
 D.~Ma.
@@ -19,10 +32,10 @@ D.~Ma.
   computer and communications security}, ASIACCS '08, pages 341--352, New York,
   NY, USA, 2008. ACM.
 
-\bibitem{Popa2012-CryptDB}
-R.~A. Popa, C.~M.~S. Redfield, N.~Zeldovich, and H.~Balakrishnan.
-\newblock Cryptdb: processing queries on an encrypted database.
-\newblock {\em Commun. ACM}, 55(9):103--111, Sept. 2012.
+\bibitem{Sandhu1996-RBAC}
+R.~Sandhu, E.~Coyne, H.~Feinstein, and C.~Youman.
+\newblock Role-based access control models.
+\newblock {\em Computer}, 29(2):38--47, 1996.
 
 \bibitem{Schneier1999-Secure}
 B.~Schneier and J.~Kelsey.

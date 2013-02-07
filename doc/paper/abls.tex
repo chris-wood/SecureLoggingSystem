@@ -21,12 +21,15 @@
 \usepackage{fancybox, fancyvrb}
 \usepackage{listings}
 
+\newenvironment{definition}[1][Definition]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}]}{\end{trivlist}}
+
 \permission{}
 \CopyrightYear{2012}
 %\crdata{0-00000-00-0/00/00}
 \begin{document}
 
-\title{ABLS - An Attribute Based Logging System for the Cloud}
+\title{ABLS: Enabling Attribute-Based Logging and Automated Auditing in the Cloud}
 \numberofauthors{1}
 \author{
 \alignauthor{
@@ -37,280 +40,259 @@ Department of Computer Science \\
 \date{\today}
 \maketitle
 \begin{abstract}
-User-based non-repudiation is an increasingly important property of cloud-based applica-tions. It provides irrefutable evidence that ties system behavior to specific users, thus enabling strict enforcement of organizational security policies. System logs are typically used as the basis for this property. Thus, the effectiveness of system audits based on log files reduces to the problem of maintaining the integrity and confidentiality of log files. In this project, we study the problem of building secure log files. We investigate the benefits of ciphertext-policy attribute-based encryption (CP-ABE) to solve a variety of log design issues. In addition, we also present the architecture and a preliminary analysis for a proof-of-concept system that fulfills the confidentiality and integrity requirements for a secure log.
+User-based non-repudiation is an increasingly important property of cloud-based applications. It provides irrefutable 
+evidence that ties system behavior to specific users, thus enabling strict enforcement of organizational security policies. 
+System logs are typically used as the basis for this property. Thus, the effectiveness of system audits based on log files 
+reduces to the problem of maintaining the integrity and confidentiality of log files without sacrificing the usefulness
+of the data in these log files. In an ideal setting, automated audits would be possible on encrypted log data that defines
+audit trails. Furthermore, since useful log messages may contain sensitive information, access control for log 
+data should be implemented so as to restrict access to only those parties that need to view it (i.e. generating users,
+colleagues of generating users, auditors, system administrators, etc). ABAC has been a common technique used to
+satisfy this requirement. %with the expense of role explosion. 
+
+In this paper we address all of the aforementioned issues with ABLS, an attribute-based logging system designed
+to support automates audits of encrypted audit trails (log data) based on user-defined security policies. Access to
+sensitive log information is enforced using ciphertext-policy attribute-based encryption (CP-ABE) with a minimal number
+of log-related roles, and thus a small number of attributes, to avoid the problem of increasing encryption computational
+complexity with attribute explosion. We present the preliminary design of ABLS and discuss how audit trails are 
+constructed, automated audit tasks are defined and specified, and how the system may be used in practical applications.
 \end{abstract}
 
 \section{Introduction}
-User-based non-repudiation is a system security property that provides indisputable evidence that links
-specific actions to individual users (or entities) that trigger such actions. Cryptographically speaking, non-repudiation requires that the integrity and 
+User-based non-repudiation is a system security property that provides indisputable evidence linking
+specific actions to individual users (or entities) that trigger such actions. Cryptographically speaking, 
+non-repudiation requires that the integrity and 
 origin of all data should be provable. In essence, this enables system audits to be conducted that can
-identify data misuse (and thus, potential security policy violations) by comparing the sources of system events
-with all entities authorized to invoke these events. Therefore, treating non-repudiation as a required system 
-quality attribute in the architecture is likely to become a common trend in the commercial, 
-government, and even more specifically, the health-care domain.
+identify data misuse, and thus, potential security policy violations, by comparing the contextual information 
+of system events (e.g. source user, time of the event, etc) with all entities authorized to invoke such events. 
+Therefore, treating non-repudiation as a required system quality attribute in the architecture is likely to 
+become a common trend in the commercial, government, and even more specifically, the health-care domain.
 
-System audits typically use log files to determine the cause and effect of events that took 
+System audits typically use log files to determine the ``who, what, when, and how'' of events that took 
 place during the system's lifetime. In order to provide accurate information for non-repudiation purposes,
 it is often necessary to place some amount user-sensitive data in these log files that can be used
 to trace data back to its origin. As such, logs of events generated by a client that is being served must
-maintain data confidentiality and integrity should the system be compromised. These goals are commonly achieved
-using a combination of encryption and signature techniques \cite{Ma2008-FssAgg}. However, traditional approaches to
-encryption and signature generation and verification are becoming less effective in the context of cloud
-applications. Furthermore, naive approaches to log security that are based on tamper-resistant hardware and 
-maintaining continuous secure communication channels between a log aggregator and end user are no longer useful in 
-the context of cloud-based applications \cite{Schneier1999-Secure}. 
+maintain data confidentiality and integrity should the system be compromised. Historical approaches
+to the problem of log security are based on tamper-resistant hardware and maintaining continuous 
+secure communication channels between a log aggregator and end user \cite{Schneier1999-Secure}. 
+However, such solutions are not applicable in the context of cloud-based applications. 
 
-Symmetric-key and public-key encryption of log entries are very common confidentiality techniques 
-proposed in the literature. However, in cloud-based applications, these schemes are becoming less useful.
-There is a need for a robust access control mechanism that enables dynamic user addition and revocation
-with minimal overhead (i.e. re-encrypting a subset of the log database should be avoided). Both symmetric- and 
-public-key cryptosystems lack in that access policies must be tied directly to keys used for
+Recent approaches have relied on combinations of encryption and signature techniques \cite{Ma2008-FssAgg}. 
+Symmetric-key and public-key encryption (and verification) of log entries are very common confidentiality techniques 
+proposed in the literature. Unfortunately, these schemes are becoming less useful in cloud-based applications.
+There is a need for robust access control mechanisms that enable dynamic user addition and revocation
+with minimal overhead. In other words, continuously re-encrypting a subset of the log database should be avoided. 
+Both symmetric- and public-key cryptosystems suffer in that access policies must be tied directly to keys used for
 encryption and decryption. If the access policy for a set of log messages needs to be changed, then both the keys used to
 encrypt and decrypt such log entries will need to be regenerated and distributed, and the entries must also
 be re-encrypted. Both of these tasks can be very expensive. 
 
 In addition, symmetric-key cryptosystems require keys to be shared among users who need access to the 
-same set of logs, which requires a secure and comprehensive key management and distribution policy. 
-From a storage perspective, public-key cryptosystems (e.g. RSA and ElGamal) suffer from the extra data transfer and 
-storage requirements for large cryptographic keys and certificates. There may be insufficient resources 
-to maintain a public-key infrastructure (PKI) for managing keys and digital certificates for all users. 
+same set of logs. This requires a secure and comprehensive key management and distribution scheme and
+supporting policy. In a similar vein, public-key cryptosystems (e.g. RSA and ElGamal) suffer 
+from the extra data transfer and storage requirements for large cryptographic keys and certificates. There 
+may be insufficient resources to maintain a public-key infrastructure (PKI) for managing keys and digital 
+certificates for all users. 
 
 In terms of log file integrity, aggregate signature schemes that support forward secrecy through the use of 
-symmetric- and public-key cryptosystems are also becoming outdated \cite{Yavuz2009-BAF}. Symmetric-key schemes may promote
-high computational efficiency for signature generation, but they do not directly support public verifiability for 
-administrators and auditors. This means that robust key distribution schemes or the introduction of a trusted third party (TTP) are needed to ensure all required parties can access the necessary log information. Such schemes also 
-suffer from high storage requirements and communication overhead. Public-key schemes have similar issues, 
-as the increased key size leads to even larger storage requirements and less computational efficiency. 
+symmetric- and public-key cryptosystems are also becoming outdated \cite{Yavuz2009-BAF}. 
+Symmetric-key schemes may promote high computational efficiency for signature generation, but they 
+do not directly support public verifiability for administrators and auditors. This means that robust key 
+distribution schemes or the introduction of a trusted third party (TTP) are needed to ensure that all 
+required parties can verify the necessary log data. Such schemes also 
+suffer from relatively high storage requirements and communication overhead. Public-key 
+schemes have similar issues, as the increased key size leads to even larger storage 
+requirements and less computational efficiency. Also, public-key schemes introduce the need
+for a trusted certificate authority to grant certificates for all parties that sign log information. % TODO: find a citation for this...
+One time-tested technique for supporting log file integrity is the use of authenticated 
+hash-chains \cite{Schneier1999-Secure}, which will be the focus of this paper.
 
 Collectively, we see that a balance between encryption and signature generation and verification performance is
 needed to support the unique scalability and resource usage requirements for cloud-based applications.
-Attribute-based encryption (ABE), a new cryptographic scheme that uses user attributes (or roles, in certain 
-circumstances) to maintain the confidentiality of user-sensitive data, has an appealing application
+Furthermore, the selected cryptographic primitives to encrypt, sign, and verify data must not exacerbate the
+problem of dynamically changing access control policies and user privileges. Role-based Access Control (RBAC),
+which first gained popularity in the mid 1990s \cite{Sandhu1996-RBAC} \cite{David1992-RBAC} and was later 
+proposed as a standard for the National Institute of Standards and Technology in 2001\cite{Ferraiolo2001-RBAC}, 
+is an increasingly popular access control policy that enables users to be associated with roles that change
+less frequently. In the context of maintaining the confidentiality of log messages generated by many users,
+RBAC surpasses traditional mandatory and discretionary access control (MAC and DAC) 
+\cite{Abrams1990-AccessControl}.
+
+More recently, attribute-based access control (ABAC) \cite{TODOTODO} has been developed to 
+provide fine-grained access control to sensitive data. It is common practice to specify user roles as attributes
+in this access control scheme, thus enabling the benefits of RBAC with fine-grained access control.
+Attribute-based encryption (ABE) \cite{Goyal2006-ABAC}, a new cryptographic scheme that uses 
+user attributes (or roles, in this context) to maintain the confidentiality of user-sensitive data, has an appealing application
 to logging systems maintained in the cloud and is capable of satisfying the aforementioned confidentiality 
-requirements. In addition, authenticated hash-chains have been shown to be effective at enforcing log file integrity
-in numerous logging schemes  \cite{Schneier1999-Secure}. 
+requirements. 
 
-ABLS, an attribute-based logging system that supports 
-ciphertext-policy attribute-based encryption (CP-ABE) 
-\cite{Bethencourt2007-CPABE} and authenticated hash-chain constructions for log file confidentiality and integrity, 
-respectively, is a logging system designed for the cloud to address the aforementioned problems. This paper
-describes the motivation and design of ABLS, as well as some implementation details of the prototype. The paper
-concludes with a discussion of the current status of the project and planned work to be completed.
+In this paper we address all of the aforementioned issues with ABLS, an attribute-based logging system designed
+to support automates audits of encrypted audit trails (log data) based on user-defined security policies. Access to
+sensitive log information is enforced using ciphertext-policy attribute-based encryption (CP-ABE) with a minimal number
+of log-related roles, and thus a small number of attributes, to avoid the problem of increasing encryption computational
+complexity with attribute explosion. We present the preliminary design of ABLS and discuss how audit trails are 
+constructed, automated audit tasks are defined and specified, and how the system may be used in practical applications.
 
-\section{Implementation}
-In order to test both the correctness and performance of ABLS, a proof-of-concept system has been
-developed. In this section we provide the design and rationale for the prototype architecture.
+\section{Cryptography Preliminaries}
+Ciphertext Policy Attribute-Based Encryption (CP-ABE) is a new encryption scheme that supports complex
+access policies that specify which secret keys can be used for decryption. In CP-ABE, secret keys are analogous
+to sets of attributes, and access policies are defined using a tree-like access structure of logical AND and OR
+gates, where each leaf in the tree is an attribute \cite{Bethencourt2007-CPABE}. Implementations of 
+CP-ABE schemes are usually based on the construction of a bilinear mapping between two elliptic curve 
+groups \cite{Bethencourt2007-CPABE} \cite{Junod2010-ABE}. We define both of these terms in the following sections.
 
-\subsection{Deployment}
-\label{sec:deployment}
-ABLS is designed to be a centralized logging system backed by a set of distributed databases. A context
-diagram for the ABLS deployment scheme is shown in Figure \ref{fig:deployment}, and a more detailed
-depiction of the flow of data between application and database servers is shown in Figure \ref{fig:design}.
+\subsection{Mathematical Foundations}
+\begin{definition}
+Let $\mathbb{F}_p$ be a finite field where $p > 3$ is a prime, and $a, b \in \mathbb{F}_p$ such that
+\begin{align*}
+4a^3 + 27b^2 \not= 0 \mod p \in \mathbb{F}_p
+\end{align*}
 
-%TODO: rough deployment diagram for ABLS (different from architecture diagram)
+An \emph{ellptic curve} $E[\mathbb{F}_p]$ is the set of solutions $(x, y)$ to the equation
+\begin{align*}
+y^2 = x^3 + ax + b \mod p \in \mathbb{F}_p[x],
+\end{align*}
+together with the point at infinite $0$.
+\end{definition}
 
-%\begin{figure*}[htb!]
-%\label{fig:design}
-%\begin{center}
-%\includegraphics[width=7in]{images/design.pdf}
-%\caption{The deployment diagram for ABLS.}
-%\end{center}
-%\end{figure*}
+\begin{definition}
+Let $G_1$ and $G_2$ be cyclic groups of prime order $p$ and $g$ a generator of $G_1$. We say that $e$ is a \emph{bilinear map} defined as $e : G_1 \times G_2$, where $|G_1| = |G_2| = p$. This bilinear map satisfies the following properties:
+\begin{itemize}
+	\item Bilinearity: For all $u, v \in G_0$ and $a, b \in \mathbb{Z}_p$, we have $e(u^a, v^b) = e(u,v)^{ab}$
+	\item Non-degeneracy: $e(g, g,) \not= 1$
+	\item Computability: Both $G_1$ and $G_2$ are efficiently computable
+\end{itemize}
+\end{definition}
 
-Based on the purpose of each piece of database used in the log, it is best to physically separate databases
-that store data of different security classes rather than rely on MAC with polyinstantiation. Of course, access control
-and authentication mechanisms for all database servers is enforced at the operating system level, thus
-prohibiting immediate access to all unauthorized users other than the {\tt LoggingModule} and {\tt PolicyEngine} 
-processes. 
+\subsection{Ciphertext Policy Attribute-Based Encryption}
+In the original construction of the CP-ABE scheme, Bethencourt et al. \cite{Bethencourt2007-CPABE} defined five different procedures 
+used in the cryptosystem: \emph{Setup}, \emph{Encrypt}, \emph{KeyGeneration}, \emph{Derypt}, and 
+\emph{Delegate}. We define each of these procedures as follows:
+\begin{itemize}
+	\item \textbf{Setup} - This procedure takes the implicit security parameter as input and outputs the public and master keys $PK$ and $MK$.
+	\item \textbf{Encrypt}(\textbf{PK}, M, $\mathbb{A}$) - This procedure will encrypt $M$, a plaintext message, to produce a ciphertext $CT$ such that only a user that possesses a set of attributes that satisfies the access structure $\mathbb{A}$ will be able to decrypt the message. The encryption process embeds $\mathbb{A}$ into the ciphertext.
+	\item \textbf{KeyGeneration}(\textbf{MK}, $\mathbb{S}$) - This procedure generates a private key $SK$ using the master key $MK$ and set of attributes $S$ that describe the private key. 
+	\item \textbf{Decrypt}(\textbf{PK}, \textbf{CT}, \textbf{SK}) - This procedure decrypts the ciphertext $CT$ using the provided secret key $SK$ to return the original message $M$. Decryption is only successful if the set $S$ of attributes, which is associated with the key $SK$, satisfies the access policy embedded within the ciphertext (which is part of the access structure $\mathbb{A}$).
+	\item \textbf{Delegate}(\textbf{SK}, \~{S}) - This procedure outputs a secret key \~{$SK$} for the set of attributes \~{$S$}, where \~{$S$} $\subset S$, the set of attributes associated with the secret key \textbf{SK}.
+\end{itemize}
 
-In the current ABLS prototype, all database servers are separated as individual SQLite database files. Once
-the deployment platform is selected and properly configured, these will be replaced with instances of MySQL 
-databases running on separate servers.
+\section{Access Policy Definition}
+%%%% TODO: start proofreading here...
+One of the motivating parts of this project was to explore the usefulness of CP-ABE schemes
+for secure logging. The ability to embed robust access policies within the encrypted
+ciphertext made this an appealing solution. The CP-ABE scheme also provides us with the ability to
+enforce dynamic access to certain log entries using our policy engine (described in the next section),
+prevent insider attacks by tying access to user attributes rather than user keys. Furthermore,
+we avoid the need for a full-blown public or private key distribution scheme by encapsulating the secret
+key generation process for encryption within the logging system. Key distribution is only needed when
+decrypting log messages. We begin our discussion with a description of the access policies generated
+by our policy engine, which is used to grant temporal access to certain log entries.
 
-\subsection{Hybrid Key Management}
-\label{sec:keyMgmt}
-In order to increase the performance of log entry encryption during a given user session, symmetric-key encryption
-using AES-256 is chosen to encrypt all log entry messages. The symmetric key is then encrypted using the CP-ABE
-scheme. This design enhancement enables increased improvement without sacrificing the level of confidentiality 
-granularity that is needed for each log entry. 
+\subsection{Access Policy Definitions}
+The policy engine in our logging scheme is motivated by the need to provide forward and backward security
+for log entries (i.e. dynamic temporal access) with very fine grained role descriptions. In 
+fact, user identities are the basis for access policies. This allows us to control explicit access to log entries based on individual
+identities, in addition to the abstract notion of user roles. For example, if a user 
+U1 and their colleagues U2, U3, and U4 should be the only ones to view log entries associated with a specific event E1, then the access 
+policy for such log entries should be based on the identity of U1 and an attribute that describes
+colleagues of U1. Such an access policy might be defined as follows.
+\begin{align*}
+\text{(User ID)} \lor \text{(Colleague of User)} \lor \text{(System Administrator)}
+\end{align*}
+With this rule, U1 will always be able to access the data (which is a fact that should never change), but 
+colleagues must request access through the policy engine. Upon receiving a request, the policy engine would
+check the colleagues of U1 at the current time against the requesting user, and if the requesting user
+belongs to the set of colleagues of U1 they are granted the temporary colleague of U1 attribute to decrypt the data. 
 
-The basic algorithm for encrypting a log entry is shown in Algorithm \ref{alg:encrypt}. Once encrypted, the cipher text
-is stored as specified in Section \ref{sec:LogConstruction}.
+%\subsection{Event-Specific Policies}
+%TODO: how we tie events to policies
+%Policy(event, source) = build based on source and the source rules for this event 
+%users have a set of events associated with them (all events are enumerated), and then rules for each event
 
-\begin{algorithm}[ht!] %[htb]
-\caption{Log entry encryption} \label{alg:encrypt}
+Our logging scheme makes the assumption that events, and the access policies for all data associated
+with such events, are well defined. With this
+assumption, we can represent the behavior of the policy engine by the system users and their associated
+data, events, and policy rules for specific events. In this way, policy rules are coupled to events in that 
+policies for access are generated based on the type of event that occurred and the user who is requesting 
+access to such information. Policy rules can be thought of as functions similar to the one described by 
+{\tt RuleE1} and {\tt RuleE2} (Algorithms \ref{alg:ruleE1} and \ref{alg:ruleE2}, respectively).
+In this example, we see that the rule for event E1 
+takes an {\tt EventInformation} structure, which contains
+all of the information generated for an event. A prospective definition for an {\tt EventInformation} structure
+is shown below.
+\begin{lstlisting}
+struct 
+{
+    User SourceUser;
+    int EventId;
+} 
+EventInformation;
+\end{lstlisting} 
+
+The information contained within this structure is specific 
+to the implementation of the system. For our purposes, we only require the source user from which the
+event was generated, as well as the event identifier. The policy engine would then query the user
+database to determine the secret identity of the source user and embed this in the resulting attribute
+list. Optionally, depending on the implementation of {\tt RuleE1}, the policy engine would append additional
+attributes to the list in disjunctive normal form. The simplicity of these policy implementations 
+makes changing them an effortless task should the organization's security policy change.
+
+\begin{algorithm}[t] %[htb]
+\caption{{\tt RuleE1} policy implementation} \label{alg:ruleE1}
 \begin{algorithmic}[1]
-\REQUIRE{An unencrypted log entry $L_i$ for session $S_j$ of user $U_k$}
-% \ENSURE{The number of all minimum $(s,t)$-cuts of $G$}
-
-% I decided not to list the input/output in this case, so that's why the above two lines are commented out
-\STATE{Let $P$ be the access control policy for the message of $L_i$, as determined by the {\tt PolicyManager}}
-\IF{The symmetric key $K$ for $(U_k, S_j)$ has not been generated for $P$}
-	\STATE{Generate $K$ and encrypt it (with the CP-ABE encryption module) using $P$}
-	\STATE{Persist $K$ to the key database}
-\ENDIF
-\STATE{Encrypt $L_i$ with AES-256 using $K$, yielding $E(L_i, K)$}
-\STATE{Persist $(L_i, K)$ to the log database}
+\REQUIRE{An {\tt EventInformation} object instance $e$.}
+\ENSURE{The access policy for the event corresponding to the information in $e$}
+\STATE{attributeId $\leftarrow$ database.queryUserId(e.SourceUser)}
+\STATE{Return ('attributeID' OR 'Colleague of attributeID' OR 'System Administrator')}
 \end{algorithmic}
 \end{algorithm}
 
-\subsection{Database Design}
-\label{sec:databaseDesign}
-As shown in section \ref{sec:deployment}, there are four main databases that must be maintained by ABLS:
-the log, key, user, and policy database. The log database maintains the all information in the log chain for every 
-single user and session pair. The key database stores the cryptographic keys that were used to construct
-such log chains. The user and policy databases store user information and policy rules for ABLS, respectively. 
-In the current prototype of ABLS, the policy database is not used externally. All event rules are hard-coded into
-the {\tt PolicyEngine}. 
+\begin{algorithm}[t] %[htb]
+\caption{{\tt RuleE2} policy implementation} \label{alg:ruleE2}
+\begin{algorithmic}[1]
+\REQUIRE{An {\tt EventInformation} object instance $e$.}
+\ENSURE{The access policy for the event corresponding to the information in $e$}
+\STATE{attributeId $\leftarrow$ database.queryUserId(e.SourceUser)}
+\STATE{Return ('attributeID' OR 'System Administrator')}
+\end{algorithmic}
+\end{algorithm}
 
-In order to link the entries in the log tables to their corresponding verification and encryption keys in the key database,
-common user and session IDs are used (though not as the primary key for the tables since they do not satisfy
-the uniqueness property). However, because such the storage of such user and session information in plaintext
-may lead to violation of user privacy, they are deterministically masked before being stored in the database. This technique
-was inspired by CryptDB \cite{Popa2012-CryptDB}.
+\subsection{Key Generation and Management}
+By default, the secret keys used for decryption are never cached in the system's local memory. Since it is
+expected that log entries will be read much less frequently than they will be written, such keys are generated
+on demand by querying the appropriate database. Furthermore, the key generation process can be done in two ways. 
+For policy rules that limit the access to only the generating user, only a single query to the attribute database
+is required to establish the user's secret key and then decrypt the data for all log entries corresponding to that rule. With this key
+the user may decrypt these entries offline without the need to query the policy engine for the appropriate access rights.
 
-This masking procedure works by encrypting the user and session attributes with a symmetric key generated
-by the logger's master key salted by the user's unique identifier. Specifically, the encrypted user and session IDs, 
-$[U_i]$ and $[S_j]$, are generated as follows.
-\begin{align*}
-[U_i] = E(M_k || H(U_i), U_i) \\
-[S_j] = E(M_k || H(U_i), S_j) \\
-\end{align*}
+Conversely, for access policy rules that embed conditions for colleagues or other users 
+related to the source user, the policy engine must first query the
+user database to ensure the requesting user meets the relationship criteria set in place by the policy. Then,
+if this is successful, the policy engine will grant the appropriate secret key to the requesting user. The tradeoff
+is that, while an online TTP is needed for such colleagues to access the log entry contents, it is significantly easier
+for the system administrators to manage who has access to specific log entries aside from the original source user.
+Simply modifying the user's relationships in the system database is sufficient to revoke access from certain colleagues.
 
-TODO: discuss how the salt changes for each table so attackers can't link things together...
+In order to maintain the security of the system at runtime, it is necessary to cycle the master and public keys
+associated with the encryption scheme. Our current system does not support this feature, but there are two
+ways that it could be implemented. The first way is to persist the old master and 
+public keys to a safe location that could be called during auditing and verification if needed. The second way is 
+to re-encrypt the entire log database with the new master and public key. Unfortunately, this would not only require the system to be 
+brought offline during the update (in order to avoid synchronization issues with live traffic), but it would also
+mean that the new master and public key serve as a single point of failure for the entire database if compromised. 
+Therefore, future releases of this system plan to implement the first approach to manage keys. It would be
+best to determine the key cycle lifetime based on empirical data associated with the growth of the log database.
+Intuitively, in order to maintain auditing and verification efficiency, the cycle frequency should be defined as 
+a monotonically increasing function that is proportional to the growth of the database. 
 
-%\section{Auditing}
-%TODO: Initial audit design implemented
+\section{Structured Log Design}
+TODO
 
-\newpage
+\section{Automated Audits}
+TODO
 
-\section{Completed Work}
-For Phase 1 of the project, I focused mainly on fixing some of the design and implementation flaws in my previous 
-prototype, redesigning the database to support the new symmetric key management scheme and data 
-partitioning for different security classes, specifying the deployment scheme, and improving the quality test
-of my internal unit tests and the functionality of the test driver program. The specifics of each of these improvements is
-outlined in the following sections.
-
-\subsection{Hybrid Key Management}
-As described in Section \ref{sec:keyMgmt}, the process of encryption log messages was changed to use symmetric-key
-encryption instead of CP-ABE due to the added performance improvement. Pairing-based cryptography is computationally
-expensive, and under the assumption that ABLS might be subject to very heavy traffic loads at any particular time, the 
-overhead of encrypting data to be stored in the database should be as minimal as possible. Therefore, each unique
-policy that is needed to encrypt a log message is associated with a symmetric key, which is in turn encrypted and 
-serialized using CP-ABE. The Charm crypto package allows all cryptographic objects (which tend to be nested
-Python dictionaries and other complicated data structures) to be serialized to byte representations for database 
-persistence. 
-
-Also, in order to improve the performance of the logger, the per-policy symmetric keys for a user session are kept
-in memory until the session has been closed. This avoids the need for the logger to query the database for the key 
-when a new piece of data to be inserted into the log. 
-
-Unfortunately, with this new key management scheme, the verification procedure becomes dependent on the
-logger's master key. Thus, I have to implement a mechanism to share this key between the two entities. I expect
-to complete this modification for Phase 2 of the project.
-
-\subsection{Relational Database Design}
-The relational database design was modified in order to support the new symmetric key management scheme and provide 
-enhanced security for the stored data. In particular, rather than storing the cryptographic keys in the same database as the
-log information, these two databases are now segregated and are expected to be deployed on different database servers.
-By hardening both databases, a malicious attacker would need to circumvent the access control mechanisms protecting
-two physically disjoint databases, rather than just one. 
-
-In addition, to better support audits that use the log database, a timestamp field was added to each table as a required
-attribute. Not only does such information capture the exact timing of critical system events, it acts as a protection
-mechanism in the event that log messages are inserted into the database out of order. Also, it is important to note that
-each and every timestamp for a log message is generated as soon as the {\tt ClientHandler} reads the data from
-its open socket. This is done to provide the most accurate timing information.
-
-%Redesigned the relational database model to account for the different security classes among data that is used by ABLS. This resulted in a physical separation of database servers.
-%TODO: added times, separated the database tables, optimized data types for columns to match what's stored
-
-\subsection{Database Column Masking}
-The initial implementation of the database masking procedure, which is outlined in Section \ref{sec:databaseDesign}
-was started in this phase of the project. Currently, only the ability for the logger to store the encrypted user and session IDs 
-is supported. The verifiers have yet to be updated to use this encrypted data to perform the strong verification check. This 
-will finished in the next phase of the project.
-
-\subsection{Bootstrapping, Test Enhancement, and Deployment}
-In order to streamline the test and deployment phases of development, a bootstrap script was implemented to configure
-new (empty) versions of the local SQLite databases. The main executable script (main.py) was also modified to support
-debug and production modes of operation, in which the debug mode clears the contents of every database and
-then proceeds to insert false user data into the users table to begin the logging process. The test driver program,
-TrafficProxyDriver.py, is then modified accordingly to use the default data contained within the database. With these
-changes, the typical process to start and interact with the ABLS system is as follows.
-
-\begin{enumerate}
-	\item Run the bootstrap script to create new versions of the local SQLite databases. In the actual deployment of an ABLS system, this script would connect to the remote databases and re-specify their schemas accordingly. Thus, it is meant only for development purposes and should not be used on a live ABLS instance.
-	\item Run the main executable file (main.py) with the -c (clear) to flag to enable debug mode, in which the databases are wiped clean and replaced with a small set of fake data. If you wish to start the ABLS system at this point in time, you may also add the -s (start) flag to the script so that it starts the ABLS instance.
-	\item Run the test driver program (TrafficProxyDriver.py) and point it to the host and port at which the traffic proxy within the ABLS instance is listening. By default, this is ``localhost'' and port 9998, but this can easily be configured in the source code. 
-\end{enumerate}
-
-Aside for the initialization code, the test driver program now includes a more robust suite of tests to simulate varying traffic 
-loads. The user interface of this program was also improved so as to aid the developers in interacting with the ABLS 
-prototype at runtime. Given the difficulty of testing this distributed system at runtime, creating a more sophisticated
-test driver was crucial to the development process that enabled smoke tests to be run with minimal effort.
-
-However, despite the increased complexity of the test driver, it does not, nor will it ever, support the ability to acquire 
-diagnostic information from the ABLS runtime. This information is logged by the ABLS runtime to the appropriate log 
-file, and the administrators for the ABLS system can check this information at their discretion.
-
-The system deployment strategy was finalized 
-
-\subsection{Outstanding Bug Fixes}
-TODO: fixed bugs left over from last quarter, had to get the dev. environment set up again
-
-\subsection{Research and Literature Survey}
-An initial action item for this work was to investigate the possibility of replacing the relational database model with a 
-NoSQL model. I spent a significant amount of time during week 4 investigating the benefits of making a transition
-to such a DBMS. In particular, I examined MongoDB, a common document-based NoSQL database. Unfortunately,
-my research revealed that MongoDB is not an ACID system, and thus transactions are not guaranteed to keep the
-database in a consistent state. In the context of ABLS, a failed transaction could put the system in a bad state. Therefore,
-I made the decision to keep the relational database model but hide the user-sensitive information using the techniques
-discussed in Section \ref{sec:databaseDesign}.
-
-A comprehensive literature survey on related logging and non-repudiation work was also completed during this phase 
-of the project. The corresponding articles that were read are included in this phase's submission package. The digest of this work is expected to be a part of the final report and potential publication.
-
-\section{Future Work}
-For the remainder of the project I plan to finish up the partially completed work introduced in the previous section and 
-focus on the auditing aspect of ABLS. Auditing will be supported both manually and automatically through
-a robust log query interface, which places the ABLS runtime in the role of the reference monitor, and automated
-strategy-driven tasks run within the context of the ABLS runtime, respectively. The following sections expand upon all
-of these action items in more detail.
-
-\subsection{Complete Database Masking}
-Following the design outlined in Section \ref{sec:databaseDesign}, the database masking scheme will be completed by
-adding support to the database verifiers. Since the verifiers run within the context of the ABLS system, they will be granted
-permission to all of the database servers so that they may request the appropriate entity and epoch keys used to perform
-strong verification checks on the data in user session log chains. Also, this must be the first activity that is completed 
-because the log querying and automated audit tasks depend on the database columns being properly masked. 
-
-\subsection{Log Collection}
-As part of the proposed design, the all log messages to be inserted into the database will be handed off to a common log 
-collector. This log collector will be implemented as a separate actor (thread) running within the ABLS process and 
-will assume a portion of the database communication overhead from the logger to free up cycles for processing
-more log messages. 
-
-\subsection{Log Querying}
-- design and implement an easy API for querying information from the log (and only the log) table that checks user authentication privileges first - the logger is the reference monitor to the outside world
-
-- variety of selection functions in which the user can specify the user ID or user and session ID, all data that comes back
-is verified using strong verification, contents of the log messages are filtered depending on their policy (only if the policy matches the client's attributes will the results be returned)
-
-- outline process of querying (client is authenticated with username/password, attributes are generated, database is queried using encrypted data, results are filtered based on policy, and result is returned)
-
-\subsection{Audit Strategy Design}
-- auditing design and implementation (define automated worker tasks that use pre-defined strategies for
-auditing (search by userID) or whatnot that can be triggered by any web application set in front of ABLS - 
-making it easy for auditors to start their own automated audits). 
-
-\subsection{Audit Protocol}
-
-\subsection{ABLS Configuration File} 
-TODO: implement and make use of a configuration file to read in all parameters for the system (so they're not hardcoded), simple change
-
-\subsection{Client Authentication}
-TODO: public-key authentication using SSL certificates (prefered), user logins for audit interface
+\section{Use Case: Electronic Health Record Systems}
+TODO
 
 \begin{comment}
 \begin{table}
