@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.4-1.40.13 (TeX Live 2012) (format=pdflatex 2012.6.30)  6 FEB 2013 23:43
+This is pdfTeX, Version 3.1415926-2.4-1.40.13 (TeX Live 2012) (format=pdflatex 2012.6.30)  8 FEB 2013 00:59
 entering extended mode
  \write18 enabled.
  file:line:error style messages enabled.
@@ -453,19 +453,19 @@ Package: listings 2007/02/22 1.4 (Carsten Heinz)
 (./abls.aux)
 \openout1 = `abls.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 30.
-LaTeX Font Info:    ... okay on input line 30.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 30.
-LaTeX Font Info:    ... okay on input line 30.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 30.
-LaTeX Font Info:    ... okay on input line 30.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 30.
-LaTeX Font Info:    ... okay on input line 30.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 30.
-LaTeX Font Info:    ... okay on input line 30.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 30.
-LaTeX Font Info:    ... okay on input line 30.
-LaTeX Font Info:    Try loading font information for T1+ppl on input line 30.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 32.
+LaTeX Font Info:    ... okay on input line 32.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 32.
+LaTeX Font Info:    ... okay on input line 32.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 32.
+LaTeX Font Info:    ... okay on input line 32.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 32.
+LaTeX Font Info:    ... okay on input line 32.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 32.
+LaTeX Font Info:    ... okay on input line 32.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 32.
+LaTeX Font Info:    ... okay on input line 32.
+LaTeX Font Info:    Try loading font information for T1+ppl on input line 32.
  (/usr/local/texlive/2012/texmf-dist/tex/latex/psnfss/t1ppl.fd
 File: t1ppl.fd 2001/06/04 font definitions for T1/ppl.
 )
@@ -536,66 +536,48 @@ Package caption Info: float package is loaded.
 Package caption Info: listings package is loaded.
 Package caption Info: End \AtBeginDocument code.
 \c@lstlisting=\count151
-LaTeX Font Info:    Try loading font information for U+msa on input line 41.
+LaTeX Font Info:    Try loading font information for U+msa on input line 43.
 
 (/usr/local/texlive/2012/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2009/06/22 v3.00 AMS symbols A
 )
-LaTeX Font Info:    Try loading font information for U+msb on input line 41.
+LaTeX Font Info:    Try loading font information for U+msb on input line 43.
 
 (/usr/local/texlive/2012/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2009/06/22 v3.00 AMS symbols B
 )
-LaTeX Font Info:    Try loading font information for U+lasy on input line 41.
+LaTeX Font Info:    Try loading font information for U+lasy on input line 43.
 
 (/usr/local/texlive/2012/texmf-dist/tex/latex/base/ulasy.fd
 File: ulasy.fd 1998/08/17 v2.2e LaTeX symbol font definitions
 )
-LaTeX Font Info:    Try loading font information for T1+pcr on input line 41.
+LaTeX Font Info:    Try loading font information for T1+pcr on input line 43.
 
 (/usr/local/texlive/2012/texmf-dist/tex/latex/psnfss/t1pcr.fd
 File: t1pcr.fd 2001/06/04 font definitions for T1/pcr.
 )
-Overfull \hbox (6.83115pt too wide) in paragraph at lines 43--52
+Overfull \hbox (6.83115pt too wide) in paragraph at lines 45--54
 \T1/ppl/m/n/9 User-based non-repudiation is an in-creas-ingly im-por-tant prop-
 
  []
 
 
-Overfull \hbox (2.96083pt too wide) in paragraph at lines 53--60
+Overfull \hbox (2.96083pt too wide) in paragraph at lines 55--62
 \T1/ppl/m/n/9 the prob-lem of in-creas-ing en-cryp-tion com-pu-ta-tional com-pl
 ex-
  []
 
 
-Overfull \hbox (4.70671pt too wide) in paragraph at lines 62--70
+Overfull \hbox (4.70671pt too wide) in paragraph at lines 64--72
 \T1/ppl/m/n/9 to in-di-vid-ual users (or en-ti-ties) that trig-ger such ac-tion
 s. Cryp-
  []
 
-LaTeX Font Info:    Font shape `T1/ppl/bx/n' in size <9> not available
-(Font)              Font shape `T1/ppl/b/n' tried instead on input line 77.
 
-LaTeX Warning: Citation `Schneier1999-Secure' on page \thepage  undefined on in
-put line 77.
-
-
-LaTeX Warning: Citation `Ma2008-FssAgg' on page \thepage  undefined on input li
-ne 80.
-
-
-Overfull \hbox (3.86081pt too wide) in paragraph at lines 80--89
+Overfull \hbox (3.86081pt too wide) in paragraph at lines 82--91
 \T1/ppl/m/n/9 mon con-fi-den-tial-ity tech-niques pro-posed in the lit-er-a-tur
 e. Un-
  []
-
-
-LaTeX Warning: Citation `Yavuz2009-BAF' on page \thepage  undefined on input li
-ne 98.
-
-
-LaTeX Warning: Citation `Schneier1999-Secure' on page \thepage  undefined on in
-put line 108.
 
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
@@ -604,119 +586,132 @@ Underfull \vbox (badness 10000) has occurred while \output is active []
 
 
 ]
-
-LaTeX Warning: Citation `Sandhu1996-RBAC' on page \thepage  undefined on input 
-line 114.
-
-
-LaTeX Warning: Citation `David1992-RBAC' on page \thepage  undefined on input l
-ine 114.
-
-
-LaTeX Warning: Citation `Ferraiolo2001-RBAC' on page \thepage  undefined on inp
-ut line 115.
-
-
-LaTeX Warning: Citation `Abrams1990-AccessControl' on page \thepage  undefined 
-on input line 119.
-
-
-Overfull \hbox (3.47398pt too wide) in paragraph at lines 110--120
+Overfull \hbox (3.47398pt too wide) in paragraph at lines 112--122
 \T1/ppl/m/n/9 ments for cloud-based ap-pli-ca-tions. Fur-ther-more, the se-lect
 ed
  []
 
+LaTeX Font Info:    Font shape `T1/ppl/bx/n' in size <9> not available
+(Font)              Font shape `T1/ppl/b/n' tried instead on input line 123.
 
 LaTeX Warning: Citation `TODOTODO' on page \thepage  undefined on input line 12
-1.
+3.
 
 
-LaTeX Warning: Citation `Goyal2006-ABAC' on page \thepage  undefined on input l
-ine 124.
-
-
-Overfull \hbox (2.96083pt too wide) in paragraph at lines 129--135
+Overfull \hbox (2.96083pt too wide) in paragraph at lines 131--137
 \T1/ppl/m/n/9 the prob-lem of in-creas-ing en-cryp-tion com-pu-ta-tional com-pl
 ex-
  []
 
 
+Overfull \hbox (1.39552pt too wide) in paragraph at lines 138--143
+[]\T1/ppl/m/n/9 The pa-per is or-ga-nized in a top-down fash-ion, start-ing wit
+h
+ []
+
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+
+Overfull \hbox (4.24838pt too wide) in paragraph at lines 152--157
+\T1/ppl/m/n/9 mo-ti-va-tion (TODO: CITE), we spec-ify this set of non-terminals
+
+ []
+
+
+Overfull \hbox (2.31314pt too wide) in paragraph at lines 158--159
+[]\T1/ppl/m/n/9 LAudit, a sim-ple context-free gram-mar that is built on these
+ []
+
+
+LaTeX Warning: Citation `Sandhu2000-nist-rbac' on page \thepage  undefined on i
+nput line 169.
+
+<images/relational_design_v2.pdf, id=12, 668.4975pt x 557.08125pt>
+File: images/relational_design_v2.pdf Graphic file (type pdf)
+
+<use images/relational_design_v2.pdf>
+Package pdftex.def Info: images/relational_design_v2.pdf used on input line 199
+.
+(pdftex.def)             Requested size: 216.81pt x 180.67525pt.
+
+
+LaTeX Warning: Reference `sec:databaseDesign' on page \thepage  undefined on in
+put line 207.
+
+
+Overfull \hbox (8.66714pt too wide) in paragraph at lines 205--212
+\T1/ppl/m/n/9 ever, all in-for-ma-tion about af-fected users is en-crypted (mas
+ked)
+ []
+
+[2]
+
 LaTeX Warning: Citation `Bethencourt2007-CPABE' on page \thepage  undefined on 
-input line 140.
+input line 244.
 
 
 LaTeX Warning: Citation `Bethencourt2007-CPABE' on page \thepage  undefined on 
-input line 142.
+input line 246.
 
 
 LaTeX Warning: Citation `Junod2010-ABE' on page \thepage  undefined on input li
-ne 142.
+ne 246.
 
 
-Overfull \hbox (4.21237pt too wide) in paragraph at lines 137--143
+Overfull \hbox (4.21237pt too wide) in paragraph at lines 241--247
 \T1/ppl/m/n/9 tion. In CP-ABE, se-cret keys are anal-o-gous to sets of at-tribu
 tes,
  []
 
 
-Overfull \hbox (4.66577pt too wide) in paragraph at lines 167--167
+Overfull \hbox (4.66577pt too wide) in paragraph at lines 271--271
 []\secfnt Ciphertext Pol-icy Attribute-Based En-cryp-
  []
 
 
 LaTeX Warning: Citation `Bethencourt2007-CPABE' on page \thepage  undefined on 
-input line 168.
+input line 272.
 
 
-Overfull \hbox (3.00583pt too wide) in paragraph at lines 180--189
+Overfull \hbox (3.00583pt too wide) in paragraph at lines 285--294
 \T1/ppl/m/n/9 ac-cess to cer-tain log en-tries us-ing our pol-icy en-gine (de-s
 cribed
  []
 
-[2]
-Overfull \hbox (2.91647pt too wide) in paragraph at lines 200--205
+[3 <./images/relational_design_v2.pdf>]
+Overfull \hbox (2.91647pt too wide) in paragraph at lines 305--310
 \T1/ppl/m/n/9 With this rule, U1 will al-ways be able to ac-cess the data (whic
 h
  []
 
 
-LaTeX Warning: Reference `alg:ruleE1' on page \thepage  undefined on input line
- 217.
-
-
-LaTeX Warning: Reference `alg:ruleE2' on page \thepage  undefined on input line
- 217.
-
-
-Overfull \hbox (3.81633pt too wide) in paragraph at lines 211--222
+Overfull \hbox (3.81633pt too wide) in paragraph at lines 316--327
 \T1/ppl/m/n/9 and the ac-cess poli-cies for all data as-so-ci-ated with such ev
 ents,
  []
 
 
-Overfull \hbox (15.04794pt too wide) in paragraph at lines 267--274
+Overfull \hbox (15.04794pt too wide) in paragraph at lines 372--379
 \T1/ppl/m/n/9 Sim-ply mod-i-fy-ing the user's re-la-tion-ships in the sys-tem d
 atabase
  []
 
-[3]
-Overfull \hbox (32.01184pt too wide) in paragraph at lines 293--293
+
+Overfull \hbox (32.01184pt too wide) in paragraph at lines 392--392
 []\secfnt USE CASE: ELEC-TRONIC HEALTH RECORD
  []
 
-(./abls.bbl) [4] (./abls.aux)
+(./abls.bbl [4]) [5] (./abls.aux)
 
 LaTeX Warning: There were undefined references.
 
-
-LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
-
  ) 
 Here is how much of TeX's memory you used:
- 7080 strings out of 493488
- 101160 string characters out of 3141326
- 182868 words of memory out of 3000000
- 10223 multiletter control sequences out of 15000+200000
+ 7091 strings out of 493488
+ 101413 string characters out of 3141326
+ 183916 words of memory out of 3000000
+ 10232 multiletter control sequences out of 15000+200000
  48046 words of font info for 63 fonts, out of 3000000 for 9000
  957 hyphenation exceptions out of 8191
  44i,12n,42p,445b,839s stack positions out of 5000i,500n,10000p,200000b,50000s
@@ -734,10 +729,10 @@ ype1/urw/palatino/uplb8a.pfb></usr/local/texlive/2012/texmf-dist/fonts/type1/ur
 w/palatino/uplr8a.pfb></usr/local/texlive/2012/texmf-dist/fonts/type1/urw/palat
 ino/uplri8a.pfb></usr/local/texlive/2012/texmf-dist/fonts/type1/urw/times/utmb8
 a.pfb></usr/local/texlive/2012/texmf-dist/fonts/type1/urw/times/utmr8a.pfb>
-Output written on abls.pdf (4 pages, 171984 bytes).
+Output written on abls.pdf (5 pages, 215544 bytes).
 PDF statistics:
- 74 PDF objects out of 1000 (max. 8388607)
- 53 compressed objects within 1 object stream
+ 96 PDF objects out of 1000 (max. 8388607)
+ 69 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
- 1 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 6 words of extra memory for PDF output out of 10000 (max. 10000000)
 

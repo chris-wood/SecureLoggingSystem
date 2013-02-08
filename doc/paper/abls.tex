@@ -20,6 +20,8 @@
 \usepackage[noend]{algorithmic}
 \usepackage{fancybox, fancyvrb}
 \usepackage{listings}
+\usepackage{amsmath}
+\usepackage{array}
 
 \newenvironment{definition}[1][Definition]{\begin{trivlist}
 \item[\hskip \labelsep {\bfseries #1}]}{\end{trivlist}}
@@ -133,6 +135,108 @@ of log-related roles, and thus a small number of attributes, to avoid the proble
 complexity with attribute explosion. We present the preliminary design of ABLS and discuss how audit trails are 
 constructed, automated audit tasks are defined and specified, and how the system may be used in practical applications.
 
+The paper is organized in a top-down fashion, starting with the structure of log data and corresponding ability
+to define automated audit tasks. Using this foundation, we then introduce the relational data model used to persist
+log information, followed by the cryptographic access control mechanisms used to maintain the confidentiality
+of log data and audit trails. Finally, we conclude with a practical use case for ABLS in the context of healthcare 
+organizations.
+
+\section{Structured Log Data and Automated Audits}
+A major motivating factor for our log data structure comes from realistic security policies. In this context, we make
+the assumption that a security policy can be stated as a set of \emph{negative} requirements. For example, one 
+such requirement might be that a doctor is not allowed to change their patient's address. In order to conduct an 
+automated audit for violations of this policy, we first translate this semantically-rich requirement into a language
+whose structure can be easily mapped to a relational data model. This enables us to leverage the power of 
+structured query languages (i.e. SQL) to search for policy violations.
+
+One solution for parsing security policy requirements into relational data is to define a grammar for producing 
+requirement strings from a set of non-terminals that correspond to relations. Using the NIST RBAC model of
+access control as motivation (TODO: CITE), we specify this set of non-terminals and relations to be the set identifiers 
+$USER$, $OBS$, $OPS$, and $AFFECTEDUSERS$. These finite sets are minimal enough to allow the specification
+of most security policies, thus making it suitable for our needs. 
+
+LAudit, a simple context-free grammar that is built on these relations, is shown below.
+
+%{\setlength\tabcolsep{4pt}
+%\begin{tabular}{>{$}l<{$}>{$}r<{$}>{$}l<{$}}
+%  \text{LAudit} &\Coloneqq & \text{USER OPS}\\
+%  &| & \text{USER OPS OBS} \\
+%  &| & \text{USER OPS OBS USER} \\
+%\end{tabular}}
+
+\vspace{.35cm} 
+In this context, USER, OPS, and OBS are all finite sets composed of the users, operations, and objects of a
+system, as specified by the NIST RBAC model \cite{Sandhu2000-nist-rbac}. While simple, this language effectively
+captures the ``who'' and ``what'' of log events. ABLS is capable of appending a timestamp to every that it receives,
+which rounds off the log event with ``when'' information. 
+
+ABLS clients must submit log messages according to a pre-defined schema that captures
+all of the information in LAudit. The JSON schema used for constructing log messages is shown below.
+
+\begin{lstlisting}
+[
+    {
+        user : int,
+        session : int,
+        action : int (or String),
+        object : int (or String),
+        affectedUsers : [int]
+    }
+]
+\end{lstlisting}
+
+In order to capture this information in a relational model to enable efficient queries, a new Event table was added
+to the database schema. There is a one-to-one correspondence between Event 
+and Log records, and the security of such Event
+and Log information is maintained using the same hash chain construction techniques as in the preliminary design.
+However, for simplicity, the notion of hash chain epochs was removed.
+Also, Action, Object, and AffectedUserGroup tables were added to the database schema to store relevant information
+about log events as they are received from the log proxy. A high-level depiction of this new relational model is shown
+in Figure \ref{fig:design2}.
+
+\begin{figure}[ht!]
+\begin{center}
+\includegraphics[width=3in]{images/relational_design_v2.pdf}
+\caption{A high-level depiction of the new relational data model that supports automated audit tasks.}
+\label{fig:design2}
+\end{center}
+\end{figure}
+
+In this model, all Action and Object records are stored in plaintext. These tables store elements of a finite set, and
+encrypting them would not deter a determined attacker. However, all information about affected users is encrypted 
+(masked) using the same technique discussed in Section \ref{sec:databaseDesign}. As such, an attacker can infer
+information about what types of objects were operated upon, but they cannot determine the specifics of these actions
+or the users who performed them without compromising the ABLS master key $M_k$. We feel as though this strikes
+a good balance between robust audit specification, reasonable measures of audit and log efficiency, and overall 
+log security. 
+
+Audit tasks enforce audit rules using a blacklist approach. Audit rules are specified using the aforementioned 
+log message schema and then assigned to audit tasks that periodically run to see if the rules are being properly enforced.
+For example, an audit rule might be configured as follows:
+
+
+%define a grammar for specifying 
+%If we consider the set of security policy requirements similar to the aforementioned example as a set of sentences
+%accepted by a context-free language $L$, where the alphabet $\Sigma$ of $L$ is a set of finite users, actions, 
+%objects, and other attributes (i.e. timestamps), 
+
+%LAudit, a simple context-free grammar that is capable of producing such security policies, enables us to parse such 
+
+%Parsing the semantics of such 
+%a security policy 
+
+%the details of such
+%a policy snippet requires the log data to uniquely identify the doctor as a user generating an action, ``change'' as an
+%action performed on an ``address'' object, and a patient as an affected user. It is natural to parse the semantics of
+%this security policy 
+
+%express such semantics
+%using a formal language that captures users, objects, actions, and other important attributes that are general enough
+%to allow the specification of any security policy.
+
+%LAudit, a language for specifying audit log data, was created to fulfill this exact role. 
+
+
 \section{Cryptography Preliminaries}
 Ciphertext Policy Attribute-Based Encryption (CP-ABE) is a new encryption scheme that supports complex
 access policies that specify which secret keys can be used for decryption. In CP-ABE, secret keys are analogous
@@ -176,7 +280,7 @@ used in the cryptosystem: \emph{Setup}, \emph{Encrypt}, \emph{KeyGeneration}, \e
 	\item \textbf{Delegate}(\textbf{SK}, \~{S}) - This procedure outputs a secret key \~{$SK$} for the set of attributes \~{$S$}, where \~{$S$} $\subset S$, the set of attributes associated with the secret key \textbf{SK}.
 \end{itemize}
 
-\section{Access Policy Definition}
+\section{Log Access Policies}
 %%%% TODO: start proofreading here...
 One of the motivating parts of this project was to explore the usefulness of CP-ABE schemes
 for secure logging. The ability to embed robust access policies within the encrypted
@@ -284,12 +388,6 @@ Therefore, future releases of this system plan to implement the first approach t
 best to determine the key cycle lifetime based on empirical data associated with the growth of the log database.
 Intuitively, in order to maintain auditing and verification efficiency, the cycle frequency should be defined as 
 a monotonically increasing function that is proportional to the growth of the database. 
-
-\section{Structured Log Design}
-TODO
-
-\section{Automated Audits}
-TODO
 
 \section{Use Case: Electronic Health Record Systems}
 TODO
