@@ -523,7 +523,7 @@ diagram for the ABLS deployment scheme is shown in Figure \ref{fig:deployment}.
 \begin{figure*}[htb!]
 \begin{center}
 \includegraphics[width=5in]{images/deployment.pdf}
-\caption{A high-level depiction of the deployment for an ABLS instance, where each box represents a unique runtime environment (i.e. a unique server).}
+\caption{A high-level deployment diagram for ABLS.}
 \label{fig:deployment}
 \end{center}
 \end{figure*}
@@ -582,9 +582,38 @@ the logging scheme and avoiding the use of BLOB attribute types.
 \end{table}
 
 \section{Applications}
-TODO: Electronic Health Record Systems
+ABLS would be particularly useful in the healthcare domain, where organizations are required to comply with HIPAA policies
+and regulations. Non-repudiation is a critical element that is needed to support these compliance efforts. Therefore,
+configuring ABLS for use in these organizations can help securely collect and persist relevant log information, and 
+also automate the auditing process to reinforce the manual efforts done by security administrators. In such an environment,
+healthcare web applications would be configured to send all relevant user events to an ABLS instance in the cloud
+via the HTTP API. All clients could be authenticated using a standard password-based scheme that is connected
+the organization's user database.
 
-% patient behavior encrypted using policies, client web application transmits data to ABLS instance in the cloud via HTTP, dedicated machines and databases in the hospital connect to the LogProxy and ABLS using continuous TCP streams. Policies are defined according to HIPAA, and may potentially be marked up using XACML.
+Similarly, all dedicated health machines and terminals in hospitals and physician offices would maintain continuous 
+data streams to an ABLS instance and send all log data over a TCP socket using an API similar to that which is exposed to
+web applications. These dedicated entities could be authenticated using two-way SSL authentication so as to allow authentication
+to take place using automatically exchanged SSL certificates.
+
+Security administrators could review the organization's required security policies and encode them using the popular eXtensible
+Access Control Markup Language (XACML), which could be used to configure the ABLS policy engine for encrypting all incoming log data.
+Similarly, the security administrators could define automated audit tasks that ensure policy violations do not occur. The security
+administrator would also be responsible for configuring the frequency at which automated audit and verification tasks and run. 
+Although the current ABLS prototype does not currently export policy violations to a dashboard of any kind, in the event that 
+this feature was added, the security administrator would also be responsible for configuring the connection between ABLS and the 
+dashboard. Finally, depending on the rate at which the ABLS databases grow, the security administrator should also specify the 
+parameters for archiving all audit data in a remote location. 
+
+\section{Conclusion}
+In this paper we presented ABLS, a secure logging system for the cloud that supports automated audits and dynamic,
+attribute-based log file encryption. We discussed the log integrity and confidentiality properties supported by ABLS, 
+and how they map to the underlying system architecture and relational data model. We then presented a sample deployment 
+scheme for an ABLS instance in the cloud, which included the client interfaces for submitting log data and executing 
+audit queries. We finished with a performance analysis of the current ABLS prototype and discussion of employing ABLS in 
+the healthcare domain. This paper revealed that achieving automated audits is a non-trivial challenge that must strike
+a balance between system performance and storage overhead. While the current ABLS design provides efficient automated
+audits to help support non-repudiation, there are several fundamental design changes (i.e. the application of FssAgg 
+signature generation algorithms to encrypted log chains) that can be explored for further improvement.
 
 \begin{comment}
 \begin{table}

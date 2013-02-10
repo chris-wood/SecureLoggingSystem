@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.4-1.40.13 (TeX Live 2012) (format=pdflatex 2012.6.30)  10 FEB 2013 17:30
+This is pdfTeX, Version 3.1415926-2.4-1.40.13 (TeX Live 2012) (format=pdflatex 2012.6.30)  10 FEB 2013 18:10
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -789,23 +789,42 @@ e 565.
 LaTeX Warning: Text page \thepage  contains only floats.
 
 
-Overfull \vbox (13.26843pt too high) has occurred while \output is active []
+Overfull \vbox (2.76843pt too high) has occurred while \output is active []
 
 
 
 LaTeX Warning: Text page \thepage  contains only floats.
 
 
-Overfull \vbox (13.26843pt too high) has occurred while \output is active []
+Overfull \vbox (2.76843pt too high) has occurred while \output is active []
 
 
-[6 <./images/logSchema.png> <./images/deployment.pdf>] (./abls.bbl
-Underfull \vbox (badness 1946) has occurred while \output is active []
+[6 <./images/logSchema.png> <./images/deployment.pdf>]
+Overfull \hbox (6.6517pt too wide) in paragraph at lines 585--592
+\T1/ppl/m/n/9 main, where or-ga-ni-za-tions are re-quired to com-ply with HIPAA
 
- [7 <./images/logPerf-eps-converted-to.pdf> <./images/logPerfDiffEvents-eps-con
-verted-to.pdf>])
-Overfull \vbox (2.51898pt too high) has occurred while \output is active []
+ []
 
+
+Overfull \hbox (6.77695pt too wide) in paragraph at lines 585--592
+\T1/ppl/m/n/9 ment that is needed to sup-port these com-pli-ance ef-forts. Ther
+e-
+ []
+
+
+Overfull \hbox (1.21498pt too wide) in paragraph at lines 585--592
+\T1/ppl/m/n/9 help se-curely col-lect and per-sist rel-e-vant log in-for-ma-tio
+n, and
+ []
+
+(./abls.bbl [7 <./images/logPerf-eps-converted-to.pdf> <./images/logPerfDiffEve
+nts-eps-converted-to.pdf>]
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+)
+
+Package balance Warning: You have called \balance in second column
+(balance)                Columns might not be balanced.
 
 [8] (./abls.aux)
 
@@ -837,7 +856,7 @@ w/palatino/uplb8a.pfb></usr/local/texlive/2012/texmf-dist/fonts/type1/urw/palat
 ino/uplr8a.pfb></usr/local/texlive/2012/texmf-dist/fonts/type1/urw/palatino/upl
 ri8a.pfb></usr/local/texlive/2012/texmf-dist/fonts/type1/urw/times/utmb8a.pfb><
 /usr/local/texlive/2012/texmf-dist/fonts/type1/urw/times/utmr8a.pfb>
-Output written on abls.pdf (8 pages, 315883 bytes).
+Output written on abls.pdf (8 pages, 318191 bytes).
 PDF statistics:
  141 PDF objects out of 1000 (max. 8388607)
  100 compressed objects within 1 object stream
