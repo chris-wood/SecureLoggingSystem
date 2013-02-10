@@ -15,6 +15,7 @@ from datetime import datetime
 import uuid
 import hashlib
 import logging
+import pika
 
 # Build the system path
 sys.path.append("./LoggerModule/")
@@ -37,6 +38,12 @@ channel = connection.channel()
 channel.queue_declare(queue='log') # Ensure the log queue is there
 channel.queue_declare(queue='audit') # Ensure the audit queue is there
 
+def logCallback(ch, method, properties, body):
+    print " [x] Received %r" % (body,)
+
+def auditCallback(ch, method, properties, body):
+    print " [x] Received %r" % (body,)
+
 channel.basic_consume(logCallback,
                       queue='log',
                       no_ack=True)
@@ -44,12 +51,6 @@ channel.basic_consume(logCallback,
 channel.basic_consume(auditCallback,
                       queue='audit',
                       no_ack=True)
-
-def logCallback(ch, method, properties, body):
-    print " [x] Received %r" % (body,)
-
-def auditCallback(ch, method, properties, body):
-    print " [x] Received %r" % (body,)
 
 def help():
 	''' Display the available commands to the user.
@@ -100,7 +101,7 @@ def loadConfig(configFile = "abls.conf"):
 			params["AUDIT_USER_DB"] = parts[1].rstrip().strip()
 	return params
 
-def main():
+def start(startAudit = True, startLog = True, startVerify = True):
 	''' The main entry point into the logging system that initializes everything
 	needed to be active at runtime.
 	'''	
@@ -121,10 +122,7 @@ def main():
 	# Create the global configuration object...
 	params = loadConfig()
 
-
-
 	# See if they even started anything
-	'''
 	if (audit == log == verify == False):
 		printUsage()
 		sys.exit(0)
@@ -133,17 +131,18 @@ def main():
 	keyMgr = KeyManager()
 
 	# Start whatever services are specified by the user...
-	if (log):
+	if (log or startLog):
 		print("Starting the log service on port " + str(params["LOG_PORT"]))
 		collector = LogCollector(params, keyMgr)
 		logProxy = LogProxy(params, keyMgr, collector).start()	
-	if (audit):
+	if (audit or startAudit):
 		print("Starting the audit service on port " + str(params["AUDIT_PORT"]))
 		auditProxy = AuditProxy(params, keyMgr).start()
-	if (verify):
+	if (verify or startVerify):
 		print("Starting the verify service")
 		verifier = VerifyCrawler(1, params["LOG_DB"], params["KEY_DB"], keyMgr).start()
 
+	'''
 	# Jump into the input-handling loop...
 	print("---------------------------")
 	print("Type 'help' or '?' for help")
@@ -160,4 +159,4 @@ def main():
 	'''
 
 if (__name__ == '__main__'):
-	main()
+	start(False, False, False)

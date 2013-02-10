@@ -1,10 +1,43 @@
-\begin{thebibliography}{1}
+\begin{thebibliography}{10}
 
 \bibitem{Abrams1990-AccessControl}
 M.~Abrams, K.~Eggers, L.~LaPadula, and I.~Olson.
 \newblock A generalized framework for access control: An informal description.
 \newblock In {\em Proceedings of the 13th National Computer Security
   Conference}, pages 135--143, 1990.
+
+\bibitem{akinyelecharm}
+J.~Akinyele, M.~Green, and A.~Rubin.
+\newblock Charm: A framework for rapidly prototyping cryptosystems.
+
+\bibitem{alipour2011policy}
+H.~Alipour, M.~Sabbari, and E.~Nazemi.
+\newblock A policy based access control model for web services.
+\newblock In {\em Internet Technology and Secured Transactions (ICITST), 2011
+  International Conference for}, pages 472--477. IEEE, 2011.
+
+\bibitem{annas2003hipaa}
+G.~Annas.
+\newblock Hipaa regulations—a new era of medical-record privacy?
+\newblock {\em New England Journal of Medicine}, 348(15):1486--1490, 2003.
+
+\bibitem{Bellare1997-ForwardIntegrity}
+M.~Bellare and B.~S. Yee.
+\newblock Forward integrity for secure audit logs.
+\newblock Technical report, 1997.
+
+\bibitem{Bethencourt2007-CPABE}
+J.~Bethencourt, A.~Sahai, and B.~Waters.
+\newblock Ciphertext-policy attribute-based encryption.
+\newblock In {\em Proceedings of the 2007 IEEE Symposium on Security and
+  Privacy}, SP '07, pages 321--334, Washington, DC, USA, 2007. IEEE Computer
+  Society.
+
+\bibitem{president2004revolutionizing}
+P.~I. T.~A. Committee et~al.
+\newblock Revolutionizing health care through information technology.
+\newblock {\em Arlington, VA: National Coordination Office for Information
+  Technology Research and Development}, 2004.
 
 \bibitem{David1992-RBAC}
 F.~David and K.~Richard.
@@ -25,6 +58,13 @@ V.~Goyal, O.~Pandey, A.~Sahai, and B.~Waters.
 \newblock In {\em Proceedings of the 13th ACM conference on Computer and
   communications security}, pages 89--98. ACM, 2006.
 
+\bibitem{Junod2010-ABE}
+P.~Junod and A.~Karlov.
+\newblock An efficient public-key attribute-based broadcast encryption scheme
+  allowing arbitrary access policies.
+\newblock In {\em Proceedings of the tenth annual ACM workshop on Digital
+  rights management}, DRM '10, pages 13--24, New York, NY, USA, 2010. ACM.
+
 \bibitem{Ma2008-FssAgg}
 D.~Ma.
 \newblock Practical forward secure sequential aggregate signatures.
@@ -32,16 +72,42 @@ D.~Ma.
   computer and communications security}, ASIACCS '08, pages 341--352, New York,
   NY, USA, 2008. ACM.
 
+\bibitem{ma2008practical}
+D.~Ma.
+\newblock Practical forward secure sequential aggregate signatures.
+\newblock In {\em Proceedings of the 2008 ACM symposium on Information,
+  computer and communications security (ASIACCS’08)}, pages 341--352, 2008.
+
+\bibitem{Popa2012-CryptDB}
+R.~A. Popa, C.~M.~S. Redfield, N.~Zeldovich, and H.~Balakrishnan.
+\newblock Cryptdb: processing queries on an encrypted database.
+\newblock {\em Commun. ACM}, 55(9):103--111, Sept. 2012.
+
 \bibitem{Sandhu1996-RBAC}
 R.~Sandhu, E.~Coyne, H.~Feinstein, and C.~Youman.
 \newblock Role-based access control models.
 \newblock {\em Computer}, 29(2):38--47, 1996.
+
+\bibitem{Sandhu2000-nist-rbac}
+R.~Sandhu, D.~Ferraiolo, and R.~Kuhn.
+\newblock The nist model for role-based access control: towards a unified
+  standard.
+\newblock In {\em Symposium on Access Control Models and Technologies:
+  Proceedings of the fifth ACM workshop on Role-based access control},
+  volume~26, pages 47--63, 2000.
 
 \bibitem{Schneier1999-Secure}
 B.~Schneier and J.~Kelsey.
 \newblock Secure audit logs to support computer forensics.
 \newblock {\em ACM Transactions on Information and System Security (TISSEC)},
   2(2):159--176, 1999.
+
+\bibitem{shen2006attribute}
+H.~Shen and F.~Hong.
+\newblock An attribute-based access control model for web services.
+\newblock In {\em Parallel and Distributed Computing, Applications and
+  Technologies, 2006. PDCAT'06. Seventh International Conference on}, pages
+  74--79. IEEE, 2006.
 
 \bibitem{Yavuz2009-BAF}
 A.~A. Yavuz and P.~Ning.
@@ -50,5 +116,12 @@ A.~A. Yavuz and P.~Ning.
 \newblock In {\em Proceedings of the 2009 Annual Computer Security Applications
   Conference}, ACSAC '09, pages 219--228, Washington, DC, USA, 2009. IEEE
   Computer Society.
+
+\bibitem{zhu2008attribute}
+J.~Zhu and W.~Smari.
+\newblock Attribute based access control and security for collaboration
+  environments.
+\newblock In {\em Aerospace and Electronics Conference, 2008. NAECON 2008. IEEE
+  National}, pages 31--35. IEEE, 2008.
 
 \end{thebibliography}

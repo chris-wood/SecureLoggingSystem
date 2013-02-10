@@ -1,0 +1,55 @@
+This is BibTeX, Version 0.99d (TeX Live 2012)
+Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
+The top-level auxiliary file: abls.aux
+The style file: abbrv.bst
+Database file #1: ../abls.bib
+Repeated entry---line 216 of file ../abls.bib
+ : @article{akinyelecharm
+ :                       ,
+I'm skipping whatever remains of this entry
+Warning--empty journal in akinyelecharm
+Warning--empty year in akinyelecharm
+Warning--empty institution in Bellare1997-ForwardIntegrity
+Warning--can't use both volume and number fields in Sandhu2000-nist-rbac
+You've used 20 entries,
+            2118 wiz_defined-function locations,
+            635 strings with 7733 characters,
+and the built_in function-call counts, 7969 in all, are:
+= -- 832
+> -- 317
+< -- 13
++ -- 129
+- -- 104
+* -- 523
+:= -- 1228
+add.period$ -- 68
+call.type$ -- 20
+change.case$ -- 112
+chr.to.int$ -- 0
+cite$ -- 24
+duplicate$ -- 340
+empty$ -- 641
+format.name$ -- 104
+if$ -- 1757
+int.to.chr$ -- 0
+int.to.str$ -- 20
+missing$ -- 19
+newline$ -- 102
+num.names$ -- 40
+pop$ -- 127
+preamble$ -- 1
+purify$ -- 91
+quote$ -- 0
+skip$ -- 261
+stack$ -- 0
+substring$ -- 542
+swap$ -- 118
+text.length$ -- 13
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 80
+warning$ -- 4
+while$ -- 83
+width$ -- 22
+write$ -- 234
+(There was 1 error message)

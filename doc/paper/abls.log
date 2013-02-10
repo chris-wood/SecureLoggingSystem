@@ -1,9 +1,8 @@
-This is pdfTeX, Version 3.1415926-2.4-1.40.13 (TeX Live 2012) (format=pdflatex 2012.6.30)  10 FEB 2013 00:47
+This is pdfTeX, Version 3.1415926-2.4-1.40.13 (TeX Live 2012) (format=pdflatex 2012.6.30)  10 FEB 2013 17:30
 entering extended mode
- \write18 enabled.
- file:line:error style messages enabled.
+ restricted \write18 enabled.
  %&-line parsing enabled.
-**abls.tex
+**abls
 (./abls.tex
 LaTeX2e <2011/06/27>
 Babel <v3.8m> and hyphenation patterns for english, dumylang, nohyphenation, ge
@@ -478,27 +477,24 @@ Package: mhsetup 2010/01/21 v1.2a programming setup (MH)
 \l_MT_below_intertext_dim=\dimen154
 \l_MT_above_shortintertext_dim=\dimen155
 \l_MT_below_shortintertext_dim=\dimen156
-) (./abls.aux
-
-LaTeX Warning: Label `fig:deployment' multiply defined.
-
-)
+) (./abls.aux)
 \openout1 = `abls.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 33.
-LaTeX Font Info:    ... okay on input line 33.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 33.
-LaTeX Font Info:    ... okay on input line 33.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 33.
-LaTeX Font Info:    ... okay on input line 33.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 33.
-LaTeX Font Info:    ... okay on input line 33.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 33.
-LaTeX Font Info:    ... okay on input line 33.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 33.
-LaTeX Font Info:    ... okay on input line 33.
-LaTeX Font Info:    Try loading font information for T1+ppl on input line 33.
- (/usr/local/texlive/2012/texmf-dist/tex/latex/psnfss/t1ppl.fd
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 34.
+LaTeX Font Info:    ... okay on input line 34.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 34.
+LaTeX Font Info:    ... okay on input line 34.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 34.
+LaTeX Font Info:    ... okay on input line 34.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 34.
+LaTeX Font Info:    ... okay on input line 34.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 34.
+LaTeX Font Info:    ... okay on input line 34.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 34.
+LaTeX Font Info:    ... okay on input line 34.
+LaTeX Font Info:    Try loading font information for T1+ppl on input line 34.
+
+(/usr/local/texlive/2012/texmf-dist/tex/latex/psnfss/t1ppl.fd
 File: t1ppl.fd 2001/06/04 font definitions for T1/ppl.
 )
 (/usr/local/texlive/2012/texmf-dist/tex/context/base/supp-pdf.mkii
@@ -568,45 +564,50 @@ Package caption Info: float package is loaded.
 Package caption Info: listings package is loaded.
 Package caption Info: End \AtBeginDocument code.
 \c@lstlisting=\count155
-LaTeX Font Info:    Try loading font information for U+msa on input line 44.
+LaTeX Font Info:    Try loading font information for U+msa on input line 45.
 
 (/usr/local/texlive/2012/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2009/06/22 v3.00 AMS symbols A
 )
-LaTeX Font Info:    Try loading font information for U+msb on input line 44.
+LaTeX Font Info:    Try loading font information for U+msb on input line 45.
 
 (/usr/local/texlive/2012/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2009/06/22 v3.00 AMS symbols B
 )
-LaTeX Font Info:    Try loading font information for U+lasy on input line 44.
+LaTeX Font Info:    Try loading font information for U+lasy on input line 45.
 
 (/usr/local/texlive/2012/texmf-dist/tex/latex/base/ulasy.fd
 File: ulasy.fd 1998/08/17 v2.2e LaTeX symbol font definitions
 )
-LaTeX Font Info:    Try loading font information for T1+pcr on input line 44.
+LaTeX Font Info:    Try loading font information for T1+pcr on input line 45.
 
 (/usr/local/texlive/2012/texmf-dist/tex/latex/psnfss/t1pcr.fd
 File: t1pcr.fd 2001/06/04 font definitions for T1/pcr.
 )
-Overfull \hbox (6.83115pt too wide) in paragraph at lines 46--55
+Overfull \hbox (6.83115pt too wide) in paragraph at lines 47--56
 \T1/ppl/m/n/9 User-based non-repudiation is an in-creas-ingly im-por-tant prop-
 
  []
 
 
-Overfull \hbox (2.96083pt too wide) in paragraph at lines 56--63
+Overfull \hbox (2.96083pt too wide) in paragraph at lines 57--64
 \T1/ppl/m/n/9 the prob-lem of in-creas-ing en-cryp-tion com-pu-ta-tional com-pl
 ex-
  []
 
 
-Overfull \hbox (4.70671pt too wide) in paragraph at lines 65--73
+Overfull \hbox (4.70671pt too wide) in paragraph at lines 66--74
 \T1/ppl/m/n/9 to in-di-vid-ual users (or en-ti-ties) that trig-ger such ac-tion
 s. Cryp-
  []
 
 
-Overfull \hbox (3.86081pt too wide) in paragraph at lines 83--92
+Overfull \hbox (4.86015pt too wide) in paragraph at lines 84--93
+\T1/ppl/m/n/9 tion and sig-na-ture tech-niques [12]. Symmetric-key and public-
+ []
+
+
+Overfull \hbox (3.86081pt too wide) in paragraph at lines 84--93
 \T1/ppl/m/n/9 mon con-fi-den-tial-ity tech-niques pro-posed in the lit-er-a-tur
 e. Un-
  []
@@ -618,25 +619,25 @@ Underfull \vbox (badness 10000) has occurred while \output is active []
 
 
 ]
-Overfull \hbox (3.47398pt too wide) in paragraph at lines 113--123
+Overfull \hbox (3.47398pt too wide) in paragraph at lines 114--124
 \T1/ppl/m/n/9 ments for cloud-based ap-pli-ca-tions. Fur-ther-more, the se-lect
 ed
  []
 
-LaTeX Font Info:    Font shape `T1/ppl/bx/n' in size <9> not available
-(Font)              Font shape `T1/ppl/b/n' tried instead on input line 124.
 
-LaTeX Warning: Citation `TODOTODO' on page \thepage  undefined on input line 12
-4.
+Overfull \hbox (1.98969pt too wide) in paragraph at lines 114--124
+\T1/ppl/m/n/9 the Na-tional In-sti-tute of Stan-dards and Tech-nol-ogy in 2001[
+9],
+ []
 
 
-Overfull \hbox (2.96083pt too wide) in paragraph at lines 132--138
+Overfull \hbox (2.96083pt too wide) in paragraph at lines 133--139
 \T1/ppl/m/n/9 the prob-lem of in-creas-ing en-cryp-tion com-pu-ta-tional com-pl
 ex-
  []
 
 
-Overfull \hbox (1.39552pt too wide) in paragraph at lines 139--144
+Overfull \hbox (1.39552pt too wide) in paragraph at lines 140--145
 []\T1/ppl/m/n/9 The pa-per is or-ga-nized in a top-down fash-ion, start-ing wit
 h
  []
@@ -644,224 +645,181 @@ h
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
+LaTeX Font Info:    Font shape `T1/ppl/bx/n' in size <9> not available
+(Font)              Font shape `T1/ppl/b/n' tried instead on input line 160.
 
-Overfull \hbox (2.31314pt too wide) in paragraph at lines 159--160
-[]\T1/ppl/m/n/9 LAudit, a sim-ple context-free gram-mar that is built on these
+Overfull \hbox (5.05786pt too wide) in paragraph at lines 180--187
+[]\T1/ppl/m/n/9 Log file re-li-a-bil-ity, which re-duces to log in-tegrity, is 
+achieved
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 159--160
+Overfull \hbox (5.43651pt too wide) in paragraph at lines 180--187
+\T1/ppl/m/n/9 through hash chains and message-authentication codes, which
+ []
 
+[2]
+Overfull \hbox (6.52515pt too wide) in paragraph at lines 238--246
+\T1/ppl/m/n/9 dif-fer-ent in-tegrity and per-for-mance guar-an-tees. The first 
+mode
  []
 
 
-LaTeX Warning: Citation `Sandhu2000-nist-rbac' on page \thepage  undefined on i
-nput line 170.
-
-
-LaTeX Warning: Citation `Bellare1997-ForwardIntegrity' on page \thepage  undefi
-ned on input line 192.
-
-
-Overfull \hbox (2.59258pt too wide) in paragraph at lines 198--205
-[]\T1/ppl/m/n/9 Log in-tegrity is achieved through hash chains and message-
- []
-
-
-Overfull \hbox (4.45491pt too wide) in paragraph at lines 198--205
-\T1/ppl/m/n/9 that con-tains the gen-er-at-ing source in-for-ma-tion, the en-cr
-ypted
- []
-
-[2] <images/hashchain.pdf, id=19, 344.03531pt x 353.06906pt>
-File: images/hashchain.pdf Graphic file (type pdf)
-
-<use images/hashchain.pdf>
-Package pdftex.def Info: images/hashchain.pdf used on input line 213.
-(pdftex.def)             Requested size: 275.22862pt x 282.45563pt.
-
-Overfull \hbox (1.30983pt too wide) in paragraph at lines 224--230
-[]\T1/ppl/m/n/9 In this con-text, an epoch $\OML/cmm/m/it/9 Ep[]$ \T1/ppl/m/n/9
- sim-ply cor-re-sponds to a fixed-
- []
-
-
-LaTeX Warning: Reference `sec:security' on page \thepage  undefined on input li
-ne 258.
-
-
-LaTeX Warning: Reference `fig:tagChain' on page \thepage  undefined on input li
-ne 275.
-
-
-Overfull \hbox (5.23846pt too wide) in paragraph at lines 293--295
-\T1/ppl/m/n/9 con-trol the fre-quency of data sent to the log server, which
- []
-
-
-LaTeX Warning: Reference `log:ComputationalComplexity' on page \thepage  undefi
-ned on input line 295.
-
-
-Overfull \hbox (18.32448pt too wide) in paragraph at lines 297--298
-\T1/ppl/m/n/9 num-bers, which leads to very fine-grained database queries. 
- []
-
-
-LaTeX Warning: Reference `alg:weakVerify' on page \thepage  undefined on input 
-line 306.
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 324--326
-[] []$\OML/cmm/m/it/9 UID$\T1/ppl/m/n/9 , $\OML/cmm/m/it/9 SID$\T1/ppl/m/n/9 , 
-$\OMS/cmsy/m/n/9 L \OT1/cmr/m/n/9 =
- []
-
-
-LaTeX Warning: Reference `sec:architecture' on page \thepage  undefined on inpu
-t line 363.
-
-[3]
-
-LaTeX Warning: Reference `fig:schema' on page \thepage  undefined on input line
- 374.
-
-
-Overfull \hbox (2.28688pt too wide) in paragraph at lines 385--393
-[]\T1/ppl/m/n/9 a new Event ta-ble was added to the database schema. There
- []
-
-
-Overfull \hbox (9.1625pt too wide) in paragraph at lines 385--393
-\T1/ppl/m/n/9 is a one-to-one cor-re-spon-dence be-tween Event and Log records,
-
- []
-
-<images/relational_design_v2.pdf, id=30, 668.4975pt x 557.08125pt>
-File: images/relational_design_v2.pdf Graphic file (type pdf)
-
-<use images/relational_design_v2.pdf>
-Package pdftex.def Info: images/relational_design_v2.pdf used on input line 396
-.
-(pdftex.def)             Requested size: 231.26378pt x 192.72026pt.
-
-Overfull \hbox (8.66714pt too wide) in paragraph at lines 402--409
-\T1/ppl/m/n/9 ever, all in-for-ma-tion about af-fected users is en-crypted (mas
-ked)
- []
-
-<images/logSchema.png, id=31, 934.49126pt x 477.785pt>
-File: images/logSchema.png Graphic file (type png)
-
-<use images/logSchema.png>
-Package pdftex.def Info: images/logSchema.png used on input line 412.
-(pdftex.def)             Requested size: 231.26378pt x 118.23575pt.
-
-
-LaTeX Warning: Citation `Bethencourt2007-CPABE' on page \thepage  undefined on 
-input line 423.
-
-
-LaTeX Warning: Citation `Bethencourt2007-CPABE' on page \thepage  undefined on 
-input line 425.
-
-
-LaTeX Warning: Citation `Junod2010-ABE' on page \thepage  undefined on input li
-ne 425.
-
-
-Overfull \hbox (3.3025pt too wide) in paragraph at lines 419--426
-\T1/ppl/m/n/9 forced us-ing ci-pher-text pol-icy attribute-based en-cryp-tion (
-CP-
- []
-
-[4 <./images/hashchain.pdf>]
-Overfull \hbox (4.66577pt too wide) in paragraph at lines 450--450
+Overfull \hbox (4.66577pt too wide) in paragraph at lines 279--279
 []\secfnt Ciphertext Pol-icy Attribute-Based En-cryp-
  []
 
-
-LaTeX Warning: Citation `Bethencourt2007-CPABE' on page \thepage  undefined on 
-input line 451.
-
-[5 <./images/relational_design_v2.pdf> <./images/logSchema.png>]
-<images/cpabePolicy.pdf, id=103, 491.8375pt x 487.8225pt>
+<images/cpabePolicy.pdf, id=24, 491.8375pt x 487.8225pt>
 File: images/cpabePolicy.pdf Graphic file (type pdf)
 
 <use images/cpabePolicy.pdf>
-Package pdftex.def Info: images/cpabePolicy.pdf used on input line 472.
+Package pdftex.def Info: images/cpabePolicy.pdf used on input line 300.
 (pdftex.def)             Requested size: 108.405pt x 107.5148pt.
 
-Overfull \hbox (3.81633pt too wide) in paragraph at lines 478--489
+Overfull \hbox (3.81633pt too wide) in paragraph at lines 306--314
 \T1/ppl/m/n/9 and the ac-cess poli-cies for all data as-so-ci-ated with such ev
 ents,
  []
 
 
-Overfull \hbox (15.04794pt too wide) in paragraph at lines 535--542
+Overfull \hbox (14.81396pt too wide) in paragraph at lines 306--314
+\T1/ppl/m/n/9 gen-er-at-ing ac-cess poli-cies is de-pen-dent on administrator-d
+efined
+ []
+
+[3 <./images/cpabePolicy.pdf>]
+Overfull \hbox (15.04794pt too wide) in paragraph at lines 406--413
 \T1/ppl/m/n/9 Sim-ply mod-i-fy-ing the user's re-la-tion-ships in the sys-tem d
 atabase
  []
 
-[6 <./images/cpabePolicy.pdf>]
 
-LaTeX Warning: Citation `Popa2012-CryptDB' on page \thepage  undefined on input
- line 615.
+Overfull \hbox (2.31314pt too wide) in paragraph at lines 443--444
+[]\T1/ppl/m/n/9 LAudit, a sim-ple context-free gram-mar that is built on these
+ []
 
 
-Overfull \hbox (5.1661pt too wide) in paragraph at lines 611--616
+Underfull \hbox (badness 10000) in paragraph at lines 443--444
+
+ []
+
+[4]
+Overfull \hbox (5.1661pt too wide) in paragraph at lines 484--489
 \T1/ppl/m/n/9 spond-ing ver-i-fi-ca-tion and en-cryp-tion keys in the key datab
 ase,
  []
 
 
-Overfull \hbox (3.05093pt too wide) in paragraph at lines 611--616
+Overfull \hbox (3.05093pt too wide) in paragraph at lines 484--489
 \T1/ppl/m/n/9 tion in plain-text may lead to a pri-vacy vi-o-la-tion if the dat
 abase
  []
 
+<images/logSchema.png, id=44, 934.49126pt x 477.785pt>
+File: images/logSchema.png Graphic file (type png)
 
-Overfull \hbox (2.07896pt too wide) in paragraph at lines 638--640
+<use images/logSchema.png>
+Package pdftex.def Info: images/logSchema.png used on input line 512.
+(pdftex.def)             Requested size: 361.34999pt x 184.75337pt.
+
+Overfull \hbox (2.07896pt too wide) in paragraph at lines 520--522
 []\T1/ppl/m/n/9 ABLS is de-signed to be a cen-tral-ized log-ging sys-tem backed
 
  []
 
-<images/deployment.pdf, id=118, 822.07124pt x 877.2775pt>
+<images/deployment.pdf, id=45, 822.07124pt x 877.2775pt>
 File: images/deployment.pdf Graphic file (type pdf)
 
 <use images/deployment.pdf>
-Package pdftex.def Info: images/deployment.pdf used on input line 643.
+Package pdftex.def Info: images/deployment.pdf used on input line 525.
 (pdftex.def)             Requested size: 361.34999pt x 385.6151pt.
 
-
-LaTeX Warning: Citation `akinyelecharm' on page \thepage  undefined on input li
-ne 658.
-
-
-Overfull \hbox (3.0241pt too wide) in paragraph at lines 657--660
+Overfull \hbox (3.0241pt too wide) in paragraph at lines 539--546
 \T1/ppl/m/n/9 chi-tec-ture was its scal-able per-for-mance while pro-cess-ing l
 arge
  []
 
-[7] (./abls.bbl
-Underfull \vbox (badness 10000) has occurred while \output is active []
+Package epstopdf Info: Source file: <images/logPerf.eps>
+(epstopdf)                    date: 2013-02-09 23:55:08
+(epstopdf)                    size: 9070 bytes
+(epstopdf)             Output file: <images/logPerf-eps-converted-to.pdf>
+(epstopdf)                    date: 2013-02-10 17:27:01
+(epstopdf)                    size: 8630 bytes
+(epstopdf)             Command: <repstopdf --outfile=images/logPerf-eps-convert
+ed-to.pdf images/logPerf.eps>
+(epstopdf)             \includegraphics on input line 549.
+Package epstopdf Info: Output file is already uptodate.
+<images/logPerf-eps-converted-to.pdf, id=46, 494.84875pt x 404.51125pt>
+File: images/logPerf-eps-converted-to.pdf Graphic file (type pdf)
 
- [8 <./images/deployment.pdf>]) [9] (./abls.aux)
+<use images/logPerf-eps-converted-to.pdf>
+Package pdftex.def Info: images/logPerf-eps-converted-to.pdf used on input line
+ 549.
+(pdftex.def)             Requested size: 216.81pt x 177.22629pt.
+Package epstopdf Info: Source file: <images/logPerfDiffEvents.eps>
+(epstopdf)                    date: 2013-02-10 00:29:39
+(epstopdf)                    size: 9142 bytes
+(epstopdf)             Output file: <images/logPerfDiffEvents-eps-converted-to.
+pdf>
+(epstopdf)                    date: 2013-02-10 17:27:02
+(epstopdf)                    size: 8582 bytes
+(epstopdf)             Command: <repstopdf --outfile=images/logPerfDiffEvents-e
+ps-converted-to.pdf images/logPerfDiffEvents.eps>
+(epstopdf)             \includegraphics on input line 557.
+Package epstopdf Info: Output file is already uptodate.
+
+<images/logPerfDiffEvents-eps-converted-to.pdf, id=47, 508.90125pt x 404.51125p
+t>
+File: images/logPerfDiffEvents-eps-converted-to.pdf Graphic file (type pdf)
+ <use images/logPerfDiffEvents-eps-converted-to.pdf>
+Package pdftex.def Info: images/logPerfDiffEvents-eps-converted-to.pdf used on 
+input line 557.
+(pdftex.def)             Requested size: 216.81pt x 172.3378pt.
+
+
+Package caption Warning: \label without proper \caption on input line 571.
+See the caption package documentation for explanation.
+
+
+LaTeX Warning: Reference `tab:storage' on page \thepage  undefined on input lin
+e 565.
+
+[5]
+
+LaTeX Warning: Text page \thepage  contains only floats.
+
+
+Overfull \vbox (13.26843pt too high) has occurred while \output is active []
+
+
+
+LaTeX Warning: Text page \thepage  contains only floats.
+
+
+Overfull \vbox (13.26843pt too high) has occurred while \output is active []
+
+
+[6 <./images/logSchema.png> <./images/deployment.pdf>] (./abls.bbl
+Underfull \vbox (badness 1946) has occurred while \output is active []
+
+ [7 <./images/logPerf-eps-converted-to.pdf> <./images/logPerfDiffEvents-eps-con
+verted-to.pdf>])
+Overfull \vbox (2.51898pt too high) has occurred while \output is active []
+
+
+[8] (./abls.aux)
 
 LaTeX Warning: There were undefined references.
 
-
-LaTeX Warning: There were multiply-defined labels.
-
  ) 
 Here is how much of TeX's memory you used:
- 7658 strings out of 493488
- 111194 string characters out of 3141326
- 199912 words of memory out of 3000000
- 10783 multiletter control sequences out of 15000+200000
- 49182 words of font info for 64 fonts, out of 3000000 for 9000
+ 7649 strings out of 493488
+ 111183 string characters out of 3141326
+ 196913 words of memory out of 3000000
+ 10774 multiletter control sequences out of 15000+200000
+ 48046 words of font info for 63 fonts, out of 3000000 for 9000
  957 hyphenation exceptions out of 8191
- 44i,12n,42p,445b,839s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 44i,12n,42p,441b,839s stack positions out of 5000i,500n,10000p,200000b,50000s
 {/usr/local/texlive/2012/texmf-dist/fonts/enc/dvips/base/8r.enc}</usr/local/t
 exlive/2012/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi5.pfb></usr/local/tex
 live/2012/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi6.pfb></usr/local/texli
@@ -878,12 +836,11 @@ ype1/urw/helvetic/uhvr8a.pfb></usr/local/texlive/2012/texmf-dist/fonts/type1/ur
 w/palatino/uplb8a.pfb></usr/local/texlive/2012/texmf-dist/fonts/type1/urw/palat
 ino/uplr8a.pfb></usr/local/texlive/2012/texmf-dist/fonts/type1/urw/palatino/upl
 ri8a.pfb></usr/local/texlive/2012/texmf-dist/fonts/type1/urw/times/utmb8a.pfb><
-/usr/local/texlive/2012/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/local
-/texlive/2012/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on abls.pdf (9 pages, 458422 bytes).
+/usr/local/texlive/2012/texmf-dist/fonts/type1/urw/times/utmr8a.pfb>
+Output written on abls.pdf (8 pages, 315883 bytes).
 PDF statistics:
- 201 PDF objects out of 1000 (max. 8388607)
- 154 compressed objects within 2 object streams
+ 141 PDF objects out of 1000 (max. 8388607)
+ 100 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
  26 words of extra memory for PDF output out of 10000 (max. 10000000)
 

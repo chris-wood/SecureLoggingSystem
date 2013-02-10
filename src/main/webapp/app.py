@@ -39,6 +39,7 @@ USERS = {
 }
 USER_NAMES = dict((u.name, u) for u in USERS.itervalues())
 
+# Dummy credentials
 SECRET_KEY = "yeah, not actually a secret"
 DEBUG = True
 
@@ -117,11 +118,6 @@ def api_echo():
 		jsResp = json.dumps({"success": False, "message": "Only HTTP POST commands accepted for /submitLog."})
 		resp = Response(jsResp, status=400, mimetype='application/json')
 		return resp
-
-def startApp():
-	''' Start the app....
-	'''
-	app.run(debug=True)
 
 if '__main__' == __name__:
     app.run(debug=True)

@@ -1,4 +1,5 @@
 % ABLS - term-long paper
+% Christopher Wood
 
 \documentclass{sig-alternate}
 
@@ -121,8 +122,8 @@ less frequently. In the context of maintaining the confidentiality of log messag
 RBAC surpasses traditional mandatory and discretionary access control (MAC and DAC) 
 \cite{Abrams1990-AccessControl}.
 
-More recently, attribute-based access control (ABAC) \cite{TODOTODO} has been developed to 
-provide fine-grained access control to sensitive data. It is common practice to specify user roles as attributes
+More recently, attribute-based access control (ABAC) \cite{shen2006attribute} \cite{alipour2011policy} \cite{zhu2008attribute}
+has been developed to provide fine-grained access control to sensitive data. It is common practice to specify user roles as attributes
 in this access control scheme, thus enabling the benefits of RBAC with fine-grained access control.
 Attribute-based encryption (ABE) \cite{Goyal2006-ABAC}, a new cryptographic scheme that uses 
 user attributes (or roles, in this context) to maintain the confidentiality of user-sensitive data, has an appealing application
@@ -142,8 +143,291 @@ log information, followed by the cryptographic access control mechanisms used to
 of log data and audit trails. Finally, we conclude with a practical use case for ABLS in the context of healthcare 
 organizations.
 
-\section{Structured Log Data and Automated Audits}
-A major motivating factor for our log data structure comes from realistic security policies. In this context, we make
+\section{Secure Logging Requirements}
+The most fundamental requirements for a secure logging system is that it provides log data integrity
+and confidentiality. In the context of a secure logging system, integrity is based on the forward-secure
+stream integrity model. This model of integrity guarantee that log data cannot be forged or rearranged 
+within the stream of log messages, and resilient against attacks that try to recover old keys after a 
+machine has been compromised (i.e. forward secure).
+
+Research into this problem has since revealed that a variety of other realistic
+requirements also exist, including a resilience to truncation and delayed detection attacks, 
+minimal reliance on an on-line server for log storage and verification, and storage efficiency. 
+For completeness, truncation and delayed detection attacks are defined below, based on 
+explanations presnted in \cite{ma2008practical}.
+
+\begin{itemize}
+  \item \textbf{Truncation attack} - An attack in which a set of log entries residing on an untrusted log
+servers is truncated, or shortened so as to remove suspicious events, without being detected by 
+synchronization with the trusted log server.
+  \item \textbf{Delayed detection} - An attack in which log entries on the untrusted log servers can be 
+  modified by an attacker who possesses the authentication key $A_i$ after compromising the system between
+  log entries $L_i$ and $L_{i+1}$. With this key, the attacker can easily change entries in the log. However, once the trusted machine synchronizes with the untrusted log server to check the integrity of the log messages, this attack is immediately detected. Of course, significant damage could have already been done during this time window when the log server is compromised and it is synchronized with the trusted machine.
+\end{itemize}
+
+%\section{Cryptographic Primitives}
+%This scheme 
+%TODO: introduce CP-ABE and FssAgg primitives, and how they're used for confidentiality and integrity, respectively
+
+\section{Log File Reliability}
+\label{sec:LogConstruction}
+
+%In this section we present our log generation and verification schemes.
+%They are influenced by past work done by Schneier et al ,
+%Bellare et al. \cite{Bellare1997-ForwardIntegrity}, Ma et al. \cite{Ma2008-FssAgg},
+%and Yavuz et al. \cite{Yavuz2009-BAF}. 
+
+Log file reliability, which reduces to log integrity, is achieved through hash chains and message-authentication codes, 
+which is a technique first introduced by Schneier et al \cite{Schneier1999-Secure} and motivated by
+Bellare et al \cite{Bellare1997-ForwardIntegrity}. 
+Each log entry is a five-tuple element that contains the generating source
+information $(U, S)$, the encrypted payload $C$ of the log data $D$, a hash digest that provides
+a link between the current and previous hash chain entries $X$, and an authentication tag for the digest $Y$. 
+Formally, each log entry $L_i$ is built using the following protocol: %%%%%% (as depicted in Figure \ref{fig:hashChain}):
+\begin{align*}
+X_i = & H(X_{i - 1}, E_{PK}(D_i)) \\ % rationale: need to link this entry to previous for chaining
+Y_i = & HMAC_{A_i}(X_i) \\ 
+L_i = & (U_{i}, S_{i}, E_{PK}(D_i), X_i, Y_i) % rationale for u/s: searhability
+\end{align*}
+
+%\begin{figure*}[ht!]
+%  \centering
+%  \includegraphics[scale=0.8]{images/hashchain.pdf} \\
+%\caption{A visual depiction of the hash chain construction scheme. In this case, the epoch window is $5$ log entries, as shown by the epoch
+%cycle after $5$ consecutive log entries.}
+%\label{fig:hashChain}
+%\end{figure*}
+
+In this scheme the $X_i$ elements are used to link together consecutive entries in 
+the hash chain. Similarly, the $Y_i$ elements are used to provide authentication 
+for the $X_i$ element using an authentication tag for the $X_i$ entries. Also, the 
+initial value for the MAC key $A_0$ is randomly generated when a user session is 
+created. 
+
+In order to prevent truncation and deletion attacks, a single entity $T_i$ for the entire log 
+chain is updated as the log chain is iteratively constructed. Formally, $T_i$ is
+computed as follows:
+\begin{align*}
+T_i = & HMAC_{B_i}(L_{i}, T_{i - 1}) \\
+T_0 = & HMAC_{B_0}(L_{i}, 1)
+\end{align*}
+$B_0$ is a secret symmetrical key that that is randomly generated when the log chain for a user session
+is initialized. This key is evolved with a pseudorandom function $H$ as follows:
+\begin{align*}
+B_{i+1} = H(B_i)
+\end{align*}
+For forward-security, this entity creation could be replaced with a publicly-verifiable Forward Secure Sequential Aggregate (FssAgg)
+signature scheme backed by a trusted certificate authority to support forward-secure stream integrity. We refer the reader to 
+\cite{Ma2008-FssAgg} for a more thorough treatment of FssAgg signature schemes and their role in updating the single log chain entity. 
+
+%A visual representation of this protocol is shown in Figure \ref{fig:tagChain}. It is
+%important to note that a chain of $T_i$ elements is not maintained. Instead, only the
+%most recent element is persisted to the database. This is critical to prevent
+%truncation attacks.
+
+%\begin{figure*}[ht!]
+%  \centering
+%  \includegraphics[scale=0.8]{images/tagchain.pdf} \\
+%\caption{A visual depiction of the protocol used to build the log chain authentication tag.}
+%\label{fig:tagChain}
+%\end{figure*}
+
+\subsection{Verification Modes}
+\label{log:VerificationModes}
+
+The ABLS log construction scheme enables two different modes of verification to be implemented,
+each of which has different integrity and performance guarantees. The first mode of verification
+requires one to walk the log chain, computing the digest $X_i$ and comparing it to the value
+stored in the database. However, this method does not guarantee the integrity of the log chain.
+The second mode of verification requires a trusted verifier task $\mathcal{V}$ to use the initial
+hash chain key $A_0$ and entity key $B_0$ to walk the log entries, computing both $X_i$ and $Y_i$,
+and comparing them against the values stored in the database. While this mode does not lend itself
+to public verifiability, it guarantees the integrity of the log chain if a forward-secure MAC is used.
+
+\section{Log Access Control}
+Access control for log data is enforced using ciphertext policy attribute-based encryption 
+(CP-ABE), a new encryption scheme that supports complex
+access policies that specify which secret keys can be used for decryption \cite{Bethencourt2007-CPABE}. 
+In CP-ABE, secret keys are analogous to sets of attributes, and access policies are defined using 
+tree-like access structures of logical AND and OR gates, where each leaf in the tree is an attribute. Implementations of 
+CP-ABE schemes are usually based on the construction of a bilinear mapping between two elliptic curve 
+groups \cite{Bethencourt2007-CPABE} \cite{Junod2010-ABE}. We define both of these terms in the following sections.
+
+\subsection{Mathematical Foundations}
+\begin{definition}
+Let $\mathbb{F}_p$ be a finite field where $p > 3$ is a prime, and $a, b \in \mathbb{F}_p$ such that
+\begin{align*}
+4a^3 + 27b^2 \not= 0 \mod p \in \mathbb{F}_p
+\end{align*}
+
+An \emph{ellptic curve} $E[\mathbb{F}_p]$ is the set of solutions $(x, y)$ to the equation
+\begin{align*}
+y^2 = x^3 + ax + b \mod p \in \mathbb{F}_p[x],
+\end{align*}
+together with the point at infinite $0$.
+\end{definition}
+
+\begin{definition}
+Let $G_1$ and $G_2$ be cyclic groups of prime order $p$ and $g$ a generator of $G_1$. We say that $e$ is a \emph{bilinear map} defined as $e : G_1 \times G_2$, where $|G_1| = |G_2| = p$. This bilinear map satisfies the following properties:
+\begin{itemize}
+	\item Bilinearity: For all $u, v \in G_0$ and $a, b \in \mathbb{Z}_p$, we have $e(u^a, v^b) = e(u,v)^{ab}$
+	\item Non-degeneracy: $e(g, g,) \not= 1$
+	\item Computability: Both $G_1$ and $G_2$ are efficiently computable
+\end{itemize}
+\end{definition}
+
+\subsection{Ciphertext Policy Attribute-Based Encryption}
+In the original construction of the CP-ABE scheme, Bethencourt et al. \cite{Bethencourt2007-CPABE} defined five different procedures 
+used in the cryptosystem: \emph{Setup}, \emph{Encrypt}, \emph{KeyGeneration}, \emph{Derypt}, and 
+\emph{Delegate}. We define each of these procedures as follows:
+\begin{itemize}
+	\item \textbf{Setup} - This procedure takes the implicit security parameter as input and outputs the public and master keys $PK$ and $MK$.
+	\item \textbf{Encrypt}(\textbf{PK}, M, $\mathbb{A}$) - This procedure will encrypt $M$, a plaintext message, to produce a ciphertext $CT$ such that only a user that possesses a set of attributes that satisfies the access structure $\mathbb{A}$ will be able to decrypt the message. The encryption process embeds $\mathbb{A}$ into the ciphertext.
+	\item \textbf{KeyGeneration}(\textbf{MK}, $\mathbb{S}$) - This procedure generates a private key $SK$ using the master key $MK$ and set of attributes $S$ that describe the private key. 
+	\item \textbf{Decrypt}(\textbf{PK}, \textbf{CT}, \textbf{SK}) - This procedure decrypts the ciphertext $CT$ using the provided secret key $SK$ to return the original message $M$. Decryption is only successful if the set $S$ of attributes, which is associated with the key $SK$, satisfies the access policy embedded within the ciphertext (which is part of the access structure $\mathbb{A}$).
+	\item \textbf{Delegate}(\textbf{SK}, \~{S}) - This procedure outputs a secret key \~{$SK$} for the set of attributes \~{$S$}, where \~{$S$} $\subset S$, the set of attributes associated with the secret key \textbf{SK}.
+\end{itemize}
+
+\subsection{Access Policy Definition}
+
+A major component of ABLS is the policy engine, which maps access policies defined on an event basis to 
+the corresponding access tree used for encryption. For example, an access policy might state that only User
+XYZ, or physician assistants or nurse practitioners from Medical Group A, are allowed to access data associated
+with an event $E$. The corresponding access tree for this policy is shown in Figure \ref{fig:accessTree}.  
+
+\begin{figure}[ht!]
+\begin{center}
+\includegraphics[width=1.5in]{images/cpabePolicy.pdf}
+\caption{Access tree for a policy that only enables access to user XYZ, Medical Group A physician assistants, and Medical Group A nurse practitioners.}
+\label{fig:accessTree}
+\end{center}
+\end{figure}
+
+Our logging scheme makes the assumption that events, and the access policies for all data associated
+with such events, are well defined, which is often the case with organizations that must
+comply with federal legislation like HIPAA \cite{annas2003hipaa}. With this
+assumption, the behavior of the policy engine in generating access policies is dependent on
+administrator-defined policy rules for events of interest and the corresponding attributes of
+system users and data that trigger such events. In this way, policy rules are coupled to events so that 
+policies for access are generated based on the type of event that occurred and the user who is requesting 
+access to such information. 
+
+\begin{comment}
+In this scheme, policy rules can be thought of as functions similar to the ones described by 
+{\tt Rule-$E_1$} and {\tt Rule-$E_2$} (Algorithms \ref{alg:ruleE1} and \ref{alg:ruleE2}, respectively).
+
+In this example, we see that the rule for event $E_1$ takes an {\tt EventInformation} structure, which contains
+all of the information generated for an event. A prospective definition for an {\tt EventInformation} structure
+is shown below.
+\begin{lstlisting}
+struct 
+{
+    User SourceUser;
+    int EventId;
+} 
+EventInformation;
+\end{lstlisting} 
+
+The information contained within this structure is specific 
+to the implementation of the system. For our purposes, we only require the source user from which the
+event was generated, as well as the event identifier. The policy engine would then query the user
+database to determine the secret identity of the source user and embed this in the resulting attribute
+list. Optionally, depending on the implementation of {\tt RuleE1}, the policy engine would append additional
+attributes to the list in disjunctive normal form. The simplicity of these policy implementations 
+makes changing them an effortless task should the organization's security policy change.
+
+
+\begin{algorithm}[ht] %[htb]
+\caption{{\tt Rule-$E_1$} policy} \label{alg:ruleE1}
+\begin{algorithmic}[1]
+\REQUIRE{An {\tt EventInformation} object instance $e$.}
+\ENSURE{The access policy for the event corresponding to the information in $e$}
+\STATE{UserID $\leftarrow$ database.queryUserId(e.SourceUser)}
+\STATE{Return ('UserID' OR 'Colleague of attributeID' OR 'System Administrator')}
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[ht] %[htb]
+\caption{{\tt Rule-$E_2$} policy} \label{alg:ruleE2}
+\begin{algorithmic}[1]
+\REQUIRE{An {\tt EventInformation} object instance $e$.}
+\ENSURE{The access policy for the event corresponding to the information in $e$}
+\STATE{UserID $\leftarrow$ database.queryUserId(e.SourceUser)}
+\STATE{Return ('UserID' OR 'System Administrator')}
+\end{algorithmic}
+\end{algorithm}
+\end{comment}
+
+\subsection{Key Generation and Management}
+Pairing-based cryptography is computationally expensive, and under the assumption that ABLS might be subject 
+to very heavy traffic loads at any particular time, the 
+overhead of encrypting data to be stored in the database should be as minimal as possible. Therefore, each unique
+policy that is needed to encrypt a log message is associated with a symmetric key, which is in 
+turn encrypted using CP-ABE and then serialized to be stored in the key database. 
+This design enhancement enables increased throughput without sacrificing the 
+level of confidentiality granularity that is needed for each log entry. However, should an 
+unencrypted policy key for a given user's session become compromised, the remaining entries in that log database are at risk of being compromised. 
+
+The basic procedure for encrypting a log entry is shown in Algorithm \ref{alg:encrypt}. Once encrypted, the ciphertext
+is stored in the database with the rest of the information necessary to continue the log chain for a given user's session.
+  
+\begin{algorithm}[h] %[htb]
+\caption{Log entry encryption} \label{alg:encrypt}
+\begin{algorithmic}[1]
+\REQUIRE{An unencrypted log entry $L_i$ for session $S_j$ of user $U_k$}
+% \ENSURE{The number of all minimum $(s,t)$-cuts of $G$}
+
+% I decided not to list the input/output in this case, so that's why the above two lines are commented out
+\STATE{Let $P$ be the access control policy for the message of $L_i$, as determined by the {\tt PolicyEngine}}
+\IF{The symmetric key $K$ for $(U_k, S_j)$ has not been generated for $P$}
+  \STATE{Generate $K$ and encrypt it with the CP-ABE encryption module using $P$, yielding $K_E$}
+  \STATE{Persist $K_E$ to the key database}
+\ELSE
+  \STATE{Query the database for $K_E$, the encrypted key for policy $P$.}
+  \STATE{Decrypt $K_E$ using the attributes of user $U_k$, yielding $K$}
+\ENDIF
+\STATE{Encrypt $L_i$ with AES-256 using $K$, yielding $E(L_i, K)$}
+\STATE{Persist $E(L_i, K)$ to the log database}
+\end{algorithmic}
+\end{algorithm}
+
+In order to improve the performance of the logger, the per-policy symmetric keys used for encryption for a user session are kept
+in memory until the session has been closed. This avoids the need for the logger to query the database for the key 
+when a new log message arrives. 
+
+By default, the secret keys used for decryption are never cached in the system's local memory. Since it is
+expected that log entries will be read much less frequently than they will be written, such keys are generated
+on demand by querying the appropriate database. Furthermore, the key generation process can be done in two ways. 
+For policy rules that limit the access to only the generating user, only a single query to the attribute database
+is required to establish the user's secret key and then decrypt the data for all log entries corresponding to that rule. 
+With this key the user may decrypt these entries offline without the need to query the policy engine for the 
+appropriate access rights.
+
+Conversely, for access policy rules that embed attributes for colleagues or other users related to the 
+source user, the policy engine must first query the user database to ensure the requesting 
+user meets the relationship criteria set in place by the policy. Then,
+if this is successful, the policy engine will grant the appropriate secret key to the requesting user. The tradeoff
+is that, while an online TTP is needed for such colleagues to access the log entry contents, it is significantly easier
+for the system administrators to manage who has access to specific log entries aside from the original source user.
+Simply modifying the user's relationships in the system database is sufficient to revoke access from certain colleagues.
+
+In order to maintain the security of the system at runtime, it is necessary to cycle the master and public keys
+associated with the encryption scheme. Our current system does not support this feature, but there are two
+ways that it could be implemented. The first way is to persist the old master and 
+public keys to a safe location that could be called during auditing and verification if needed. The second way is 
+to re-encrypt the entire log database with the new master and public key. Unfortunately, this would not only require the system to be 
+brought offline during the update (in order to avoid synchronization issues with live traffic), but it would also
+mean that the new master and public key serve as a single point of failure for the entire database if compromised. 
+Therefore, future releases of this system plan to implement the first approach to manage keys. It would be
+best to determine the key cycle lifetime based on empirical data associated with the growth of the log database.
+Intuitively, in order to maintain auditing and verification efficiency, the cycle frequency should be defined as 
+a monotonically increasing function that is proportional to the growth of the database. 
+
+\section{Structured Log Data for Automated Audits}
+Current technological solutions for automated audits in organizations where the usage of audit trails is required for compliance activities
+are considered to be ineffective \cite{president2004revolutionizing}. In order to support automated audits of audit trails,
+it is necessary to specify a formal structure for this data that matches organizational security policies. 
+Therefore, a major motivating factor for the ABLS log data structure comes from realistic security policies. In this context, we make
 the assumption that a security policy can be stated as a set of \emph{negative} requirements. For example, one 
 such requirement might be that a doctor is not allowed to change their patient's address. In order to conduct an 
 automated audit for violations of this policy, we first translate this semantically-rich requirement into a language
@@ -187,426 +471,15 @@ is shown below.
 ]
 \end{lstlisting}
 
-In this section we present our log generation and verification schemes.
-They are influenced by past work done by Schneier et al \cite{Schneier1999-Secure},
-Bellare et al. \cite{Bellare1997-ForwardIntegrity}, Ma et al. \cite{Ma2008-FssAgg},
-and Yavuz et al. \cite{Yavuz2009-BAF}. 
-
-\subsection{Log Construction}
-\label{sec:LogConstruction}
-
-Log integrity is achieved through hash chains and message-authentication codes. 
-Each log entry is a five-tuple element that contains the generating source
-information, the encrypted payload of the entry, a hash digest that provides
-a link between the current and previous hash chain entries, and an authentication tag for this digest. In the proof-of-concept
-system implementation, Keccak is used as the standalone hash function $H$
-and the $HMAC$ function is built using $SHA$-$512$. 
-Formally, each log entry $L_i$ is built using the following protocol (as depicted in Figure \ref{fig:hashChain}):
-\begin{align*}
-X_i = & H(X_{i - 1}, E_{SK}(D_i)) \\ % rationale: need to link this entry to previous for chaining
-Y_i = & HMAC_{EpK_{j}}(X_i, Ep_{j}) \\ % rationale: for epoch-key based: can keep in logger memory and then commit on epoch cycle (helps against wiretapping attacks and load balancing)
-L_i = & (U_{ID}, S_{ID}, E_{SK}(D_i), X_i, Y_i) % rationale for u/s: searhability
-\end{align*}
-
-\begin{figure*}[ht!]
-  \centering
-  \includegraphics[scale=0.8]{images/hashchain.pdf} \\
-\caption{A visual depiction of the hash chain construction scheme. In this case, the epoch window is $5$ log entries, as shown by the epoch
-cycle after $5$ consecutive log entries.}
-\label{fig:hashChain}
-\end{figure*}
-
-In this scheme the $X_i$ elements are used to link together consecutive entries in 
-the hash chain. Similarly, the $Y_i$ elements are used to provide authentication 
-for the $X_i$ element using an authentication tag that is computed from $X_i$ and the 
-previous epoch digest $Ep_{j - 1}$. 
-
-In this context, an epoch $Ep_j$ simply corresponds to a fixed-size set of log entries that
-are being processed (i.e. an epoch window). For example, if the epoch size is $n$ entries, then the 
-log generation scheme will cycle after $n$ log entries have been constructed and begin working on a new set of log entries. After a cycle is completed, a context block
-for the most recent epoch is created and inserted into an epoch chain (similar to the log chain). These log generation cycles create frames (or windows) in the entire log chain in which the 
-scheme generates log entries using a single epoch block and key $Ep_{j}$ and $EpK_j$, respectively. 
-More specifically, $Y_i$ is the authentication tag that is built using only the entries within the current epoch window.
-
-%TODO: forward-secrecy guarantees... compare to aggregate signatures (we store each hash chain and the entire thing altogether)
-
-%In order to provide computationally efficient means of generating the 
-%authentication tag for the log chain, log generation is divided into epochs of
-%client-defined sizes. The selection criteria for this epoch size is 
-%discussed in more detail later, but should generally be based
-%on the frequency of traffic that is generated by the host application. 
-
-Context blocks for epoch windows are stored in the same way as log chains.
-Each epoch chain entry $Ep_j$ is built as follows:
-\begin{align*}
-Ep_j = & HMAC_{EpK_{j}}(Ep_{j - 1}, L_{l}) \\
-Ep_0 = & HMAC_{EpK_{0}}(0)
-\end{align*}
-In this context, $L_{l}$ is the last log chain entry for the previous epoch $Ep_{j - 1}$.
-Thus, each epoch chain entry maintains the integrity of the log chain at each epoch cycle
-by linking the most recent log chain entry to the previous epoch context block.
-The key $EpK_{j}$ that is used to compute the $Y_i$ authentication tag is
-based on the current epoch $Ep_j$, and only evolves when the epoch window cycles. 
-This update is done with a pseudorandom function $H$ (which,
-in our case, is simply the Keccak hash function), and is defined as follows:
-\begin{align*}
-EpK_{j + 1} = H(EpK_{j}) \\
-\end{align*}
-The initial epoch key $EpK_0$ is a secret that is initialized when a session
-is started. Corruption of this key can enable a determined attacker to reconstruct
-the log chain and epoch chain without detection. Without this information, however,
-such modifications are always detectable. We refer to Section \ref{sec:security} for
-a more detailed description of this issue.
-
-Finally, as a third layer of integrity, a single digest for the entire log $T_i$
-chain is stored as the log chain is iteratively constructed. Formally, $T_i$ is
-built as follows:
-\begin{align*}
-T_i = & HMAC_{T_{K_{i}}}(L_{i}, T_{i - 1}) \\
-T_0 = & HMAC_{T_{K_{0}}}(L_{i}, 1) %caw: this needs to change in the code. current code does not do it this way.
-\end{align*}
-The secret key $T_{K_{0}}$ for the entire log chain is another secret that is
-initialized when the session is started. Similar to the epoch key, it is evolved
-with a pseudorandom function $H$ as follows:
-\begin{align*}
-T_{K_{i + 1}} = H(T_{K_{i}})
-\end{align*}
-
-A visual representation of this protocol is shown in Figure \ref{fig:tagChain}. It is
-important to note that a chain of $T_i$ elements is not maintained. Instead, only the
-most recent element is persisted to the database. This is critical to prevent
-truncation attacks.
-
-%\begin{figure*}[ht!]
-%  \centering
-%  \includegraphics[scale=0.8]{images/tagchain.pdf} \\
-%\caption{A visual depiction of the protocol used to build the log chain authentication tag.}
-%\label{fig:tagChain}
-%\end{figure*}
-
-\subsection{Log Generation Rationale}
-The construction of each log entry satisfies the following properties:
-\begin{enumerate}
-  \item Each log entry payload is encrypted and only viewable by those with the appropriate attributes.
-  \item The integrity of the log chain is ensured through the links generated by $X_i$ elements, which are verifiable by the $Y_i$ authentication tags.
-  \item The integrity of the entire log chain is guaranteed with the $T_i$ element. This protects the log chain against truncation attacks.
-  \item The epoch-based log generation enables the logger to control the frequency of data
-  sent to the log server, which helps with load balancing and protects against wiretapping attacks.
-  \item The epoch window is assumed to be a fixed (constant) size, and thus it requires $\mathcal{O}(1)$ time to verify. The log chain can be verified in $\mathcal{O}(n)$ time, where $n$ is the length of the log chain. These results are discussed in Section \ref{log:ComputationalComplexity}.
-  \item There are three different modes of verification that can be performed (weak, normal, and strongest). These modes are described in Section \ref{log:VerificationModes}.
-  \item The log is searchable by the user identity and session numbers, which leads to very fine-grained database queries. 
-\end{enumerate}
-
-\subsubsection{Verification Modes}
-\label{log:VerificationModes}
-
-Our log construction scheme enables three different modes of verification to be implemented,
-each of which has different integrity and performance guarantees. Table \ref{tab:verifModes} 
-provides an overview of the differences between these modes of verification. Algorithms \ref{alg:strongVerify}
-and \ref{alg:weakVerify} provide a description of two of these verification modes.
-
-\begin{table*}[ht!]
-  \caption{The integrity and performance differences for the three log verification modes supported by the log generation scheme.}
-  \label{tab:verifModes}
-  \begin{tabular}{|l|l|l|l|}
-    \hline
-    \textbf{Verification Mode} & \textbf{Visibility} & \textbf{Integrity Guarantees} & \textbf{Worst-case Performance} \\ \hline
-    Weak & Public & Weak & 1 Keccak computation \\ 
-    Normal & Private & Medium & 2 Keccak and 2 $HMAC$ computations \\ 
-    Strong & Private & Strong & 2 Keccak and 4 $HMAC$ computations \\
-    \hline
-  \end{tabular}
-\end{table*}
-
-\begin{algorithm}[ht!] %[htb]
-\caption{Strongest verification procedure} \label{alg:strongVerify}
-\begin{algorithmic}[1]
-\REQUIRE{$UID$, $SID$, $\mathcal{L} = \{L_0, L_1,...,L_n\}, ChainDigest, Ep_k, L_k, EpochSize$}
-% \ENSURE{The number of all minimum $(s,t)$-cuts of $G$}
-
-% I decided not to list the input/output in this case, so that's why the above two lines are commented out
-\STATE{$payload \leftarrow UID | SID | 0 | L_0[3] | 0$}
-\STATE{$epoch \leftarrow HMAC(Ep_k, 0)$}
-\STATE{$x_1 \leftarrow Keccak(payload)$}
-\STATE{Return $FAIL$ if $x_1 \not= L_0[4]$}
-\STATE{$y_1 \leftarrow HMAC(Ep_k, epoch | x_1)$}
-\STATE{Return $FAIL$ if $y_1 \not= L_0[5]$}
-\STATE{$ed \leftarrow HMAC(L_k, x_1)$}
-\STATE{$L_k \leftarrow HMAC(L_k, \text{''constant value''})$}
-\FOR{$i = 1 \to n$}
-  \STATE{$payload \leftarrow UID | SID | i | L_i[3] | L_{i - 1}[4]$}
-  \STATE{$x_i \leftarrow Keccak(payload)$}
-  \STATE{Return $FAIL$ if $x_i \not= L_i[4]$}
-  \IF{$i | EpochSize$}
-    \STATE{$newKey \leftarrow Keccak(Ep_k$)}
-    \STATE{$Ep_k \leftarrow newKey$}
-    \STATE{$payload \leftarrow epoch | L_{i - 1}[4]$}
-    \STATE{$ed = HMAC(newKey, payload)$}
-  \ENDIF
-  \STATE{$y_i \leftarrow HMAC(Ep_k, epoch | x_i)$}
-  \STATE{Return $FAIL$ if $y_i \not= L_i[5]$}
-  \STATE{$ed \leftarrow HMAC(L_k, x_1)$}
-  \STATE{$L_k \leftarrow HMAC(L_k, \text{''constant value''})$}
-\ENDFOR
-\STATE{Return $FAIL$ if $ed \not= ChainDigest$}
-\STATE{Return $PASS$}
-\end{algorithmic}
-\end{algorithm}
-
-Although the weak verification mode does not provide the strongest integrity guarantees, it
-is useful for offline analysis of log files by users. In such situations, although the users 
-cannot be entirely positive that the log file has not been tampered with, they can at least 
-view some of their own data. For automated verifiers that run concurrently with the logging system, 
-the strong verification mode enables them to walk the database to perform integrity 
-checks on log chains for user sessions. This provides the users and system administrators 
-with confidence that the log database is correct. We discuss the role of automated
-verifiers in Section \ref{sec:architecture}.
-
-\subsection{Searchability}
-Based on the definitions provided in Section \ref{sec:LogConstruction}, it is easy to 
-see that log searchability is done by querying the database with known user identities and optional session 
-identifiers. This was a tradeoff that we made to support reasonable auditing performance. 
-It has been shown that in some application domains the presence of any relevant information
-pertaining to users is a violation of security policies. However, since the entire entry payload
-is kept confidential to unauthorized users through encryption, we do not anticipate the presence 
-of this information causing many problems. 
-
-The database schema for our logging system is shown in Figure \ref{fig:schema}. We emphasize that, 
-if the log server were compromised, the only information that a determined attacker could retrieve from
-the log database is a collection of user identities, which do not directly correspond to ``real'' user
-identities (i.e. database user identities are GUIDs that are generated whenever a user account is created
-by the host application). 
-
-\section{Relational Model}
+\section{Relational Model and Privacy Implications}
 In order to capture the audit information in a relational model to enable efficient and automated queries, 
 the events, actions, objects, and affected users are all coupled to the incoming log data. The resulting relational
-model is shown in Figure TODO
+model is shown in Figure \ref{fig:schema}.
 
-a 
-new Event table was added to the database schema. There is a one-to-one correspondence between Event 
-and Log records, and the security of such Event
-and Log information is maintained using the same hash chain construction techniques as in the preliminary design.
-However, for simplicity, the notion of hash chain epochs was removed.
-Also, Action, Object, and AffectedUserGroup tables were added to the database schema to store relevant information
-about log events as they are received from the log proxy. A high-level depiction of this new relational model is shown
-in Figure \ref{fig:design2}.
-
-\begin{figure}[ht!]
-\begin{center}
-\includegraphics[width=3.2in]{images/relational_design_v2.pdf}
-\caption{A high-level depiction of the new relational data model that supports automated audit tasks.}
-\label{fig:design2}
-\end{center}
-\end{figure}
-
-In this model, all Action and Object records are stored in plaintext. These tables store elements of a finite set, and
-encrypting them would not deter a determined attacker. However, all information about affected users is encrypted 
-(masked) using the same technique discussed in Section \ref{sec:databaseDesign}. As such, an attacker can infer
-information about what types of objects were operated upon, but they cannot determine the specifics of these actions
-or the users who performed them without compromising the ABLS master key $M_k$. We feel as though this strikes
-a good balance between robust audit specification, reasonable measures of audit and log efficiency, and overall 
-log security. 
-
-\begin{figure}[htb!]
-\begin{center}
-\includegraphics[width=3.2in]{images/logSchema.png}
-\caption{TODO}
-\label{fig:deployment}
-\end{center}
-\end{figure}
-
-\section{Log Access Control}
-The primary means of access control for log data is enforced using ciphertext policy 
-attribute-based encryption (CP-ABE), a new encryption scheme that supports complex
-access policies that specify which secret keys can be used for decryption. In CP-ABE, secret keys are analogous
-to sets of attributes, and access policies are defined using tree-like access structures of logical AND and OR
-gates, where each leaf in the tree is an attribute \cite{Bethencourt2007-CPABE}. Implementations of 
-CP-ABE schemes are usually based on the construction of a bilinear mapping between two elliptic curve 
-groups \cite{Bethencourt2007-CPABE} \cite{Junod2010-ABE}. We define both of these terms in the following sections.
-
-\subsection{Mathematical Foundations}
-\begin{definition}
-Let $\mathbb{F}_p$ be a finite field where $p > 3$ is a prime, and $a, b \in \mathbb{F}_p$ such that
-\begin{align*}
-4a^3 + 27b^2 \not= 0 \mod p \in \mathbb{F}_p
-\end{align*}
-
-An \emph{ellptic curve} $E[\mathbb{F}_p]$ is the set of solutions $(x, y)$ to the equation
-\begin{align*}
-y^2 = x^3 + ax + b \mod p \in \mathbb{F}_p[x],
-\end{align*}
-together with the point at infinite $0$.
-\end{definition}
-
-\begin{definition}
-Let $G_1$ and $G_2$ be cyclic groups of prime order $p$ and $g$ a generator of $G_1$. We say that $e$ is a \emph{bilinear map} defined as $e : G_1 \times G_2$, where $|G_1| = |G_2| = p$. This bilinear map satisfies the following properties:
-\begin{itemize}
-	\item Bilinearity: For all $u, v \in G_0$ and $a, b \in \mathbb{Z}_p$, we have $e(u^a, v^b) = e(u,v)^{ab}$
-	\item Non-degeneracy: $e(g, g,) \not= 1$
-	\item Computability: Both $G_1$ and $G_2$ are efficiently computable
-\end{itemize}
-\end{definition}
-
-\subsection{Ciphertext Policy Attribute-Based Encryption}
-In the original construction of the CP-ABE scheme, Bethencourt et al. \cite{Bethencourt2007-CPABE} defined five different procedures 
-used in the cryptosystem: \emph{Setup}, \emph{Encrypt}, \emph{KeyGeneration}, \emph{Derypt}, and 
-\emph{Delegate}. We define each of these procedures as follows:
-\begin{itemize}
-	\item \textbf{Setup} - This procedure takes the implicit security parameter as input and outputs the public and master keys $PK$ and $MK$.
-	\item \textbf{Encrypt}(\textbf{PK}, M, $\mathbb{A}$) - This procedure will encrypt $M$, a plaintext message, to produce a ciphertext $CT$ such that only a user that possesses a set of attributes that satisfies the access structure $\mathbb{A}$ will be able to decrypt the message. The encryption process embeds $\mathbb{A}$ into the ciphertext.
-	\item \textbf{KeyGeneration}(\textbf{MK}, $\mathbb{S}$) - This procedure generates a private key $SK$ using the master key $MK$ and set of attributes $S$ that describe the private key. 
-	\item \textbf{Decrypt}(\textbf{PK}, \textbf{CT}, \textbf{SK}) - This procedure decrypts the ciphertext $CT$ using the provided secret key $SK$ to return the original message $M$. Decryption is only successful if the set $S$ of attributes, which is associated with the key $SK$, satisfies the access policy embedded within the ciphertext (which is part of the access structure $\mathbb{A}$).
-	\item \textbf{Delegate}(\textbf{SK}, \~{S}) - This procedure outputs a secret key \~{$SK$} for the set of attributes \~{$S$}, where \~{$S$} $\subset S$, the set of attributes associated with the secret key \textbf{SK}.
-\end{itemize}
-
-\subsection{Access Policy Definition}
-
-% TODO
-A major component of ABLS is the policy engine, which maps access policies defined on an event basis to 
-the corresponding access tree used for encryption. For example, an access policy might state that only User
-XYZ, or physician assistants or nurse practitioners from Medical Group A, are allowed to access data associated
-with an event $E$. The corresponding access tree for this policy is shown in Figure \ref{fig:accessTree}.  
-
-\begin{figure}[ht!]
-\begin{center}
-\includegraphics[width=1.5in]{images/cpabePolicy.pdf}
-\caption{Access tree for a policy that only enables access to user XYZ, Medical Group A physician assistants, and Medical Group A nurse practitioners.}
-\label{fig:accessTree}
-\end{center}
-\end{figure}
-
-Our logging scheme makes the assumption that events, and the access policies for all data associated
-with such events, are well defined. With this
-assumption, we can represent the behavior of the policy engine by the system users and their associated
-data, events, and policy rules for specific events. In this way, policy rules are coupled to events in that 
-policies for access are generated based on the type of event that occurred and the user who is requesting 
-access to such information. Policy rules can be thought of as functions similar to the one described by 
-{\tt RuleE1} and {\tt RuleE2} (Algorithms \ref{alg:ruleE1} and \ref{alg:ruleE2}, respectively).
-In this example, we see that the rule for event E1 
-takes an {\tt EventInformation} structure, which contains
-all of the information generated for an event. A prospective definition for an {\tt EventInformation} structure
-is shown below.
-\begin{lstlisting}
-struct 
-{
-    User SourceUser;
-    int EventId;
-} 
-EventInformation;
-\end{lstlisting} 
-
-The information contained within this structure is specific 
-to the implementation of the system. For our purposes, we only require the source user from which the
-event was generated, as well as the event identifier. The policy engine would then query the user
-database to determine the secret identity of the source user and embed this in the resulting attribute
-list. Optionally, depending on the implementation of {\tt RuleE1}, the policy engine would append additional
-attributes to the list in disjunctive normal form. The simplicity of these policy implementations 
-makes changing them an effortless task should the organization's security policy change.
-
-\begin{algorithm}[t] %[htb]
-\caption{{\tt RuleE1} policy implementation} \label{alg:ruleE1}
-\begin{algorithmic}[1]
-\REQUIRE{An {\tt EventInformation} object instance $e$.}
-\ENSURE{The access policy for the event corresponding to the information in $e$}
-\STATE{attributeId $\leftarrow$ database.queryUserId(e.SourceUser)}
-\STATE{Return ('attributeID' OR 'Colleague of attributeID' OR 'System Administrator')}
-\end{algorithmic}
-\end{algorithm}
-
-\begin{algorithm}[t] %[htb]
-\caption{{\tt RuleE2} policy implementation} \label{alg:ruleE2}
-\begin{algorithmic}[1]
-\REQUIRE{An {\tt EventInformation} object instance $e$.}
-\ENSURE{The access policy for the event corresponding to the information in $e$}
-\STATE{attributeId $\leftarrow$ database.queryUserId(e.SourceUser)}
-\STATE{Return ('attributeID' OR 'System Administrator')}
-\end{algorithmic}
-\end{algorithm}
-
-\subsection{Key Generation and Management}
-By default, the secret keys used for decryption are never cached in the system's local memory. Since it is
-expected that log entries will be read much less frequently than they will be written, such keys are generated
-on demand by querying the appropriate database. Furthermore, the key generation process can be done in two ways. 
-For policy rules that limit the access to only the generating user, only a single query to the attribute database
-is required to establish the user's secret key and then decrypt the data for all log entries corresponding to that rule. 
-With this key the user may decrypt these entries offline without the need to query the policy engine for the 
-appropriate access rights.
-
-Conversely, for access policy rules that embed conditions for colleagues or other users 
-related to the source user, the policy engine must first query the
-user database to ensure the requesting user meets the relationship criteria set in place by the policy. Then,
-if this is successful, the policy engine will grant the appropriate secret key to the requesting user. The tradeoff
-is that, while an online TTP is needed for such colleagues to access the log entry contents, it is significantly easier
-for the system administrators to manage who has access to specific log entries aside from the original source user.
-Simply modifying the user's relationships in the system database is sufficient to revoke access from certain colleagues.
-
-In order to maintain the security of the system at runtime, it is necessary to cycle the master and public keys
-associated with the encryption scheme. Our current system does not support this feature, but there are two
-ways that it could be implemented. The first way is to persist the old master and 
-public keys to a safe location that could be called during auditing and verification if needed. The second way is 
-to re-encrypt the entire log database with the new master and public key. Unfortunately, this would not only require the system to be 
-brought offline during the update (in order to avoid synchronization issues with live traffic), but it would also
-mean that the new master and public key serve as a single point of failure for the entire database if compromised. 
-Therefore, future releases of this system plan to implement the first approach to manage keys. It would be
-best to determine the key cycle lifetime based on empirical data associated with the growth of the log database.
-Intuitively, in order to maintain auditing and verification efficiency, the cycle frequency should be defined as 
-a monotonically increasing function that is proportional to the growth of the database. 
-
-\subsection{Hybrid Key Management}
-\label{sec:keyMgmt}
-
-Pairing-based cryptography is computationally expensive, and under the assumption that ABLS might be subject 
-to very heavy traffic loads at any particular time, the 
-overhead of encrypting data to be stored in the database should be as minimal as possible. Therefore, each unique
-policy that is needed to encrypt a log message is associated with an AES-256 symmetric key, which is in 
-turn encrypted using CP-ABE and then serialized to be stored in the key database. The Charm crypto package allows all cryptographic 
-objects (which tend to be nested Python dictionaries and other complicated data structures) to be serialized to byte 
-representations for database persistence. This design enhancement enables 
-increased throughput without sacrificing the level of confidentiality granularity that is needed for each log entry. 
-However, should an unencrypted policy key for a given user's session become compromised, the remaining entries in 
-that log database are at risk of being compromised. 
-
-The basic procedure for encrypting a log entry is shown in Algorithm \ref{alg:encrypt}. Once encrypted, the ciphertext
-is stored in the database with the rest of the information necessary to continue the log chain for a given user's session.
-  
-\begin{algorithm}[h] %[htb]
-\caption{Log entry encryption} \label{alg:encrypt}
-\begin{algorithmic}[1]
-\REQUIRE{An unencrypted log entry $L_i$ for session $S_j$ of user $U_k$}
-% \ENSURE{The number of all minimum $(s,t)$-cuts of $G$}
-
-% I decided not to list the input/output in this case, so that's why the above two lines are commented out
-\STATE{Let $P$ be the access control policy for the message of $L_i$, as determined by the {\tt PolicyEngine}}
-\IF{The symmetric key $K$ for $(U_k, S_j)$ has not been generated for $P$}
-	\STATE{Generate $K$ and encrypt it with the CP-ABE encryption module using $P$, yielding $K_E$}
-	\STATE{Persist $K_E$ to the key database}
-\ELSE
-	\STATE{Query the database for $K_E$, the encrypted key for policy $P$.}
-	\STATE{Decrypt $K_E$ using the attributes of user $U_k$, yielding $K$}
-\ENDIF
-\STATE{Encrypt $L_i$ with AES-256 using $K$, yielding $E(L_i, K)$}
-\STATE{Persist $E(L_i, K)$ to the log database}
-\end{algorithmic}
-\end{algorithm}
-
-In order to improve the performance of the logger, the per-policy symmetric keys for a user session are kept
-in memory until the session has been closed. This avoids the need for the logger to query the database for the key 
-when a new log message arrives. 
-
-Also, in order to ensure that every encryption module (cipher) contained within loggers, verifiers, and database 
-shims uses the same master key $M_k$, a key manager singleton object was implemented and shared among
-all ABLS entities that require the master key. Upon creation, an encryption module will register itself with the key
-manager in order to receive any changes made to the master or public key.
-
-\subsection{Database Design}
-\label{sec:databaseDesign}
-
-As shown in section \ref{sec:deployment}, there are five main databases that must be maintained by ABLS:
-the log, key, user, audit\_user, and policy database. The log database maintains all information in the log chain for every 
+This schema only corresponds to the log database in ABLS. There are in fact four databases altogether that must be maintained by ABLS:
+the log, key, user, and policy database. The log database maintains all information in the log chain for every 
 single user and session pair. The key database stores the cryptographic keys that were used to construct
-such log chains. The user, audit\_user, and policy databases store user information and policy rules for ABLS, respectively. 
-In the current prototype of ABLS, the policy database is not used internally. Instead, all event rules are 
-hard-coded into the {\tt PolicyEngine}. 
+such log chains. The user, and policy databases store user information and policy rules for ABLS, respectively. 
 
 In order to link the entries in the log tables to their corresponding verification and encryption keys in the key database,
 common user and session IDs are used (though not as the primary key for the tables since they do not satisfy
@@ -627,11 +500,20 @@ inference attacks in the event that the database servers are compromised. Furthe
 who will have access to $M_k$ through the key manager, to decrypt log entries and recover the user identifier 
 so that they may check the contents of the other databases as needed.
 
-Also, to better support audits that use the log database, a timestamp field was added to each table as a required
-attribute. Not only does such information capture the exact timing of critical system events, it acts as a protection
-mechanism in the event that log messages are inserted into the database out of order. Also, it is important to note that
-each and every timestamp for a log message is generated when a database entry is generated to be sent to the log 
-collector. 
+In the log data model, all Action and Object records are stored in plaintext. These tables store elements of a finite set, and
+encrypting them would not derail a determined attacker. However, all information about affected users is encrypted 
+(masked) using the aforementioned technique. As such, an attacker can infer
+information about what types of objects were operated upon, but they cannot determine the specifics of these actions
+or the users who performed them without compromising the ABLS master key $M_k$. We feel as though this strikes
+a good balance between robust audit specification, reasonable measures of audit and log efficiency, user privacy, and log security. 
+
+\begin{figure*}[htb!]
+\begin{center}
+\includegraphics[width=5in]{images/logSchema.png}
+\caption{ER diagram depicting the relational schema for the log data model.}
+\label{fig:schema}
+\end{center}
+\end{figure*}
 
 \section{Deployment}
 \label{sec:deployment}
@@ -656,21 +538,48 @@ within an ABLS instance.
 \section{Analysis}
 The prototype ABLS system was written in Python, utilizing the Charm cryptography package 
 \cite{akinyelecharm} for pairing-based cryptographic primitives. A major concern for this new architecture 
-was its scalable performance while processing large amounts of log data. 
+was its scalable performance while processing large amounts of log data. Therefore, we conducted experiments
+to measure the encryption overhead from events that have uniform access policies, as well as the
+encryption overhead from events that have different access policies. These two experiments were conducted to
+guage the overhead of that results from log encryption and querying the policy engine for generating new policies.
+The results for these two experiments are shown in Figures \ref{fig:logPerf} and \ref{fig:logPerfDiffEvents}.
 
-%TODO: INSERT IMAGES OF THE LOG DATA HERE.
-%TODO: INSERT TABLE OF DATABASE OVERHEAD HERE.
+\begin{figure}[ht!]
+\begin{center}
+\includegraphics[width=3in]{images/logPerf.eps}
+\caption{Log encryption performance for data in a single user session that all have the same access policy.}
+\label{fig:logPerf}
+\end{center}
+\end{figure}
 
-Therefore, we experimented with the performance overhead incurred by the log encryption process and corresponding storage 
+\begin{figure}[ht!]
+\begin{center}
+\includegraphics[width=3in]{images/logPerfDiffEvents.eps}
+\caption{Log encryption performance for data in a single user session that all have different same access policies.}
+\label{fig:logPerfDiffEvents}
+\end{center}
+\end{figure}
 
-12K (fresh)
-134K (after 100 log1)
-147K Feb  9 23:48 log.db (log3)
-149K Feb  9 23:49 log.db (log4)
+To measure the storage overhead for the log data we compared the physical size of an empty SQLite database against
+one that contained log data for three different policies, each with different sets of attributes. The results of
+this comparison are shown in Table \ref{tab:storage}. Based on this analysis, we concluded that each log entry contributed
+approximately 1.2Kb of information to the log database, which is largely due to the highly conservative data types in the relational model.
+This overhead could be drastically reduced if the model was adjusted to match the cryptographic primitives used in
+the logging scheme and avoiding the use of BLOB attribute types.
 
-approximately 1.2KB per log entry...
-
-TODO: estimated storage overhead and performance results (grab plots tonight and throw into the report)
+\begin{table}
+\label{tab:storage}
+\caption{Storage overhead for storing the log data}
+  \begin{tabular}{|l|l|}
+    \hline
+    Log Database Contents & Storage Size (Kb) \\ \hline
+    None & 12 \\ 
+    100 log entries - minimal attributes & 134 \\ 
+    100 log entries - medium attributes & 147 \\ 
+    100 log entries - maximum attributes & 149 \\
+    \hline
+  \end{tabular}
+\end{table}
 
 \section{Applications}
 TODO: Electronic Health Record Systems
