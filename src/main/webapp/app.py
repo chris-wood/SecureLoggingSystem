@@ -18,6 +18,8 @@ app.config['BOOTSTRAP_FONTAWESOME'] = True
 #app.config['RECAPTCHA_PUBLIC_KEY'] = '6Lfol9cSAAAAADAkodaYl9wvQCwBMr3qGR_PPHcw'
 
 class User(UserMixin):
+	''' A class for storing the users.
+	'''
 	def __init__(self, name, id, active=True):
 		self.name = name
 		self.id = id
@@ -26,26 +28,23 @@ class User(UserMixin):
 	def is_active(self):
 		return self.active
 
-
 class Anonymous(AnonymousUser):
 	name = u"Anonymous"
 
-
+# Some hard-coded users for testing purposes
 USERS = {
-	1: User(u"Notch", 1),
-	2: User(u"Steve", 2),
-	3: User(u"Creeper", 3, False),
+	1: User(u"Alice", 1),
+	2: User(u"Bob", 2),
+	3: User(u"Chris", 3, False),
 }
-
 USER_NAMES = dict((u.name, u) for u in USERS.itervalues())
 
 SECRET_KEY = "yeah, not actually a secret"
 DEBUG = True
 
+# Create the app and login manager information
 app.config.from_object(__name__)
-
 login_manager = LoginManager()
-
 login_manager.anonymous_user = Anonymous
 login_manager.login_view = "login"
 login_manager.login_message = u"Please log in to access this page."
@@ -81,7 +80,6 @@ def login():
 		else:
 			flash(u"Invalid username.")
 	return render_template("login.html")
-
 
 @app.route("/reauth", methods=["GET", "POST"])
 @login_required
@@ -119,6 +117,11 @@ def api_echo():
 		jsResp = json.dumps({"success": False, "message": "Only HTTP POST commands accepted for /submitLog."})
 		resp = Response(jsResp, status=400, mimetype='application/json')
 		return resp
+
+def startApp():
+	''' Start the app....
+	'''
+	app.run(debug=True)
 
 if '__main__' == __name__:
     app.run(debug=True)

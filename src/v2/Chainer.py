@@ -16,6 +16,7 @@ import hmac
 import json
 import time
 from datetime import datetime
+from timeit import Timer
 
 # Action IDs
 ACTION_ADD = 1
@@ -133,7 +134,7 @@ def addNewEvent(userId, sessionId, message, logInfo):
 
 	# Store the appropriate event information now (handle all three cases as needed)
 	salt = Random.new().read(32) # some random salt... always stored, just in case
-	print("Salt: " + str(salt))
+	#print("Salt: " + str(salt))
 	if (logInfo.object == None and logInfo.affectedUsers == None): # Only event with null object and affectedUsers
 		logShim.insertIntoTable("Event", "(userId, sessionId, action, salt)", (userId, sessionId, logInfo.action, salt), [False, False, False, False])
 	elif (logInfo.object == None): # Only event with object 
@@ -160,7 +161,7 @@ def addNewEvent(userId, sessionId, message, logInfo):
 			logShim.insertIntoTable("AffectedUserGroup", "(eventId, userId)", (eventId, uid), [False, True])
 
 	# Debug
-	print("Inserted the log: " + str((userId, sessionId, message, xi, yi)))
+	#print("Inserted the log: " + str((userId, sessionId, message, xi, yi)))
 
 def processLogEntry(msg):
 	''' This method is responsible for processing a single msg retrieved from the log proxy.
@@ -168,12 +169,12 @@ def processLogEntry(msg):
 	# Parse the host application data
 	entry = LogEntry(jsonString = msg)
 
-	print("requesting policy")
+	#print("requesting policy")
 	policy = manager.ask({'command' : 'policy', 'payload' : msg})
 	key = None
 	iv = None
-	print("Policy for the piece of data: " + str(policy))
-	if not ((entry.userId, entry.sessionId, policy) in policyKeyMap.keys()):
+	#print("Policy for the piece of data: " + str(policy))
+	if not ((entry.userId, entry.sessionId, policy) in policyKeyMap.keys()) or True: # the or True was added to subvert the policy check for experiment purposes
 		iv = Random.new().read(AES.block_size) # we need an IV of 16-bytes, this is also random...
 		key = Random.new().read(32)
 
@@ -240,11 +241,18 @@ def main():
 	print (json.loads(log3))
 	print (json.loads(log4))
 
+	for i in range(0, 100):
+		processLogEntry(log4)
+
 	# Shove the test logs into the log parsing method...
-	processLogEntry(log1)
-	processLogEntry(log3)
-	processLogEntry(log3)
-	processLogEntry(log4)
+	with open("times_diff_events.csv", 'w') as f:
+		for i in range(1, 100):
+			start = time.time()
+			for j in range(0, i):
+				#log = '{"userId": ' + str(j) + ', "sessionId": 1, "action": ' + str(ACTION_MODIFY) + '}'
+				processLogEntry(log1)
+			end = time.time()
+			f.write(str(i) + "," + str((end - start) * 1000) + "\n")
 
 	# Jump into the input-handling loop...
 	print("---------------------------")

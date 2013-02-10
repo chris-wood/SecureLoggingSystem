@@ -38,10 +38,10 @@ class PolicyManager(ThreadingActor):
 		''' Generate the policy for verification data (containing the verify policy and
 			the source user ID).
 		'''
-		print("PolicyManager: generating verification policy in PolicyManager.")
+		#print("PolicyManager: generating verification policy in PolicyManager.")
 		entry = LogEntry.LogEntry(jsonString = payload)
 		conj = '(verifier or ' + str(entry.userId) + ')'
-		print("PolicyManager: the resulting policy is: " + conj)
+		#print("PolicyManager: the resulting policy is: " + conj)
 		return conj
 
 	def generatePolicy(self, payload):
@@ -51,9 +51,9 @@ class PolicyManager(ThreadingActor):
 		entry = LogEntry.LogEntry(jsonString = payload)
 		conj = ''
 		try:
-			print("trying the user database")
+			#print("trying the user database")
 			attrs = self.userAttributes(str(entry.userId))
-			print("Attributes for user " + str(entry.userId) + ": " + str(attrs))
+			#print("Attributes for user " + str(entry.userId) + ": " + str(attrs))
 			conj = '('
 			for i in range(len(attrs) - 1):
 				conj = conj + str(attrs[i]).lower() + ' and '

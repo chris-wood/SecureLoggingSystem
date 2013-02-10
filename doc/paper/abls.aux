@@ -10,34 +10,68 @@
 \citation{Abrams1990-AccessControl}
 \citation{TODOTODO}
 \citation{Goyal2006-ABAC}
+\citation{Ferraiolo2001-RBAC}
 \citation{Sandhu2000-nist-rbac}
+\citation{Schneier1999-Secure}
+\citation{Bellare1997-ForwardIntegrity}
+\citation{Ma2008-FssAgg}
+\citation{Yavuz2009-BAF}
 \@writefile{toc}{\contentsline {section}{\numberline {2}Structured Log Data and Automated Audits}{\thepage }}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.1}Log Construction}{\thepage }}
+\newlabel{sec:LogConstruction}{{2.1}{\thepage }}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.2}Log Generation Rationale}{\thepage }}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.2.1}Verification Modes}{\thepage }}
+\newlabel{log:VerificationModes}{{2.2.1}{\thepage }}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.3}Searchability}{\thepage }}
 \citation{Bethencourt2007-CPABE}
 \citation{Bethencourt2007-CPABE}
 \citation{Junod2010-ABE}
-\citation{Bethencourt2007-CPABE}
-\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces A high-level depiction of the new relational data model that supports automated audit tasks.\relax }}{\thepage }}
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces A visual depiction of the hash chain construction scheme. In this case, the epoch window is $5$ log entries, as shown by the epoch cycle after $5$ consecutive log entries.\relax }}{\thepage }}
 \providecommand*\caption@xref[2]{\@setref\relax\@undefined{#1}}
-\newlabel{fig:design2}{{1}{\thepage }}
-\@writefile{toc}{\contentsline {section}{\numberline {3}Cryptography Preliminaries}{\thepage }}
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.1}Mathematical Foundations}{\thepage }}
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.2}Ciphertext Policy Attribute-Based Encryption}{\thepage }}
-\@writefile{toc}{\contentsline {section}{\numberline {4}Log Access Policies}{\thepage }}
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}Access Policy Definitions}{\thepage }}
+\newlabel{fig:hashChain}{{1}{\thepage }}
+\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces The integrity and performance differences for the three log verification modes supported by the log generation scheme.\relax }}{\thepage }}
+\newlabel{tab:verifModes}{{1}{\thepage }}
+\@writefile{toc}{\contentsline {section}{\numberline {3}Relational Model}{\thepage }}
+\@writefile{toc}{\contentsline {section}{\numberline {4}Log Access Control}{\thepage }}
+\citation{Bethencourt2007-CPABE}
+\@writefile{loa}{\contentsline {algorithm}{\numberline {1}{\ignorespaces Strongest verification procedure\relax }}{\thepage }}
+\newlabel{alg:strongVerify}{{1}{\thepage }}
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces A high-level depiction of the new relational data model that supports automated audit tasks.\relax }}{\thepage }}
+\newlabel{fig:design2}{{2}{\thepage }}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}Mathematical Foundations}{\thepage }}
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces TODO\relax }}{\thepage }}
+\newlabel{fig:deployment}{{3}{\thepage }}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.2}Ciphertext Policy Attribute-Based Encryption}{\thepage }}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.3}Access Policy Definition}{\thepage }}
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Access tree for a policy that only enables access to user XYZ, Medical Group A physician assistants, and Medical Group A nurse practitioners.\relax }}{\thepage }}
+\newlabel{fig:accessTree}{{4}{\thepage }}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.4}Key Generation and Management}{\thepage }}
+\@writefile{loa}{\contentsline {algorithm}{\numberline {2}{\ignorespaces {\tt  RuleE1} policy implementation\relax }}{\thepage }}
+\newlabel{alg:ruleE1}{{2}{\thepage }}
+\@writefile{loa}{\contentsline {algorithm}{\numberline {3}{\ignorespaces {\tt  RuleE2} policy implementation\relax }}{\thepage }}
+\newlabel{alg:ruleE2}{{3}{\thepage }}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.5}Hybrid Key Management}{\thepage }}
+\newlabel{sec:keyMgmt}{{4.5}{\thepage }}
+\citation{Popa2012-CryptDB}
+\citation{akinyelecharm}
+\@writefile{loa}{\contentsline {algorithm}{\numberline {4}{\ignorespaces Log entry encryption\relax }}{\thepage }}
+\newlabel{alg:encrypt}{{4}{\thepage }}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.6}Database Design}{\thepage }}
+\newlabel{sec:databaseDesign}{{4.6}{\thepage }}
+\@writefile{toc}{\contentsline {section}{\numberline {5}Deployment}{\thepage }}
+\newlabel{sec:deployment}{{5}{\thepage }}
+\@writefile{toc}{\contentsline {section}{\numberline {6}Analysis}{\thepage }}
 \bibstyle{abbrv}
 \bibdata{../abls}
 \bibcite{Abrams1990-AccessControl}{1}
 \bibcite{David1992-RBAC}{2}
-\@writefile{loa}{\contentsline {algorithm}{\numberline {1}{\ignorespaces {\tt  RuleE1} policy implementation\relax }}{\thepage }}
-\newlabel{alg:ruleE1}{{1}{\thepage }}
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.2}Key Generation and Management}{\thepage }}
-\@writefile{loa}{\contentsline {algorithm}{\numberline {2}{\ignorespaces {\tt  RuleE2} policy implementation\relax }}{\thepage }}
-\newlabel{alg:ruleE2}{{2}{\thepage }}
-\@writefile{toc}{\contentsline {section}{\numberline {5}Use Case: Electronic Health Record Systems}{\thepage }}
-\@writefile{toc}{\contentsline {section}{\numberline {6}References}{\thepage }}
 \bibcite{Ferraiolo2001-RBAC}{3}
 \bibcite{Goyal2006-ABAC}{4}
 \bibcite{Ma2008-FssAgg}{5}
 \bibcite{Sandhu1996-RBAC}{6}
 \bibcite{Schneier1999-Secure}{7}
 \bibcite{Yavuz2009-BAF}{8}
+\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces A high-level depiction of the deployment for an ABLS instance, where each box represents a unique runtime environment (i.e. a unique server).\relax }}{\thepage }}
+\newlabel{fig:deployment}{{5}{\thepage }}
+\@writefile{toc}{\contentsline {section}{\numberline {7}Applications}{\thepage }}
+\@writefile{toc}{\contentsline {section}{\numberline {8}References}{\thepage }}
