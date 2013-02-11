@@ -23,7 +23,7 @@ from DBShim import DBShim
 def bootstrap():
 	''' Bootstrap the database from the database with some dummy data.
 	'''
-	keyMgr = KeyManager()
+	keyMgr = KeyManager(".")
 	# Wipe the data if we're in debug mode
 	print("Debug: Clearing the log database")
 

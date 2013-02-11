@@ -48,8 +48,8 @@ class LogProxy(threading.Thread):
 
 		# Set up the socket configuration parameters
 		self.context = SSL.Context(SSL.SSLv23_METHOD)
-		self.context.use_privatekey_file('./Keys/key') # our private key
-		self.context.use_certificate_file('./Keys/cert') # our self-signed certificate
+		self.context.use_privatekey_file('./core/Keys/key') # our private key
+		self.context.use_certificate_file('./core/Keys/cert') # our self-signed certificate
 
 	def run(self):
 		''' Run the log proxy and listen for incoming connections.

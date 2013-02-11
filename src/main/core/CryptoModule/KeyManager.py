@@ -15,21 +15,21 @@ class KeyManager:
 	the various EncryptionModule.
 	'''
 
-	def __init__(self):
+	def __init__(self, prepend = "core"):
 		''' Create the initial master key and then the list to hold the ciphers for encryption.
 		'''
 		self.groupObj = PairingGroup('SS512')
-		if (os.path.isfile('CryptoModule/pubkey.pkl') and os.path.isfile('CryptoModule/masterkey.pkl')):
+		if (os.path.isfile(prepend + '/CryptoModule/pubkey.pkl') and os.path.isfile(prepend + '/CryptoModule/masterkey.pkl')):
 			print("Loading the master and public key from the file")
-			self.public = bytesToObject(pickle.load(open('CryptoModule/pubkey.pkl', 'rb')), self.groupObj)
-			self.master = bytesToObject(pickle.load(open('CryptoModule/masterkey.pkl', 'rb')), self.groupObj)
+			self.public = bytesToObject(pickle.load(open(prepend + '/CryptoModule/pubkey.pkl', 'rb')), self.groupObj)
+			self.master = bytesToObject(pickle.load(open(prepend + '/CryptoModule/masterkey.pkl', 'rb')), self.groupObj)
 		else:
 			self.cpabe = CPabe_BSW07(self.groupObj)
 			(self.public, self.master) = self.cpabe.setup()
 
 			# Persist the keys
-			outputPublic = open('CryptoModule/pubkey.pkl', 'wb')
-			outputMaster = open('CryptoModule/masterkey.pkl', 'wb')
+			outputPublic = open(prepend + '/CryptoModule/pubkey.pkl', 'wb')
+			outputMaster = open(prepend + '/CryptoModule/masterkey.pkl', 'wb')
 			pickle.dump(objectToBytes(self.public, self.groupObj), outputPublic)
 			pickle.dump(objectToBytes(self.master, self.groupObj), outputMaster)
 			outputPublic.close()

@@ -1,9 +1,9 @@
 '''
-File: Main.py
+File: ABLSMain.py
 Author: Christopher Wood, caw4567@rit.edu
 Usage:
 
-	python Main.py [-l] [-a] [-v]
+	python ABLSMain.py [-l] [-a] [-v]
 
 '''
 
@@ -25,6 +25,13 @@ sys.path.append("./Common")
 sys.path.append("./DatabaseModule")
 sys.path.append("./VerifyModule")
 sys.path.append("./CryptoModule")
+sys.path.append("./core/LoggerModule/")
+sys.path.append("./core/PolicyEngineModule/")
+sys.path.append("./core/AuditModule/")
+sys.path.append("./core/Common")
+sys.path.append("./core/DatabaseModule")
+sys.path.append("./core/VerifyModule")
+sys.path.append("./core/CryptoModule")
 from LogProxy import LogProxy
 from LogCollector import LogCollector
 from VerifyCrawler import VerifyCrawler
@@ -38,6 +45,7 @@ channel = connection.channel()
 channel.queue_declare(queue='log') # Ensure the log queue is there
 channel.queue_declare(queue='audit') # Ensure the audit queue is there
 
+# Set up temporary rabbit queue callbacks
 def logCallback(ch, method, properties, body):
     print " [x] Received %r" % (body,)
 
@@ -101,7 +109,7 @@ def loadConfig(configFile = "abls.conf"):
 			params["AUDIT_USER_DB"] = parts[1].rstrip().strip()
 	return params
 
-def start(startAudit = True, startLog = True, startVerify = True):
+def startABLS(startAll = False):
 	''' The main entry point into the logging system that initializes everything
 	needed to be active at runtime.
 	'''	
@@ -123,7 +131,7 @@ def start(startAudit = True, startLog = True, startVerify = True):
 	params = loadConfig()
 
 	# See if they even started anything
-	if (audit == log == verify == False):
+	if (audit == log == verify == False and not startAll):
 		printUsage()
 		sys.exit(0)
 
@@ -131,14 +139,14 @@ def start(startAudit = True, startLog = True, startVerify = True):
 	keyMgr = KeyManager()
 
 	# Start whatever services are specified by the user...
-	if (log or startLog):
+	if (log or startAll):
 		print("Starting the log service on port " + str(params["LOG_PORT"]))
 		collector = LogCollector(params, keyMgr)
 		logProxy = LogProxy(params, keyMgr, collector).start()	
-	if (audit or startAudit):
+	if (audit or startAll):
 		print("Starting the audit service on port " + str(params["AUDIT_PORT"]))
 		auditProxy = AuditProxy(params, keyMgr).start()
-	if (verify or startVerify):
+	if (verify or startAll):
 		print("Starting the verify service")
 		verifier = VerifyCrawler(1, params["LOG_DB"], params["KEY_DB"], keyMgr).start()
 
@@ -159,4 +167,4 @@ def start(startAudit = True, startLog = True, startVerify = True):
 	'''
 
 if (__name__ == '__main__'):
-	start(False, False, False)
+	startABLS(False, False, False)
