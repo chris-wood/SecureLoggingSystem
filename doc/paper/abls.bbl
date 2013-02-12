@@ -1,5 +1,13 @@
 \begin{thebibliography}{10}
 
+\bibitem{flask}
+Flask.
+\newblock http://flask.pocoo.org/ - Accessed: 2/9/13.
+
+\bibitem{rabbitmq}
+{RabbitMQ}.
+\newblock http://www.rabbitmq.com/ - Accessed: 2/9/13.
+
 \bibitem{Abrams1990-AccessControl}
 M.~Abrams, K.~Eggers, L.~LaPadula, and I.~Olson.
 \newblock A generalized framework for access control: An informal description.
@@ -15,6 +23,11 @@ H.~Alipour, M.~Sabbari, and E.~Nazemi.
 \newblock A policy based access control model for web services.
 \newblock In {\em Internet Technology and Secured Transactions (ICITST), 2011
   International Conference for}, pages 472--477. IEEE, 2011.
+
+\bibitem{anderson2005comparison}
+A.~Anderson.
+\newblock A comparison of two privacy policy languages: Epal and xacml.
+\newblock 2005.
 
 \bibitem{annas2003hipaa}
 G.~Annas.
@@ -64,6 +77,12 @@ P.~Junod and A.~Karlov.
   allowing arbitrary access policies.
 \newblock In {\em Proceedings of the tenth annual ACM workshop on Digital
   rights management}, DRM '10, pages 13--24, New York, NY, USA, 2010. ACM.
+
+\bibitem{king2012modifying}
+J.~King, B.~Smith, and L.~Williams.
+\newblock Modifying without a trace: General audit guidelines are inadequate
+  for electronic health record audit mechanisms.
+\newblock {\em Proceedings of ACM IHI}, 2012, 2012.
 
 \bibitem{Ma2008-FssAgg}
 D.~Ma.

@@ -14,6 +14,7 @@ import logging # Python logging module
 import pickle
 from datetime import datetime
 import logging
+import pika
 
 # Add in the files from the other modules
 sys.path.append("../PolicyEngineModule/")
@@ -70,6 +71,14 @@ class Logger(threading.Thread):
 		# Create the log queue
 		self.queue = Queue.Queue()
 
+		# Create the RabbitMQ connection
+		self.connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
+		self.channel = self.connection.channel()
+		self.channel.queue_declare(queue='log') # Ensure the log queue is there
+		self.channel.basic_consume(self.logCallback,
+             	        	queue='log',
+                	     	no_ack=True)
+
 		# Set up the Python logger
 		logFile = 'abls.log'
 		logging.basicConfig(filename=logFile,level=logging.DEBUG)
@@ -114,6 +123,12 @@ class Logger(threading.Thread):
 		self.epochKey = None
 		self.entityKey = None
 		self.policyKeyMap = None
+
+	def logCallback(ch, method, properties, body):
+		''' Rabbit message queue callback.
+		'''
+		self.processLogEntry(body)
+    	#print " [x] Received %r" % (body,)
 
 	def run(self):
 		''' Empty the queue into the log as fast as possible. We are the bottleneck. >.<

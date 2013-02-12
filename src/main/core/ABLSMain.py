@@ -32,33 +32,13 @@ sys.path.append("./core/Common")
 sys.path.append("./core/DatabaseModule")
 sys.path.append("./core/VerifyModule")
 sys.path.append("./core/CryptoModule")
+from Logger import Logger
 from LogProxy import LogProxy
 from LogCollector import LogCollector
 from VerifyCrawler import VerifyCrawler
 from KeyManager import KeyManager
 from AuditProxy import AuditProxy
 import DBShim
-
-# Create the RabbitMQ connection
-connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
-channel = connection.channel()
-channel.queue_declare(queue='log') # Ensure the log queue is there
-channel.queue_declare(queue='audit') # Ensure the audit queue is there
-
-# Set up temporary rabbit queue callbacks
-def logCallback(ch, method, properties, body):
-    print " [x] Received %r" % (body,)
-
-def auditCallback(ch, method, properties, body):
-    print " [x] Received %r" % (body,)
-
-channel.basic_consume(logCallback,
-                      queue='log',
-                      no_ack=True)
-
-channel.basic_consume(auditCallback,
-                      queue='audit',
-                      no_ack=True)
 
 def help():
 	''' Display the available commands to the user.
@@ -142,11 +122,13 @@ def startABLS(startAll = False):
 	if (log or startAll):
 		print("Starting the log service on port " + str(params["LOG_PORT"]))
 		collector = LogCollector(params, keyMgr)
-		logProxy = LogProxy(params, keyMgr, collector).start()	
-	if (audit or startAll):
+		logger = Logger(params, keyMgr, collector).start()
+		print("Starting the log proxy")
+		logProxy = LogProxy(params, keyMgr, collector).start()
+	if (audit):
 		print("Starting the audit service on port " + str(params["AUDIT_PORT"]))
 		auditProxy = AuditProxy(params, keyMgr).start()
-	if (verify or startAll):
+	if (verify):
 		print("Starting the verify service")
 		verifier = VerifyCrawler(1, params["LOG_DB"], params["KEY_DB"], keyMgr).start()
 

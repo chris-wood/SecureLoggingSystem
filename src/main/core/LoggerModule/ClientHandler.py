@@ -9,7 +9,7 @@ import threading
 import struct
 import string
 import Queue
-from Logger import Logger
+import pika
 
 # The Python logging module
 import logging
@@ -36,9 +36,14 @@ class ClientHandler(threading.Thread):
 		logging.basicConfig(filename=logFile,level=logging.DEBUG)
 
 		# Set the properties for this session (forward along the key manager)
-		self.logger = Logger(self.params, keyMgr, collector)
-		self.queue = self.logger.getQueue()
-		self.logger.start()
+		#self.logger = Logger(self.params, keyMgr, collector)
+		#self.queue = self.logger.getQueue()
+		#self.logger.start()
+
+		# Create the RabbitMQ broker and then open up a channel to it
+		self.connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
+		self.channel = self.connection.channel()
+		self.channel.queue_declare(queue='log')
 
 	def run(self):
 		''' The main loop for this cliet handler thread. Simply strip messages
@@ -64,4 +69,7 @@ class ClientHandler(threading.Thread):
 		''' Handle a client message.
 		'''
 		logging.debug("client message: " + str(message))
-		self.queue.put(message)
+		self.channel.basic_publish(exchange='',
+                     	routing_key='log',
+                      	body=message)
+		#self.queue.put(message)

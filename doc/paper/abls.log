@@ -1,8 +1,9 @@
-This is pdfTeX, Version 3.1415926-2.4-1.40.13 (TeX Live 2012) (format=pdflatex 2012.6.30)  10 FEB 2013 18:10
+This is pdfTeX, Version 3.1415926-2.4-1.40.13 (TeX Live 2012) (format=pdflatex 2012.6.30)  11 FEB 2013 20:20
 entering extended mode
- restricted \write18 enabled.
+ \write18 enabled.
+ file:line:error style messages enabled.
  %&-line parsing enabled.
-**abls
+**abls.tex
 (./abls.tex
 LaTeX2e <2011/06/27>
 Babel <v3.8m> and hyphenation patterns for english, dumylang, nohyphenation, ge
@@ -584,32 +585,37 @@ LaTeX Font Info:    Try loading font information for T1+pcr on input line 45.
 (/usr/local/texlive/2012/texmf-dist/tex/latex/psnfss/t1pcr.fd
 File: t1pcr.fd 2001/06/04 font definitions for T1/pcr.
 )
-Overfull \hbox (6.83115pt too wide) in paragraph at lines 47--56
+Overfull \hbox (6.83115pt too wide) in paragraph at lines 47--58
 \T1/ppl/m/n/9 User-based non-repudiation is an in-creas-ingly im-por-tant prop-
 
  []
 
 
-Overfull \hbox (2.96083pt too wide) in paragraph at lines 57--64
-\T1/ppl/m/n/9 the prob-lem of in-creas-ing en-cryp-tion com-pu-ta-tional com-pl
-ex-
+Overfull \hbox (13.36507pt too wide) in paragraph at lines 59--66
+\T1/ppl/m/n/9 ex-plo-sion. The in-tegrity of log data is guar-an-teed us-ing fo
+rward-
  []
 
 
-Overfull \hbox (4.70671pt too wide) in paragraph at lines 66--74
-\T1/ppl/m/n/9 to in-di-vid-ual users (or en-ti-ties) that trig-ger such ac-tion
-s. Cryp-
+Overfull \hbox (12.82501pt too wide) in paragraph at lines 77--85
+\T1/ppl/m/n/9 repudiation pur-poses, it is of-ten nec-es-sary to place some amo
+unt
  []
 
 
-Overfull \hbox (4.86015pt too wide) in paragraph at lines 84--93
-\T1/ppl/m/n/9 tion and sig-na-ture tech-niques [12]. Symmetric-key and public-
+Overfull \hbox (4.86015pt too wide) in paragraph at lines 86--96
+\T1/ppl/m/n/9 tion and sig-na-ture tech-niques [16]. Symmetric-key and public-
  []
 
 
-Overfull \hbox (3.86081pt too wide) in paragraph at lines 84--93
-\T1/ppl/m/n/9 mon con-fi-den-tial-ity tech-niques pro-posed in the lit-er-a-tur
-e. Un-
+Overfull \hbox (1.85362pt too wide) in paragraph at lines 86--96
+\T1/ppl/m/n/9 ity tech-niques pro-posed in the lit-er-a-ture. Un-for-tu-nately,
+ these
+ []
+
+
+Overfull \hbox (4.7253pt too wide) in paragraph at lines 86--96
+\T1/ppl/m/n/9 sub-set of the log database should be avoided. Both symmetric-
  []
 
 
@@ -619,98 +625,115 @@ Underfull \vbox (badness 10000) has occurred while \output is active []
 
 
 ]
-Overfull \hbox (3.47398pt too wide) in paragraph at lines 114--124
+Overfull \hbox (3.47398pt too wide) in paragraph at lines 117--127
 \T1/ppl/m/n/9 ments for cloud-based ap-pli-ca-tions. Fur-ther-more, the se-lect
 ed
  []
 
 
-Overfull \hbox (1.98969pt too wide) in paragraph at lines 114--124
-\T1/ppl/m/n/9 the Na-tional In-sti-tute of Stan-dards and Tech-nol-ogy in 2001[
-9],
- []
+Overfull \hbox (4.58945pt too wide) in paragraph at lines 137--147
+\T1/ppl/m/n/9 forced us-ing ciphertext-policy attribute-based en-cryp-tion (CP-
 
-
-Overfull \hbox (2.96083pt too wide) in paragraph at lines 133--139
-\T1/ppl/m/n/9 the prob-lem of in-creas-ing en-cryp-tion com-pu-ta-tional com-pl
-ex-
- []
-
-
-Overfull \hbox (1.39552pt too wide) in paragraph at lines 140--145
-[]\T1/ppl/m/n/9 The pa-per is or-ga-nized in a top-down fash-ion, start-ing wit
-h
  []
 
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
-LaTeX Font Info:    Font shape `T1/ppl/bx/n' in size <9> not available
-(Font)              Font shape `T1/ppl/b/n' tried instead on input line 160.
 
-Overfull \hbox (5.05786pt too wide) in paragraph at lines 180--187
+Overfull \hbox (3.7176pt too wide) in paragraph at lines 155--160
+\T1/ppl/m/n/9 which guar-an-tees that log data can-not be forged or re-ar-range
+d
+ []
+
+
+Overfull \hbox (2.58374pt too wide) in paragraph at lines 155--160
+\T1/ppl/m/n/9 ter a ma-chine has been com-pro-mised (hence, forward-secure). 
+ []
+
+LaTeX Font Info:    Font shape `T1/ppl/bx/n' in size <9> not available
+(Font)              Font shape `T1/ppl/b/n' tried instead on input line 169.
+
+Overfull \hbox (4.85153pt too wide) in paragraph at lines 172--175
+\T1/ppl/m/n/9 mes-sages, this at-tack is im-me-di-ately de-tected. Of course,
+ []
+
+
+Overfull \hbox (5.05882pt too wide) in paragraph at lines 172--175
+\T1/ppl/m/n/9 sig-nif-i-cant dam-age and log data mod-i-fi-ca-tion could have
+ []
+
+
+Overfull \hbox (5.05786pt too wide) in paragraph at lines 189--196
 []\T1/ppl/m/n/9 Log file re-li-a-bil-ity, which re-duces to log in-tegrity, is 
 achieved
  []
 
 
-Overfull \hbox (5.43651pt too wide) in paragraph at lines 180--187
-\T1/ppl/m/n/9 through hash chains and message-authentication codes, which
+Overfull \hbox (12.43854pt too wide) in paragraph at lines 189--196
+\T1/ppl/m/n/9 through hash chains and message-authentication codes (MACs),
  []
 
 [2]
-Overfull \hbox (6.52515pt too wide) in paragraph at lines 238--246
+Overfull \hbox (6.52515pt too wide) in paragraph at lines 253--258
 \T1/ppl/m/n/9 dif-fer-ent in-tegrity and per-for-mance guar-an-tees. The first 
 mode
  []
 
-
-Overfull \hbox (4.66577pt too wide) in paragraph at lines 279--279
-[]\secfnt Ciphertext Pol-icy Attribute-Based En-cryp-
- []
-
-<images/cpabePolicy.pdf, id=24, 491.8375pt x 487.8225pt>
+<images/cpabePolicy.pdf, id=23, 491.8375pt x 487.8225pt>
 File: images/cpabePolicy.pdf Graphic file (type pdf)
 
 <use images/cpabePolicy.pdf>
-Package pdftex.def Info: images/cpabePolicy.pdf used on input line 300.
+Package pdftex.def Info: images/cpabePolicy.pdf used on input line 318.
 (pdftex.def)             Requested size: 108.405pt x 107.5148pt.
-
-Overfull \hbox (3.81633pt too wide) in paragraph at lines 306--314
+ [3]
+Overfull \hbox (3.81633pt too wide) in paragraph at lines 329--340
 \T1/ppl/m/n/9 and the ac-cess poli-cies for all data as-so-ci-ated with such ev
 ents,
  []
 
 
-Overfull \hbox (14.81396pt too wide) in paragraph at lines 306--314
+Overfull \hbox (14.81396pt too wide) in paragraph at lines 329--340
 \T1/ppl/m/n/9 gen-er-at-ing ac-cess poli-cies is de-pen-dent on administrator-d
 efined
  []
 
-[3 <./images/cpabePolicy.pdf>]
-Overfull \hbox (15.04794pt too wide) in paragraph at lines 406--413
-\T1/ppl/m/n/9 Sim-ply mod-i-fy-ing the user's re-la-tion-ships in the sys-tem d
-atabase
+
+Overfull \hbox (7.71355pt too wide) in paragraph at lines 342--351
+\T1/ppl/m/n/9 needed to en-crypt a log mes-sage is as-so-ci-ated with a randoml
+y-
  []
 
 
-Overfull \hbox (2.31314pt too wide) in paragraph at lines 443--444
-[]\T1/ppl/m/n/9 LAudit, a sim-ple context-free gram-mar that is built on these
+Overfull \hbox (8.74754pt too wide) in paragraph at lines 342--351
+\T1/ppl/m/n/9 through-put with-out sac-ri-fic-ing the level of con-fi-den-tial-
+ity gran-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 443--444
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+
+Underfull \vbox (badness 6910) has occurred while \output is active []
+
+ [4 <./images/cpabePolicy.pdf>]
+Underfull \hbox (badness 10000) in paragraph at lines 426--427
 
  []
 
-[4]
-Overfull \hbox (5.1661pt too wide) in paragraph at lines 484--489
+
+Overfull \hbox (2.58318pt too wide) in paragraph at lines 462--467
+\T1/ppl/m/n/9 store user in-for-ma-tion and pol-icy rules for ABLS, re-spec-tiv
+ely. 
+ []
+
+
+Overfull \hbox (5.1661pt too wide) in paragraph at lines 468--473
 \T1/ppl/m/n/9 spond-ing ver-i-fi-ca-tion and en-cryp-tion keys in the key datab
 ase,
  []
 
 
-Overfull \hbox (3.05093pt too wide) in paragraph at lines 484--489
+Overfull \hbox (3.05093pt too wide) in paragraph at lines 468--473
 \T1/ppl/m/n/9 tion in plain-text may lead to a pri-vacy vi-o-la-tion if the dat
 abase
  []
@@ -719,24 +742,29 @@ abase
 File: images/logSchema.png Graphic file (type png)
 
 <use images/logSchema.png>
-Package pdftex.def Info: images/logSchema.png used on input line 512.
+Package pdftex.def Info: images/logSchema.png used on input line 496.
 (pdftex.def)             Requested size: 361.34999pt x 184.75337pt.
 
-Overfull \hbox (2.07896pt too wide) in paragraph at lines 520--522
+Overfull \hbox (2.07896pt too wide) in paragraph at lines 504--511
 []\T1/ppl/m/n/9 ABLS is de-signed to be a cen-tral-ized log-ging sys-tem backed
 
  []
 
-<images/deployment.pdf, id=45, 822.07124pt x 877.2775pt>
+[5] <images/deployment.pdf, id=48, 822.07124pt x 877.2775pt>
 File: images/deployment.pdf Graphic file (type pdf)
 
 <use images/deployment.pdf>
-Package pdftex.def Info: images/deployment.pdf used on input line 525.
+Package pdftex.def Info: images/deployment.pdf used on input line 514.
 (pdftex.def)             Requested size: 361.34999pt x 385.6151pt.
 
-Overfull \hbox (3.0241pt too wide) in paragraph at lines 539--546
-\T1/ppl/m/n/9 chi-tec-ture was its scal-able per-for-mance while pro-cess-ing l
-arge
+Overfull \hbox (4.06825pt too wide) in paragraph at lines 528--539
+\T1/ppl/m/n/9 ac-cess poli-cies, as well as the en-cryp-tion over-head from eve
+nts
+ []
+
+
+Overfull \hbox (1.44905pt too wide) in paragraph at lines 528--539
+\T1/ppl/m/n/9 newly-generated en-cryp-tion key. There-fore, we con-clude that
  []
 
 Package epstopdf Info: Source file: <images/logPerf.eps>
@@ -745,16 +773,16 @@ Package epstopdf Info: Source file: <images/logPerf.eps>
 (epstopdf)             Output file: <images/logPerf-eps-converted-to.pdf>
 (epstopdf)                    date: 2013-02-10 17:27:01
 (epstopdf)                    size: 8630 bytes
-(epstopdf)             Command: <repstopdf --outfile=images/logPerf-eps-convert
-ed-to.pdf images/logPerf.eps>
-(epstopdf)             \includegraphics on input line 549.
+(epstopdf)             Command: <epstopdf --outfile=images/logPerf-eps-converte
+d-to.pdf images/logPerf.eps>
+(epstopdf)             \includegraphics on input line 542.
 Package epstopdf Info: Output file is already uptodate.
-<images/logPerf-eps-converted-to.pdf, id=46, 494.84875pt x 404.51125pt>
+<images/logPerf-eps-converted-to.pdf, id=49, 494.84875pt x 404.51125pt>
 File: images/logPerf-eps-converted-to.pdf Graphic file (type pdf)
 
 <use images/logPerf-eps-converted-to.pdf>
 Package pdftex.def Info: images/logPerf-eps-converted-to.pdf used on input line
- 549.
+ 542.
 (pdftex.def)             Requested size: 216.81pt x 177.22629pt.
 Package epstopdf Info: Source file: <images/logPerfDiffEvents.eps>
 (epstopdf)                    date: 2013-02-10 00:29:39
@@ -763,103 +791,144 @@ Package epstopdf Info: Source file: <images/logPerfDiffEvents.eps>
 pdf>
 (epstopdf)                    date: 2013-02-10 17:27:02
 (epstopdf)                    size: 8582 bytes
-(epstopdf)             Command: <repstopdf --outfile=images/logPerfDiffEvents-e
-ps-converted-to.pdf images/logPerfDiffEvents.eps>
-(epstopdf)             \includegraphics on input line 557.
+(epstopdf)             Command: <epstopdf --outfile=images/logPerfDiffEvents-ep
+s-converted-to.pdf images/logPerfDiffEvents.eps>
+(epstopdf)             \includegraphics on input line 550.
 Package epstopdf Info: Output file is already uptodate.
 
-<images/logPerfDiffEvents-eps-converted-to.pdf, id=47, 508.90125pt x 404.51125p
+<images/logPerfDiffEvents-eps-converted-to.pdf, id=50, 508.90125pt x 404.51125p
 t>
 File: images/logPerfDiffEvents-eps-converted-to.pdf Graphic file (type pdf)
  <use images/logPerfDiffEvents-eps-converted-to.pdf>
 Package pdftex.def Info: images/logPerfDiffEvents-eps-converted-to.pdf used on 
-input line 557.
+input line 550.
 (pdftex.def)             Requested size: 216.81pt x 172.3378pt.
 
-
-Package caption Warning: \label without proper \caption on input line 571.
-See the caption package documentation for explanation.
-
-
-LaTeX Warning: Reference `tab:storage' on page \thepage  undefined on input lin
-e 565.
-
-[5]
-
-LaTeX Warning: Text page \thepage  contains only floats.
-
-
-Overfull \vbox (2.76843pt too high) has occurred while \output is active []
-
-
-
-LaTeX Warning: Text page \thepage  contains only floats.
-
-
-Overfull \vbox (2.76843pt too high) has occurred while \output is active []
-
-
-[6 <./images/logSchema.png> <./images/deployment.pdf>]
-Overfull \hbox (6.6517pt too wide) in paragraph at lines 585--592
+Overfull \hbox (6.6517pt too wide) in paragraph at lines 578--583
 \T1/ppl/m/n/9 main, where or-ga-ni-za-tions are re-quired to com-ply with HIPAA
 
  []
 
-
-Overfull \hbox (6.77695pt too wide) in paragraph at lines 585--592
-\T1/ppl/m/n/9 ment that is needed to sup-port these com-pli-ance ef-forts. Ther
-e-
+[6 <./images/logSchema.png> <./images/logPerf-eps-converted-to.pdf>]
+Overfull \hbox (3.41139pt too wide) in paragraph at lines 584--591
+[]\T1/ppl/m/n/9 In such an en-vi-ron-ment, health-care web ap-pli-ca-tions woul
+d
  []
 
 
-Overfull \hbox (1.21498pt too wide) in paragraph at lines 585--592
-\T1/ppl/m/n/9 help se-curely col-lect and per-sist rel-e-vant log in-for-ma-tio
-n, and
+Overfull \hbox (14.70651pt too wide) in paragraph at lines 584--591
+\T1/ppl/m/n/9 could be au-then-ti-cated us-ing a stan-dard password-based schem
+e
  []
 
-(./abls.bbl [7 <./images/logPerf-eps-converted-to.pdf> <./images/logPerfDiffEve
-nts-eps-converted-to.pdf>]
+
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
-)
+ [7 <./images/deployment.pdf>]
+Overfull \hbox (1.512pt too wide) in paragraph at lines 603--606
+\T1/ppl/m/n/9 the ad-min-is-tra-tor is only re-spon-si-ble for up-dat-ing ac-ce
+ss poli-
+ []
 
-Package balance Warning: You have called \balance in second column
-(balance)                Columns might not be balanced.
 
-[8] (./abls.aux)
+Overfull \hbox (7.89412pt too wide) in paragraph at lines 615--615
+[]\secfnt [ABLS-Main] Web Ap-pli-ca-tion Front-End 
+ []
 
-LaTeX Warning: There were undefined references.
 
- ) 
+Underfull \hbox (badness 10000) in paragraph at lines 630--634
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 635--637
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 638--641
+
+ []
+
+<images/logProtocol.pdf, id=77, 397.485pt x 331.2375pt>
+File: images/logProtocol.pdf Graphic file (type pdf)
+
+<use images/logProtocol.pdf>
+Package pdftex.def Info: images/logProtocol.pdf used on input line 655.
+(pdftex.def)             Requested size: 216.81pt x 180.68005pt.
+ [8 <./images/logPerfDiffEvents-eps-converted-to.pdf> <./images/logProtocol.pdf
+>]
+Overfull \hbox (7.58138pt too wide) in paragraph at lines 701--701
+[]\secfnt [ABLS-V1/V2/Main] ABLS Con-fig-u-ra-tion
+ []
+
+
+Overfull \hbox (26.40654pt too wide) in paragraph at lines 702--706
+\T1/ppl/m/n/9 and net-work set-tings are placed in a con-fig-u-ra-tion file (\T
+1/pcr/m/n/9 abls.conf\T1/ppl/m/n/9 )
+ []
+
+
+Overfull \hbox (4.60796pt too wide) in paragraph at lines 746--751
+[]\T1/ppl/m/n/9 The cur-rent im-ple-men-ta-tion sup-ports the new log and event
+
+ []
+
+[9]
+Overfull \hbox (11.61906pt too wide) in paragraph at lines 772--777
+[]\T1/ppl/m/n/9 Finally, we learned that sup-port-ing au-to-mated au-dits throu
+gh
+ []
+
+
+Overfull \hbox (5.00378pt too wide) in paragraph at lines 779--786
+[]\T1/ppl/m/n/9 While the cur-rent ABLS de-sign pro-vides ef-fi-cient au-to-mat
+ed
+ []
+
+
+Overfull \hbox (5.66988pt too wide) in paragraph at lines 787--790
+\T1/ppl/m/n/9 line server de-pen-dence for log ver-i-fi-ca-tion and tem-po-ral 
+(time-
+ []
+
+
+Overfull \hbox (1.57527pt too wide) in paragraph at lines 796--802
+\T1/ppl/m/n/9 map to the un-der-ly-ing sys-tem ar-chi-tec-ture and re-la-tional
+ data
+ []
+
+(./abls.bbl [10]) [11] (./abls.aux) ) 
 Here is how much of TeX's memory you used:
- 7649 strings out of 493488
- 111183 string characters out of 3141326
- 196913 words of memory out of 3000000
- 10774 multiletter control sequences out of 15000+200000
+ 7665 strings out of 493488
+ 111471 string characters out of 3141326
+ 198923 words of memory out of 3000000
+ 10789 multiletter control sequences out of 15000+200000
  48046 words of font info for 63 fonts, out of 3000000 for 9000
  957 hyphenation exceptions out of 8191
- 44i,12n,42p,441b,839s stack positions out of 5000i,500n,10000p,200000b,50000s
-{/usr/local/texlive/2012/texmf-dist/fonts/enc/dvips/base/8r.enc}</usr/local/t
-exlive/2012/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi5.pfb></usr/local/tex
-live/2012/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi6.pfb></usr/local/texli
-ve/2012/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi9.pfb></usr/local/texlive
-/2012/texmf-dist/fonts/type1/public/amsfonts/cm/cmr5.pfb></usr/local/texlive/20
-12/texmf-dist/fonts/type1/public/amsfonts/cm/cmr6.pfb></usr/local/texlive/2012/
-texmf-dist/fonts/type1/public/amsfonts/cm/cmr9.pfb></usr/local/texlive/2012/tex
-mf-dist/fonts/type1/public/amsfonts/cm/cmsy6.pfb></usr/local/texlive/2012/texmf
--dist/fonts/type1/public/amsfonts/cm/cmsy9.pfb></usr/local/texlive/2012/texmf-d
-ist/fonts/type1/public/amsfonts/symbols/msbm10.pfb></usr/local/texlive/2012/tex
-mf-dist/fonts/type1/urw/courier/ucrr8a.pfb></usr/local/texlive/2012/texmf-dist/
-fonts/type1/urw/helvetic/uhvb8a.pfb></usr/local/texlive/2012/texmf-dist/fonts/t
-ype1/urw/helvetic/uhvr8a.pfb></usr/local/texlive/2012/texmf-dist/fonts/type1/ur
-w/palatino/uplb8a.pfb></usr/local/texlive/2012/texmf-dist/fonts/type1/urw/palat
-ino/uplr8a.pfb></usr/local/texlive/2012/texmf-dist/fonts/type1/urw/palatino/upl
-ri8a.pfb></usr/local/texlive/2012/texmf-dist/fonts/type1/urw/times/utmb8a.pfb><
-/usr/local/texlive/2012/texmf-dist/fonts/type1/urw/times/utmr8a.pfb>
-Output written on abls.pdf (8 pages, 318191 bytes).
+ 44i,12n,42p,498b,1294s stack positions out of 5000i,500n,10000p,200000b,50000s
+{/usr/local/texlive/2012/texmf-dist/fonts/
+enc/dvips/base/8r.enc}</usr/local/texlive/2012/texmf-dist/fonts/type1/public/am
+sfonts/cm/cmmi5.pfb></usr/local/texlive/2012/texmf-dist/fonts/type1/public/amsf
+onts/cm/cmmi6.pfb></usr/local/texlive/2012/texmf-dist/fonts/type1/public/amsfon
+ts/cm/cmmi9.pfb></usr/local/texlive/2012/texmf-dist/fonts/type1/public/amsfonts
+/cm/cmr5.pfb></usr/local/texlive/2012/texmf-dist/fonts/type1/public/amsfonts/cm
+/cmr6.pfb></usr/local/texlive/2012/texmf-dist/fonts/type1/public/amsfonts/cm/cm
+r9.pfb></usr/local/texlive/2012/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy6
+.pfb></usr/local/texlive/2012/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy9.p
+fb></usr/local/texlive/2012/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm
+10.pfb></usr/local/texlive/2012/texmf-dist/fonts/type1/urw/courier/ucrr8a.pfb><
+/usr/local/texlive/2012/texmf-dist/fonts/type1/urw/helvetic/uhvb8a.pfb></usr/lo
+cal/texlive/2012/texmf-dist/fonts/type1/urw/helvetic/uhvr8a.pfb></usr/local/tex
+live/2012/texmf-dist/fonts/type1/urw/palatino/uplb8a.pfb></usr/local/texlive/20
+12/texmf-dist/fonts/type1/urw/palatino/uplr8a.pfb></usr/local/texlive/2012/texm
+f-dist/fonts/type1/urw/palatino/uplri8a.pfb></usr/local/texlive/2012/texmf-dist
+/fonts/type1/urw/times/utmb8a.pfb></usr/local/texlive/2012/texmf-dist/fonts/typ
+e1/urw/times/utmr8a.pfb>
+Output written on abls.pdf (11 pages, 360070 bytes).
 PDF statistics:
- 141 PDF objects out of 1000 (max. 8388607)
- 100 compressed objects within 1 object stream
+ 163 PDF objects out of 1000 (max. 8388607)
+ 115 compressed objects within 2 object streams
  0 named destinations out of 1000 (max. 500000)
- 26 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 31 words of extra memory for PDF output out of 10000 (max. 10000000)
 
